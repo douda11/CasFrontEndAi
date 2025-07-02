@@ -1,0 +1,659 @@
+<form [formGroup]="projectForm" (ngSubmit)="onSubmit()">
+  <!-- ———————————————————————————————————————————————————————— -->
+  <!-- 1) Champs “NE PAS AFFICHER” (hidden inputs) -->
+  <!-- ———————————————————————————————————————————————————————— -->
+  <input type="hidden" formControlName="projetPrioritaire" />
+  <input type="hidden" formControlName="commercial" />
+  <input type="hidden" formControlName="gestionnaire" />
+  <input type="hidden" formControlName="demarcheCommerciale" />
+  <input type="hidden" formControlName="nouveauProjet" />
+  <input type="hidden" formControlName="dateSignature" />
+  <input type="hidden" formControlName="codeApe" />
+  <input type="hidden" formControlName="nbEmployes" />
+  <input type="hidden" formControlName="dateCreation" />
+  <input type="hidden" formControlName="formeJuridique" />
+  <input type="hidden" formControlName="conventionCollective" />
+  <input type="hidden" formControlName="fonctionEntreprise" />
+  <input type="hidden" formControlName="typeSouscripteur" />
+  <input type="hidden" formControlName="typeGaranties" />
+  <input type="hidden" formControlName="typeProjets" />
+  <input type="hidden" formControlName="origineProjet" />
+  <input type="hidden" formControlName="refProduitUTWIN" />
+  <input type="hidden" formControlName="codeProduitAPRIL" />
+
+  <!-- ———————————————————————————————————————————————————————— -->
+  <!-- 2) Panneau : Type de contact & Date d'effet souhaitée -->
+  <!-- ———————————————————————————————————————————————————————— -->
+  <p-panel header="Contact & Détails du contrat" toggleable="true" styleClass="mb-3">
+    <div class="grid flex-wrap gap-4">
+      <!-- Type de contact (*) -->
+      <div class="col-12 md:col-6">
+        <label class="block mb-1">Type de contact *</label>
+        <div class="flex align-items-center gap-3">
+          <p-radioButton
+            name="typeContact"
+            formControlName="typeContact"
+            value="personne_physique"
+            inputId="tcPhysique"
+          ></p-radioButton>
+          <label for="tcPhysique">Personne physique</label>
+
+          <p-radioButton
+            name="typeContact"
+            formControlName="typeContact"
+            value="personne_morale"
+            inputId="tcMorale"
+          ></p-radioButton>
+          <label for="tcMorale">Personne morale</label>
+        </div>
+      </div>
+
+      <!-- Date d'effet souhaitée (*) -->
+      <div class="col-12 md:col-6">
+        <label for="dateEffetSouhaitee" class="block mb-1">
+          Date d’effet souhaitée *
+        </label>
+        <p-calendar
+          inputId="dateEffetSouhaitee"
+          formControlName="dateEffetSouhaitee"
+          dateFormat="dd/mm/yy"
+          showIcon="true"
+          class="w-full"
+        ></p-calendar>
+      </div>
+    </div>
+  </p-panel>
+
+  <!-- ———————————————————————————————————————————————————————— -->
+  <!-- 3) Panneau : Projet (Statut, Origine, Banque, Projet) -->
+  <!-- ———————————————————————————————————————————————————————— -->
+  <p-panel header="Détails du projet" toggleable="true" styleClass="mb-3">
+    <div class="grid flex-wrap gap-4">
+      <!-- Statut (*) -->
+      <div class="col-12 md:col-6">
+        <label for="statut" class="block mb-1">Statut *</label>
+        <p-dropdown
+          inputId="statut"
+          formControlName="statut"
+          [options]="statutOptions"
+          optionLabel="label"
+          placeholder="Sélectionner"
+          class="w-full"
+        ></p-dropdown>
+      </div>
+
+      <!-- Origine (*) -->
+      <div class="col-12 md:col-6">
+        <label for="origine" class="block mb-1">Origine *</label>
+        <p-dropdown
+          inputId="origine"
+          formControlName="origine"
+          [options]="origineOptions"
+          optionLabel="label"
+          placeholder="Sélectionner"
+          class="w-full"
+        ></p-dropdown>
+      </div>
+
+      <!-- Banque (*) -->
+      <div class="col-12 md:col-6">
+        <label for="banque" class="block mb-1">Banque *</label>
+        <p-dropdown
+          inputId="banque"
+          formControlName="banque"
+          [options]="banqueOptions"
+          optionLabel="label"
+          placeholder="Sélectionner"
+          class="w-full"
+        ></p-dropdown>
+      </div>
+
+      <!-- Projet (*) -->
+      <div class="col-12 md:col-6">
+        <label for="projet" class="block mb-1">Projet *</label>
+        <p-dropdown
+          inputId="projet"
+          formControlName="projet"
+          [options]="projetOptions"
+          optionLabel="label"
+          placeholder="Sélectionner"
+          class="w-full"
+        ></p-dropdown>
+      </div>
+    </div>
+  </p-panel>
+
+  <!-- ———————————————————————————————————————————————————————— -->
+  <!-- 4) Panneau : Coordonnées du contact -->
+  <!-- ———————————————————————————————————————————————————————— -->
+  <p-panel header="Coordonnées du contact" toggleable="true" styleClass="mb-3">
+    <div class="grid flex-wrap gap-4">
+      <!-- Civilité (*) -->
+      <div class="col-12 md:col-4">
+        <label for="civilite" class="block mb-1">Civilité *</label>
+        <p-dropdown
+          inputId="civilite"
+          formControlName="civilite"
+          [options]="civiliteOptions"
+          optionLabel="label"
+          placeholder="Sélectionner"
+          class="w-full"
+        ></p-dropdown>
+      </div>
+
+      <!-- Nom (*) -->
+      <div class="col-12 md:col-4">
+        <label for="nom" class="block mb-1">Nom de famille *</label>
+        <input
+          pInputText
+          id="nom"
+          formControlName="nom"
+          class="w-full"
+          placeholder="Saisir le nom"
+        />
+      </div>
+
+      <!-- Prénom (*) -->
+      <div class="col-12 md:col-4">
+        <label for="prenom" class="block mb-1">Prénom *</label>
+        <input
+          pInputText
+          id="prenom"
+          formControlName="prenom"
+          class="w-full"
+          placeholder="Saisir le prénom"
+        />
+      </div>
+
+      <!-- Adresse (*) -->
+      <div class="col-12 md:col-8">
+        <label for="adresse" class="block mb-1">Adresse *</label>
+        <input
+          pInputText
+          id="adresse"
+          formControlName="adresse"
+          class="w-full"
+          placeholder="Saisir l’adresse"
+        />
+      </div>
+
+      <!-- Complément d’adresse -->
+      <div class="col-12 md:col-4">
+        <label for="complementAdresse" class="block mb-1">
+          Complément d’adresse
+        </label>
+        <input
+          pInputText
+          id="complementAdresse"
+          formControlName="complementAdresse"
+          class="w-full"
+          placeholder="Étage, résidence…"
+        />
+      </div>
+
+      <!-- Ville (*) -->
+      <div class="col-12 md:col-4">
+        <label for="ville" class="block mb-1">Ville *</label>
+        <input
+          pInputText
+          id="ville"
+          formControlName="ville"
+          class="w-full"
+          placeholder="Saisir la ville"
+        />
+      </div>
+
+      <!-- Pays (*) -->
+      <div class="col-12 md:col-4">
+        <label for="pays" class="block mb-1">Pays *</label>
+        <p-dropdown
+          inputId="pays"
+          formControlName="pays"
+          [options]="paysOptions"
+          optionLabel="label"
+          placeholder="Sélectionner un pays"
+          class="w-full"
+        ></p-dropdown>
+      </div>
+
+      <!-- Téléphone (*) -->
+      <div class="col-12 md:col-4">
+        <label for="telephone" class="flex align-items-center mb-1">
+          <i class="pi pi-phone mr-1" pTooltip="+33" tooltipPosition="top"></i>
+          Numéro de téléphone *
+        </label>
+        <input
+          pInputMask
+          id="telephone"
+          formControlName="telephone"
+          mask="+33 99 99 99 99 99"
+          class="w-full"
+          placeholder="+33 XX XX XX XX XX"
+        />
+      </div>
+
+      <!-- Email (*) -->
+      <div class="col-12 md:col-6">
+        <label for="email" class="block mb-1">Email *</label>
+        <input
+          pInputText
+          id="email"
+          formControlName="email"
+          class="w-full"
+          placeholder="exemple@domaine.com"
+        />
+      </div>
+
+      <!-- Raison sociale (conditional) -->
+      <div
+        class="col-12 md:col-6"
+        *ngIf="projectForm.get('typeContact')?.value === 'personne_morale'"
+      >
+        <label for="raisonSociale" class="block mb-1">Raison sociale *</label>
+        <input
+          pInputText
+          id="raisonSociale"
+          formControlName="raisonSociale"
+          class="w-full"
+          placeholder="Saisir la raison sociale"
+        />
+      </div>
+
+      <!-- N° SIRET (conditional) -->
+      <div
+        class="col-12 md:col-6"
+        *ngIf="projectForm.get('typeContact')?.value === 'personne_morale'"
+      >
+        <label for="siret" class="block mb-1">N° SIRET *</label>
+        <input
+          pInputMask
+          id="siret"
+          formControlName="siret"
+          mask="999 999 999 99999"
+          class="w-full"
+          placeholder="Saisir le SIRET"
+        />
+      </div>
+    </div>
+  </p-panel>
+
+  <!-- ———————————————————————————————————————————————————————— -->
+  <!-- 5) Panneau : Données “Personne physique” (état civil, fumeur, Pro, …) -->
+  <!-- ———————————————————————————————————————————————————————— -->
+  <p-panel header="Données Personne Physique" toggleable="true" styleClass="mb-3">
+    <div class="grid flex-wrap gap-4">
+      <!-- Date de naissance (*) -->
+      <div class="col-12 md:col-4">
+        <label for="dateNaissance" class="block mb-1">Date de naissance *</label>
+        <p-calendar
+          inputId="dateNaissance"
+          formControlName="dateNaissance"
+          dateFormat="dd/mm/yy"
+          showIcon="true"
+          class="w-full"
+        ></p-calendar>
+      </div>
+
+      <!-- État civil (*) -->
+      <div class="col-12 md:col-4">
+        <label for="etatCivil" class="block mb-1">État civil *</label>
+        <p-dropdown
+          inputId="etatCivil"
+          formControlName="etatCivil"
+          [options]="etatCivilOptions"
+          optionLabel="label"
+          placeholder="Sélectionner"
+          class="w-full"
+        ></p-dropdown>
+      </div>
+
+      <!-- Fumeur ? (*) -->
+      <div class="col-12 md:col-4">
+        <label class="block mb-1">Fumeur ? *</label>
+        <div class="flex align-items-center gap-3">
+          <p-radioButton
+            name="fumeur"
+            formControlName="fumeur"
+            [value]="false"
+            inputId="fumeurNon"
+          ></p-radioButton>
+          <label for="fumeurNon">Non</label>
+
+          <p-radioButton
+            name="fumeur"
+            formControlName="fumeur"
+            [value]="true"
+            inputId="fumeurOui"
+          ></p-radioButton>
+          <label for="fumeurOui">Oui</label>
+        </div>
+      </div>
+
+      <!-- Catégorie pro (*) -->
+      <div class="col-12 md:col-4">
+        <label for="categoriePro" class="block mb-1">Catégorie professionnelle *</label>
+        <p-dropdown
+          inputId="categoriePro"
+          formControlName="categoriePro"
+          [options]="categorieProOptions"
+          optionLabel="label"
+          placeholder="Sélectionner"
+          class="w-full"
+        ></p-dropdown>
+      </div>
+
+      <!-- Profession (*) -->
+      <div class="col-12 md:col-4">
+        <label for="profession" class="block mb-1">Profession *</label>
+        <p-dropdown
+          inputId="profession"
+          formControlName="profession"
+          [options]="professionOptions"
+          optionLabel="label"
+          placeholder="Sélectionner"
+          class="w-full"
+        ></p-dropdown>
+      </div>
+
+      <!-- Déplacements pro ? -->
+      <div class="col-12 md:col-4">
+        <label class="block mb-1">Déplacements pro ?</label>
+        <div class="flex align-items-center gap-3">
+          <p-radioButton
+            name="deplacementsPro"
+            formControlName="deplacementsPro"
+            [value]="false"
+            inputId="deplNon"
+          ></p-radioButton>
+          <label for="deplNon">Non</label>
+
+          <p-radioButton
+            name="deplacementsPro"
+            formControlName="deplacementsPro"
+            [value]="true"
+            inputId="deplOui"
+          ></p-radioButton>
+          <label for="deplOui">Oui</label>
+        </div>
+      </div>
+
+      <!-- Manutention ? -->
+      <div class="col-12 md:col-4">
+        <label class="block mb-1">Manutention ?</label>
+        <div class="flex align-items-center gap-3">
+          <p-radioButton
+            name="manutention"
+            formControlName="manutention"
+            [value]="false"
+            inputId="manNon"
+          ></p-radioButton>
+          <label for="manNon">Non</label>
+
+          <p-radioButton
+            name="manutention"
+            formControlName="manutention"
+            [value]="true"
+            inputId="manOui"
+          ></p-radioButton>
+          <label for="manOui">Oui</label>
+        </div>
+      </div>
+
+      <!-- Travail en hauteur ? -->
+      <div class="col-12 md:col-4">
+        <label class="block mb-1">Travail en hauteur ?</label>
+        <div class="flex align-items-center gap-3">
+          <p-radioButton
+            name="travailHauteur"
+            formControlName="travailHauteur"
+            [value]="false"
+            inputId="thNon"
+          ></p-radioButton>
+          <label for="thNon">Non</label>
+
+          <p-radioButton
+            name="travailHauteur"
+            formControlName="travailHauteur"
+            [value]="true"
+            inputId="thOui"
+          ></p-radioButton>
+          <label for="thOui">Oui</label>
+        </div>
+      </div>
+
+      <!-- Total des encours assurés (*) -->
+      <div class="col-12 md:col-4">
+        <label for="totalEncoursAssures" class="block mb-1">
+          Total des encours assurés (€) *
+        </label>
+        <p-inputNumber
+          inputId="totalEncoursAssures"
+          formControlName="totalEncoursAssures"
+          mode="currency"
+          currency="EUR"
+          locale="fr-FR"
+          class="w-full"
+          placeholder="0,00"
+        ></p-inputNumber>
+      </div>
+    </div>
+  </p-panel>
+
+  <!-- ———————————————————————————————————————————————————————— -->
+  <!-- 6) Panneau : Informations sur le prêt -->
+  <!-- ———————————————————————————————————————————————————————— -->
+  <p-panel header="Informations sur le prêt" toggleable="true" styleClass="mb-3">
+    <div class="grid flex-wrap gap-4">
+      <!-- Type de prêt (*) -->
+      <div class="col-12 md:col-4">
+        <label for="typePret" class="block mb-1">Type de prêt *</label>
+        <p-dropdown
+          inputId="typePret"
+          formControlName="typePret"
+          [options]="typePretOptions"
+          optionLabel="label"
+          placeholder="Sélectionner"
+          class="w-full"
+        ></p-dropdown>
+      </div>
+
+      <!-- Capital restant dû (*) -->
+      <div class="col-12 md:col-4">
+        <label for="capitalRestantDu" class="block mb-1">
+          Capital restant dû (€) *
+        </label>
+        <p-inputNumber
+          inputId="capitalRestantDu"
+          formControlName="capitalRestantDu"
+          mode="currency"
+          currency="EUR"
+          locale="fr-FR"
+          class="w-full"
+          placeholder="0,00"
+        ></p-inputNumber>
+      </div>
+
+      <!-- Taux du prêt (%) (*) -->
+      <div class="col-12 md:col-4">
+        <label for="tauxPret" class="block mb-1">Taux du prêt (%) *</label>
+        <p-inputNumber
+          inputId="tauxPret"
+          formControlName="tauxPret"
+          mode="decimal"
+          [step]="0.01"
+          [min]="0"
+          class="w-full"
+          placeholder="0.00"
+        ></p-inputNumber>
+      </div>
+
+      <!-- Durée restante (mois) (*) -->
+      <div class="col-12 md:col-4">
+        <label for="dureeRestante" class="block mb-1">Durée restante (mois) *</label>
+        <p-inputNumber
+          inputId="dureeRestante"
+          formControlName="dureeRestante"
+          [min]="1"
+          class="w-full"
+          placeholder="0"
+        ></p-inputNumber>
+      </div>
+
+      <!-- Dont différé -->
+      <div class="col-12 md:col-4">
+        <label for="dontDiffere" class="block mb-1">Dont différé (mois)</label>
+        <p-inputNumber
+          inputId="dontDiffere"
+          formControlName="dontDiffere"
+          [min]="0"
+          class="w-full"
+          placeholder="0"
+        ></p-inputNumber>
+      </div>
+
+      <!-- Type de différé -->
+      <div class="col-12 md:col-4">
+        <label for="typeDiffere" class="block mb-1">Type de différé</label>
+        <p-dropdown
+          inputId="typeDiffere"
+          formControlName="typeDiffere"
+          [options]="typeDiffereOptions"
+          optionLabel="label"
+          placeholder="Sélectionner"
+          class="w-full"
+        ></p-dropdown>
+      </div>
+
+      <!-- Mensualité (*) -->
+      <div class="col-12 md:col-4">
+        <label for="mensualite" class="block mb-1">Mensualité (€) *</label>
+        <p-inputNumber
+          inputId="mensualite"
+          formControlName="mensualite"
+          mode="currency"
+          currency="EUR"
+          locale="fr-FR"
+          class="w-full"
+          placeholder="0,00"
+        ></p-inputNumber>
+      </div>
+
+      <!-- Durée (mois) (*) -->
+      <div class="col-12 md:col-4">
+        <label for="duree" class="block mb-1">Durée (mois) *</label>
+        <p-inputNumber
+          inputId="duree"
+          formControlName="duree"
+          [min]="1"
+          class="w-full"
+          placeholder="0"
+        ></p-inputNumber>
+      </div>
+
+      <!-- Quotité (%) (*) -->
+      <div class="col-12 md:col-4">
+        <label for="quotite" class="block mb-1">Quotité (%) *</label>
+        <p-inputNumber
+          inputId="quotite"
+          formControlName="quotite"
+          [min]="1"
+          [max]="100"
+          mode="decimal"
+          class="w-full"
+          placeholder="100"
+        ></p-inputNumber>
+      </div>
+    </div>
+  </p-panel>
+
+  <!-- ———————————————————————————————————————————————————————— -->
+  <!-- 7) Panneau : Garanties & Franchise & Assurances spécifiques -->
+  <!-- ———————————————————————————————————————————————————————— -->
+  <p-panel header="Garanties & Franchise" toggleable="true" styleClass="mb-3">
+    <div class="grid flex-wrap gap-4">
+      <!-- Garanties (*) -->
+      <div class="col-12 md:col-6">
+        <label for="garanties" class="block mb-1">Garanties *</label>
+        <p-multiSelect
+          inputId="garanties"
+          formControlName="garanties"
+          [options]="garantiesOptions"
+          optionLabel="label"
+          placeholder="Sélectionner (plusieurs)"
+          class="w-full"
+        ></p-multiSelect>
+      </div>
+
+      <!-- Franchise (*) -->
+      <div class="col-12 md:col-6">
+        <label for="franchise" class="block mb-1">Franchise (jours) *</label>
+        <p-inputNumber
+          inputId="franchise"
+          formControlName="franchise"
+          [min]="0"
+          class="w-full"
+          placeholder="0"
+        ></p-inputNumber>
+      </div>
+
+      <!-- Affections disco-vertébrales (?) -->
+      <div class="col-12 md:col-6">
+        <label class="block mb-1">Affections disco-vertébrales</label>
+        <p-checkbox
+          inputId="affectionsDisco"
+          formControlName="affectionsDisco"
+          binary="true"
+        ></p-checkbox>
+      </div>
+
+      <!-- Maladies psychiques (?) -->
+      <div class="col-12 md:col-6">
+        <label class="block mb-1">Maladies psychiques</label>
+        <p-checkbox
+          inputId="maladiesPsychiques"
+          formControlName="maladiesPsychiques"
+          binary="true"
+        ></p-checkbox>
+      </div>
+    </div>
+  </p-panel>
+
+  <!-- ———————————————————————————————————————————————————————— -->
+  <!-- 8) Panneau : Frais de distribution -->
+  <!-- ———————————————————————————————————————————————————————— -->
+  <p-panel header="Frais de distribution" toggleable="true" styleClass="mb-3">
+    <div class="col-12 md:col-6">
+      <label for="fraisDistribution" class="block mb-1">Frais de distribution (€)</label>
+      <p-inputNumber
+        inputId="fraisDistribution"
+        formControlName="fraisDistribution"
+        mode="currency"
+        currency="EUR"
+        locale="fr-FR"
+        class="w-full"
+        placeholder="0,00"
+      ></p-inputNumber>
+    </div>
+  </p-panel>
+
+  <!-- ———————————————————————————————————————————————————————— -->
+  <!-- Boutons de soumission -->
+  <!-- ———————————————————————————————————————————————————————— -->
+  <div class="flex justify-end gap-3 mt-4">
+    <button
+      pButton
+      type="button"
+      label="Valider"
+      icon="pi pi-save"
+      class="p-button-secondary"
+      (click)="onSubmit()"
+    ></button>
+    <button
+      pButton
+      type="submit"
+      label="Valider & Rechercher offres"
+      icon="pi pi-check"
+      class="p-button-success"
+    ></button>
+  </div>
+</form>

@@ -1,0 +1,50 @@
+<div class="login-wrapper">
+  <div class="login-container">
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <h2>Login</h2>
+
+      <!-- Email Field -->
+      <div class="input-group">
+        <span class="material-icons icon">mail</span>
+        <input type="email" formControlName="username" placeholder="Enter your email" pInputText required />
+        <div *ngIf="submitted && f['username'].errors" class="p-error">
+          <small *ngIf="f['username'].errors['required']">Email is required.</small>
+          <small *ngIf="f['username'].errors['email']">Enter a valid email.</small>
+        </div>
+      </div>
+
+      <!-- Password Field -->
+      <div class="input-group">
+        <span class="material-icons icon">lock</span>
+        <input type="password" formControlName="password" placeholder="Enter your password" pPassword feedback="false" required />
+        <div *ngIf="submitted && f['password'].errors" class="p-error">
+          <small *ngIf="f['password'].errors['required']">Password is required.</small>
+        </div>
+      </div>
+
+      <!-- Action Links -->
+      <div class="p-d-flex p-jc-between p-mt-3">
+        <a class="forgot-link" href="#">Forgot password?</a>
+        <p-button label="Login" icon="pi pi-sign-in" type="submit" styleClass="login-button" [disabled]="loginForm.invalid"></p-button>
+      </div>
+
+      <!-- Signup Prompt -->
+      <p class="signup-text p-mt-4">
+        Don't have an account? <a href="#">Signup now</a>
+      </p>
+
+      <!-- Error Message -->
+      <div *ngIf="error" class="error-message">
+        {{ error }}
+      </div>
+    </form>
+
+    <!-- HubSpot Login Option -->
+    <div class="login-info p-mt-4" style="text-align: center;">
+      <p-divider ></p-divider>
+      <p-button label="Login with HubSpot" icon="pi pi-external-link" type="button" (click)="loginWithHubSpot()"></p-button>
+    </div>
+  </div>
+</div>
+
+

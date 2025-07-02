@@ -1,0 +1,1015 @@
+<div class="p-4">
+  <div class="flex justify-content-between align-items-center mb-4">
+    <h1 class="text-2xl font-bold text-primary">Tarification UTWIN</h1>
+    <div>
+      <p-button
+        label="Exemple"
+        icon="pi pi-bolt"
+        styleClass="p-button-outlined mr-2"
+        (click)="loadExampleData()"
+      ></p-button>
+      <p-button
+        label="Réinitialiser"
+        icon="pi pi-refresh"
+        styleClass="p-button-secondary"
+        (click)="resetForm()"
+      ></p-button>
+    </div>
+  </div>
+
+  <div class="card">
+    <p-toast></p-toast>
+
+    <form [formGroup]="insuranceForm">
+      <p-steps
+        [model]="steps"
+        [activeIndex]="activeIndex"
+        [readonly]="false"
+      ></p-steps>
+
+      <div class="mt-4 wizard-content">
+        <!-- Step 1: Project Details -->
+        <div
+          *ngIf="activeIndex === 0"
+          class="fadeIn"
+          formGroupName="projectDetails"
+        >
+          <div class="card p-4">
+            <h2 class="text-xl font-medium mb-4">Détails du projet</h2>
+
+            <div class="grid">
+              <div class="col-12 md:col-6">
+                <div class="field">
+                  <label for="projectType" class="block mb-2"
+                    >Type de projet</label
+                  >
+                  <p-dropdown
+                    id="projectType"
+                    formControlName="projectType"
+                    [options]="projectTypes"
+                    optionLabel="label"
+                    optionValue="value"
+                    placeholder="Sélectionner un type"
+                    [style]="{ width: '100%' }"
+                  >
+                  </p-dropdown>
+                  <small
+                    *ngIf="
+                      insuranceForm.get('projectDetails.projectType')
+                        ?.invalid &&
+                      insuranceForm.get('projectDetails.projectType')?.touched
+                    "
+                    class="p-error"
+                    >Le type de projet est requis</small
+                  >
+                </div>
+              </div>
+
+              <div class="col-12 md:col-6">
+                <div class="field">
+                  <label for="effectiveDate" class="block mb-2"
+                    >Date d'effet</label
+                  >
+                  <p-calendar
+                    id="effectiveDate"
+                    formControlName="effectiveDate"
+                    [showIcon]="true"
+                    dateFormat="dd/mm/yy"
+                    [style]="{ width: '100%' }"
+                  >
+                  </p-calendar>
+                  <small
+                    *ngIf="
+                      insuranceForm.get('projectDetails.effectiveDate')
+                        ?.invalid &&
+                      insuranceForm.get('projectDetails.effectiveDate')?.touched
+                    "
+                    class="p-error"
+                    >La date d'effet est requise</small
+                  >
+                </div>
+              </div>
+
+              <div class="col-12 md:col-6">
+                <div class="field">
+                  <label for="periodicity" class="block mb-2"
+                    >Périodicité</label
+                  >
+                  <p-dropdown
+                    id="periodicity"
+                    formControlName="periodicity"
+                    [options]="periodicityOptions"
+                    optionLabel="label"
+                    optionValue="value"
+                    placeholder="Sélectionner une périodicité"
+                    [style]="{ width: '100%' }"
+                  >
+                  </p-dropdown>
+                  <small
+                    *ngIf="
+                      insuranceForm.get('projectDetails.periodicity')
+                        ?.invalid &&
+                      insuranceForm.get('projectDetails.periodicity')?.touched
+                    "
+                    class="p-error"
+                    >La périodicité est requise</small
+                  >
+                </div>
+              </div>
+
+              <div class="col-12 md:col-6">
+                <div class="field">
+                  <label for="location" class="block mb-2">Localisation</label>
+                  <p-dropdown
+                    id="location"
+                    formControlName="location"
+                    [options]="locationOptions"
+                    optionLabel="label"
+                    optionValue="value"
+                    placeholder="Sélectionner une localisation"
+                    [style]="{ width: '100%' }"
+                  >
+                  </p-dropdown>
+                  <small
+                    *ngIf="
+                      insuranceForm.get('projectDetails.location')?.invalid &&
+                      insuranceForm.get('projectDetails.location')?.touched
+                    "
+                    class="p-error"
+                    >La localisation est requise</small
+                  >
+                </div>
+              </div>
+
+              <div class="col-12 md:col-6">
+                <div class="field">
+                  <label for="paymentType" class="block mb-2"
+                    >Type de paiement</label
+                  >
+                  <p-dropdown
+                    id="paymentType"
+                    formControlName="paymentType"
+                    [options]="paymentTypeOptions"
+                    optionLabel="label"
+                    optionValue="value"
+                    placeholder="Sélectionner un type de paiement"
+                    [style]="{ width: '100%' }"
+                  >
+                  </p-dropdown>
+                  <small
+                    *ngIf="
+                      insuranceForm.get('projectDetails.paymentType')
+                        ?.invalid &&
+                      insuranceForm.get('projectDetails.paymentType')?.touched
+                    "
+                    class="p-error"
+                    >Le type de paiement est requis</small
+                  >
+                </div>
+              </div>
+
+              <div class="col-12 md:col-6">
+                <div class="field">
+                  <label for="courtageAmount" class="block mb-2"
+                    >Montant du courtage</label
+                  >
+                  <p-inputNumber
+                    id="courtageAmount"
+                    formControlName="courtageAmount"
+                    [showButtons]="false"
+                    [style]="{ width: '100%' }"
+                    [min]="0"
+                  >
+                  </p-inputNumber>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2: Borrower Info -->
+        <div *ngIf="activeIndex === 1" class="fadeIn">
+          <div class="card p-4">
+            <div class="flex justify-content-between align-items-center mb-4">
+              <h2 class="text-xl font-medium">
+                Informations sur les emprunteurs
+              </h2>
+              <p-button
+                label="Ajouter un emprunteur"
+                icon="pi pi-plus"
+                styleClass="p-button-outlined"
+                (click)="addBorrower()"
+              ></p-button>
+            </div>
+
+            <div formArrayName="borrowers">
+              <div
+                *ngFor="let borrower of borrowers.controls; let i = index"
+                class="mb-4 p-3 border-1 border-300 border-round"
+              >
+                <div class="flex justify-content-between mb-3">
+                  <h3 class="text-lg font-medium">Emprunteur {{ i + 1 }}</h3>
+                  <button
+                    pButton
+                    *ngIf="i > 0"
+                    icon="pi pi-times"
+                    class="p-button-danger p-button-text"
+                    (click)="removeBorrower(i)"
+                    type="button"
+                  ></button>
+                </div>
+
+                <div [formGroupName]="i" class="grid">
+                  <div class="col-12 md:col-6">
+                    <div class="field">
+                      <label [attr.for]="'firstName' + i" class="block mb-2"
+                        >Prénom</label
+                      >
+                      <input
+                        [id]="'firstName' + i"
+                        formControlName="firstName"
+                        pInputText
+                        class="w-full"
+                      />
+                      <small
+                        *ngIf="
+                          borrower.get('firstName')?.invalid &&
+                          borrower.get('firstName')?.touched
+                        "
+                        class="p-error"
+                        >Le prénom est requis</small
+                      >
+                    </div>
+                  </div>
+
+                  <div class="col-12 md:col-6">
+                    <div class="field">
+                      <label [attr.for]="'lastName' + i" class="block mb-2"
+                        >Nom</label
+                      >
+                      <input
+                        [id]="'lastName' + i"
+                        formControlName="lastName"
+                        pInputText
+                        class="w-full"
+                      />
+                      <small
+                        *ngIf="
+                          borrower.get('lastName')?.invalid &&
+                          borrower.get('lastName')?.touched
+                        "
+                        class="p-error"
+                        >Le nom est requis</small
+                      >
+                    </div>
+                  </div>
+
+                  <div class="col-12 md:col-6">
+                    <div class="field">
+                      <label [attr.for]="'birthDate' + i" class="block mb-2"
+                        >Date de naissance</label
+                      >
+                      <p-calendar
+                        [id]="'birthDate' + i"
+                        formControlName="birthDate"
+                        [showIcon]="true"
+                        dateFormat="dd/mm/yy"
+                        [style]="{ width: '100%' }"
+                      >
+                      </p-calendar>
+                      <small
+                        *ngIf="
+                          borrower.get('birthDate')?.invalid &&
+                          borrower.get('birthDate')?.touched
+                        "
+                        class="p-error"
+                        >La date de naissance est requise</small
+                      >
+                    </div>
+                  </div>
+
+                  <div class="col-12 md:col-6">
+                    <div class="field">
+                      <label [attr.for]="'postalCode' + i" class="block mb-2"
+                        >Code postal</label
+                      >
+                      <input
+                        [id]="'postalCode' + i"
+                        formControlName="postalCode"
+                        pInputText
+                        class="w-full"
+                      />
+                      <small
+                        *ngIf="
+                          borrower.get('postalCode')?.invalid &&
+                          borrower.get('postalCode')?.touched
+                        "
+                        class="p-error"
+                        >Code postal invalide (5 chiffres)</small
+                      >
+                    </div>
+                  </div>
+
+                  <div class="col-12 md:col-6">
+                    <div class="field">
+                      <label [attr.for]="'profession' + i" class="block mb-2"
+                        >Profession</label
+                      >
+                      <p-dropdown
+                        [id]="'profession' + i"
+                        formControlName="profession"
+                        [options]="professionOptions"
+                        optionLabel="label"
+                        optionValue="value"
+                        placeholder="Sélectionner une profession"
+                        [style]="{ width: '100%' }"
+                      >
+                      </p-dropdown>
+                      <small
+                        *ngIf="
+                          borrower.get('profession')?.invalid &&
+                          borrower.get('profession')?.touched
+                        "
+                        class="p-error"
+                        >La profession est requise</small
+                      >
+                    </div>
+                  </div>
+
+                  <div class="col-12" formGroupName="riskFactors">
+                    <h4 class="font-medium mb-2">Facteurs de risque</h4>
+                    <div class="grid">
+                      <div class="col-12 md:col-6">
+                        <div class="field-checkbox">
+                          <p-checkbox
+                            [binary]="true"
+                            formControlName="isSmoker"
+                            [id]="'isSmoker' + i"
+                          ></p-checkbox>
+                          <label [for]="'isSmoker' + i" class="ml-2"
+                            >Fumeur</label
+                          >
+                        </div>
+                      </div>
+
+                      <div class="col-12 md:col-6">
+                        <div class="field-checkbox">
+                          <p-checkbox
+                            [binary]="true"
+                            formControlName="highMileage"
+                            [id]="'highMileage' + i"
+                          ></p-checkbox>
+                          <label [for]="'highMileage' + i" class="ml-2"
+                            >Plus de 20 000 km/an</label
+                          >
+                        </div>
+                      </div>
+
+                      <div class="col-12 md:col-6">
+                        <div class="field-checkbox">
+                          <p-checkbox
+                            [binary]="true"
+                            formControlName="workAtHeight"
+                            [id]="'workAtHeight' + i"
+                          ></p-checkbox>
+                          <label [for]="'workAtHeight' + i" class="ml-2"
+                            >Travail en hauteur</label
+                          >
+                        </div>
+                      </div>
+
+                      <div class="col-12 md:col-6">
+                        <div class="field-checkbox">
+                          <p-checkbox
+                            [binary]="true"
+                            formControlName="heavyLoadHandling"
+                            [id]="'heavyLoadHandling' + i"
+                          ></p-checkbox>
+                          <label [for]="'heavyLoadHandling' + i" class="ml-2"
+                            >Manutention de charges lourdes</label
+                          >
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3: Loan Info -->
+        <div *ngIf="activeIndex === 2" class="fadeIn">
+          <div class="card p-4">
+            <div class="flex justify-content-between align-items-center mb-4">
+              <h2 class="text-xl font-medium">Informations sur les prêts</h2>
+              <p-button
+                label="Ajouter un prêt"
+                icon="pi pi-plus"
+                styleClass="p-button-outlined"
+                (click)="addLoan()"
+              ></p-button>
+            </div>
+
+            <div formArrayName="loans">
+              <div
+                *ngFor="let loan of loans.controls; let i = index"
+                class="mb-4 p-3 border-1 border-300 border-round"
+              >
+                <div class="flex justify-content-between mb-3">
+                  <h3 class="text-lg font-medium">Prêt {{ i + 1 }}</h3>
+                  <button
+                    pButton
+                    *ngIf="i > 0"
+                    icon="pi pi-times"
+                    class="p-button-danger p-button-text"
+                    (click)="removeLoan(i)"
+                    type="button"
+                  ></button>
+                </div>
+
+                <div [formGroupName]="i" class="grid">
+                  <div class="col-12 md:col-6">
+                    <div class="field">
+                      <label [attr.for]="'amount' + i" class="block mb-2"
+                        >Montant du prêt (€)</label
+                      >
+                      <p-inputNumber
+                        [id]="'amount' + i"
+                        formControlName="amount"
+                        [showButtons]="false"
+                        [style]="{ width: '100%' }"
+                        [min]="1000"
+                      >
+                      </p-inputNumber>
+                      <small
+                        *ngIf="
+                          loan.get('amount')?.invalid &&
+                          loan.get('amount')?.touched
+                        "
+                        class="p-error"
+                        >Le montant doit être supérieur à 1000€</small
+                      >
+                    </div>
+                  </div>
+
+                  <div class="col-12 md:col-6">
+                    <div class="field">
+                      <label [attr.for]="'duration' + i" class="block mb-2"
+                        >Durée (mois)</label
+                      >
+                      <p-inputNumber
+                        [id]="'duration' + i"
+                        formControlName="duration"
+                        [showButtons]="false"
+                        [style]="{ width: '100%' }"
+                        [min]="12"
+                      >
+                      </p-inputNumber>
+                      <small
+                        *ngIf="
+                          loan.get('duration')?.invalid &&
+                          loan.get('duration')?.touched
+                        "
+                        class="p-error"
+                        >La durée minimale est de 12 mois</small
+                      >
+                    </div>
+                  </div>
+
+                  <div class="col-12 md:col-6">
+                    <div class="field">
+                      <label [attr.for]="'interestRate' + i" class="block mb-2"
+                        >Taux d'intérêt (%)</label
+                      >
+                      <p-inputNumber
+                        [id]="'interestRate' + i"
+                        formControlName="interestRate"
+                        [showButtons]="false"
+                        [style]="{ width: '100%' }"
+                        [min]="0.1"
+                        [minFractionDigits]="2"
+                        [maxFractionDigits]="2"
+                      >
+                      </p-inputNumber>
+                      <small
+                        *ngIf="
+                          loan.get('interestRate')?.invalid &&
+                          loan.get('interestRate')?.touched
+                        "
+                        class="p-error"
+                        >Le taux d'intérêt doit être supérieur à 0.1%</small
+                      >
+                    </div>
+                  </div>
+
+                  <div class="col-12 md:col-6">
+                    <div class="field">
+                      <label [attr.for]="'type' + i" class="block mb-2"
+                        >Type de prêt</label
+                      >
+                      <p-dropdown
+                        [id]="'type' + i"
+                        formControlName="type"
+                        [options]="loanTypeOptions"
+                        optionLabel="label"
+                        optionValue="value"
+                        placeholder="Sélectionner un type"
+                        [style]="{ width: '100%' }"
+                      >
+                      </p-dropdown>
+                      <small
+                        *ngIf="
+                          loan.get('type')?.invalid && loan.get('type')?.touched
+                        "
+                        class="p-error"
+                        >Le type de prêt est requis</small
+                      >
+                    </div>
+                  </div>
+
+                  <div class="col-12 md:col-6">
+                    <div class="field">
+                      <label [attr.for]="'loanNumber' + i" class="block mb-2"
+                        >Numéro du prêt</label
+                      >
+                      <p-inputNumber
+                        [id]="'loanNumber' + i"
+                        formControlName="loanNumber"
+                        [showButtons]="false"
+                        [style]="{ width: '100%' }"
+                        [min]="1"
+                      >
+                      </p-inputNumber>
+                    </div>
+                  </div>
+
+                  <div class="col-12 md:col-6">
+                    <div class="field">
+                      <label
+                        [attr.for]="'deferredPeriod' + i"
+                        class="block mb-2"
+                        >Période de différé (mois)</label
+                      >
+                      <p-inputNumber
+                        [id]="'deferredPeriod' + i"
+                        formControlName="deferredPeriod"
+                        [showButtons]="false"
+                        [style]="{ width: '100%' }"
+                        [min]="0"
+                      >
+                      </p-inputNumber>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4: Coverage Options -->
+        <div *ngIf="activeIndex === 3" class="fadeIn">
+          <div class="card p-4">
+            <div class="flex justify-content-between align-items-center mb-4">
+              <h2 class="text-xl font-medium">Garanties</h2>
+              <p-button
+                label="Ajouter une garantie"
+                icon="pi pi-plus"
+                styleClass="p-button-outlined"
+                (click)="addCoverageOption()"
+              ></p-button>
+            </div>
+
+            <div formArrayName="coverageOptions">
+              <div
+                *ngFor="let coverage of coverageOptions.controls; let i = index"
+                class="mb-4 p-3 border-1 border-300 border-round"
+              >
+                <div class="flex justify-content-between mb-3">
+                  <h3 class="text-lg font-medium">Garantie {{ i + 1 }}</h3>
+                  <button
+                    pButton
+                    *ngIf="i > 0"
+                    icon="pi pi-times"
+                    class="p-button-danger p-button-text"
+                    (click)="removeCoverageOption(i)"
+                    type="button"
+                  ></button>
+                </div>
+
+                <div [formGroupName]="i" class="grid">
+                  <div class="col-12 md:col-6">
+                    <div class="field">
+                      <label [attr.for]="'guaranteeType' + i" class="block mb-2"
+                        >Type de garantie</label
+                      >
+                      <p-dropdown
+                        [id]="'guaranteeType' + i"
+                        formControlName="guaranteeType"
+                        [options]="guaranteeTypeOptions"
+                        optionLabel="label"
+                        optionValue="value"
+                        placeholder="Sélectionner un type"
+                        [style]="{ width: '100%' }"
+                      >
+                      </p-dropdown>
+                      <small
+                        *ngIf="
+                          coverage.get('guaranteeType')?.invalid &&
+                          coverage.get('guaranteeType')?.touched
+                        "
+                        class="p-error"
+                        >Le type de garantie est requis</small
+                      >
+                    </div>
+                  </div>
+
+                  <div class="col-12 md:col-6">
+                    <div class="field">
+                      <label
+                        [attr.for]="'coveragePercentage' + i"
+                        class="block mb-2"
+                        >Pourcentage de couverture (%)</label
+                      >
+                      <p-inputNumber
+                        [id]="'coveragePercentage' + i"
+                        formControlName="coveragePercentage"
+                        [showButtons]="false"
+                        [style]="{ width: '100%' }"
+                        [min]="1"
+                        [max]="100"
+                      >
+                      </p-inputNumber>
+                      <small
+                        *ngIf="
+                          coverage.get('coveragePercentage')?.invalid &&
+                          coverage.get('coveragePercentage')?.touched
+                        "
+                        class="p-error"
+                        >Le pourcentage doit être compris entre 1 et 100</small
+                      >
+                    </div>
+                  </div>
+
+                  <div class="col-12 md:col-6">
+                    <div class="field">
+                      <label
+                        [attr.for]="'deductiblePeriod' + i"
+                        class="block mb-2"
+                        >Franchise (jours)</label
+                      >
+                      <p-inputNumber
+                        [id]="'deductiblePeriod' + i"
+                        formControlName="deductiblePeriod"
+                        [showButtons]="false"
+                        [style]="{ width: '100%' }"
+                        [min]="0"
+                      >
+                      </p-inputNumber>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 5: Review & Submit -->
+        <div *ngIf="activeIndex === 4" class="fadeIn">
+          <div class="card p-4">
+            <h2 class="text-xl font-medium mb-4">Récapitulatif</h2>
+
+            <div class="grid">
+              <div class="col-12 md:col-6">
+                <div class="p-card mb-3">
+                  <div
+                    class="p-card-header border-bottom-1 border-300 pb-2 mb-3"
+                  >
+                    <h3 class="text-lg font-medium">Détails du projet</h3>
+                  </div>
+                  <div class="p-card-body">
+                    <div class="flex flex-column gap-2">
+                      <div class="flex justify-content-between">
+                        <span class="font-medium">Type de projet:</span>
+                        <span>{{
+                          getProjectTypeLabel(
+                            insuranceForm.value.projectDetails?.projectType
+                          )
+                        }}</span>
+                      </div>
+                      <div class="flex justify-content-between">
+                        <span class="font-medium">Date d'effet:</span>
+                        <span>{{
+                          insuranceForm.value.projectDetails?.effectiveDate
+                            ? (insuranceForm.value.projectDetails.effectiveDate
+                              | date : "dd/MM/yyyy")
+                            : "-"
+                        }}</span>
+                      </div>
+                      <div class="flex justify-content-between">
+                        <span class="font-medium">Périodicité:</span>
+                        <span>{{
+                          getPeriodicityLabel(
+                            insuranceForm.value.projectDetails?.periodicity
+                          )
+                        }}</span>
+                      </div>
+                      <div class="flex justify-content-between">
+                        <span class="font-medium">Courtage:</span>
+                        <span
+                          >{{
+                            insuranceForm.value.projectDetails?.courtageAmount
+                          }}
+                          €</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12 md:col-6">
+                <div class="p-card mb-3">
+                  <div
+                    class="p-card-header border-bottom-1 border-300 pb-2 mb-3"
+                  >
+                    <h3 class="text-lg font-medium">Emprunteur(s)</h3>
+                  </div>
+                  <div class="p-card-body">
+                    <div
+                      *ngFor="
+                        let borrower of insuranceForm.value.borrowers;
+                        let i = index
+                      "
+                      class="mb-3"
+                    >
+                      <div class="flex justify-content-between">
+                        <span class="font-medium">Emprunteur {{ i + 1 }}:</span>
+                        <span
+                          >{{ borrower.firstName }}
+                          {{ borrower.lastName }}</span
+                        >
+                      </div>
+                      <div class="flex justify-content-between">
+                        <span class="font-medium">Date de naissance:</span>
+                        <span>{{
+                          borrower.birthDate | date : "dd/MM/yyyy"
+                        }}</span>
+                      </div>
+                      <div class="flex justify-content-between">
+                        <span class="font-medium">Profession:</span>
+                        <span>{{
+                          getProfessionLabel(borrower.profession)
+                        }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <div class="p-card mb-3">
+                  <div
+                    class="p-card-header border-bottom-1 border-300 pb-2 mb-3"
+                  >
+                    <h3 class="text-lg font-medium">Prêt(s)</h3>
+                  </div>
+                  <div class="p-card-body">
+                    <div
+                      *ngFor="
+                        let loan of insuranceForm.value.loans;
+                        let i = index
+                      "
+                      class="mb-3 p-2 border-1 border-300 border-round"
+                    >
+                      <div class="flex justify-content-between">
+                        <span class="font-medium">Prêt {{ i + 1 }}:</span>
+                        <span>{{ loan.amount | currency : "EUR" }}</span>
+                      </div>
+                      <div class="flex justify-content-between">
+                        <span class="font-medium">Durée:</span>
+                        <span>{{ loan.duration }} mois</span>
+                      </div>
+                      <div class="flex justify-content-between">
+                        <span class="font-medium">Taux:</span>
+                        <span>{{ loan.interestRate | number : "1.2-2" }}%</span>
+                      </div>
+                      <div class="flex justify-content-between">
+                        <span class="font-medium">Type:</span>
+                        <span>{{ getLoanTypeLabel(loan.type) }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <div class="p-card mb-3">
+                  <div
+                    class="p-card-header border-bottom-1 border-300 pb-2 mb-3"
+                  >
+                    <h3 class="text-lg font-medium">Garanties</h3>
+                  </div>
+                  <div class="p-card-body">
+                    <div
+                      *ngFor="
+                        let coverage of insuranceForm.value.coverageOptions;
+                        let i = index
+                      "
+                      class="mb-2"
+                    >
+                      <div class="flex justify-content-between">
+                        <span class="font-medium"
+                          >{{
+                            getGuaranteeTypeLabel(coverage.guaranteeType) ||
+                              coverage.guaranteeType
+                          }}:</span
+                        >
+                        <span
+                          >{{ coverage.coveragePercentage }}% (franchise:
+                          {{ coverage.deductiblePeriod }} jours)</span
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="flex justify-content-center mt-4">
+              <p-button
+                label="Calculer le tarif"
+                icon="pi pi-calculator"
+                [loading]="submitting"
+                (click)="submitForm()"
+              ></p-button>
+            </div>
+          </div>
+          <!-- Results Section -->
+          <div *ngIf="quoteResponse" class="card p-4 mt-4">
+            <h2 class="text-xl font-medium mb-4 text-primary">
+              Résultat de la tarification UTWIN
+            </h2>
+
+            <!-- Si quoteResponse.success est définie et vraie -->
+            <div
+              *ngIf="quoteResponse?.success"
+              class="result-content p-3 border-1 border-primary border-round bg-primary-50"
+            >
+              <div class="grid">
+                <div class="col-12 md:col-6">
+                  <div class="mb-3">
+                    <h3 class="text-lg font-medium">Détails du tarif</h3>
+                    <div class="flex justify-content-between mt-2">
+                      <span class="font-medium">Prime annuelle:</span>
+                      <span>€{{ getAnnualPrice() | number : "1.2-2" }}</span>
+                    </div>
+                    <div class="flex justify-content-between">
+                      <span class="font-medium">Prime mensuelle:</span>
+                      <span>€{{ getMonthlyPrice() | number : "1.2-2" }}</span>
+                    </div>
+                    <div class="flex justify-content-between">
+                      <span class="font-medium">Taux:</span>
+                      <span>
+                        {{ quoteResponse.quotes?.[0]?.additionalInfo?.rate | number:'1.4-4'
+                        }}%
+                      </span>
+                    </div>
+                    <div class="flex justify-content-between">
+                      <span class="font-medium">Prime DC:</span>
+                      <span>
+                        €{{ quoteResponse.quotes?.[0]?.additionalInfo?.primeDC | number:'1.2-2' }}
+                      </span>
+                    </div>
+                    <div class="flex justify-content-between">
+                      <span class="font-medium">Prime IPT:</span>
+                      <span>
+                        €{{ quoteResponse.quotes?.[0]?.additionalInfo?.primeIPP | number:'1.2-2' }}
+                      </span>
+                    </div>
+                    <div class="flex justify-content-between">
+                      <span class="font-medium">Prime ITT:</span>
+                      <span>
+                        €{{ quoteResponse.quotes?.[0]?.additionalInfo?.primeITT | number:'1.2-2' }}
+                      </span>
+                    </div>
+                    <div class="flex justify-content-between">
+                      <span class="font-medium">Frais:</span>
+                      <span>
+                        €{{ quoteResponse.quotes?.[0]?.additionalInfo?.frais | number:'1.2-2' }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-12 md:col-6">
+                  <div class="mb-3">
+                    <h3 class="text-lg font-medium">
+                      Informations complémentaires
+                    </h3>
+                    <div class="flex justify-content-between mt-2">
+                      <span class="font-medium">Référence:</span>
+                      <span>
+                        {{ quoteResponse.quotes?.[0]?.additionalInfo?.reference || '-' }}
+                      </span>
+                    </div>
+                    <div class="flex justify-content-between">
+                      <span class="font-medium">Id Projet:</span>
+                      <span>
+                        {{ quoteResponse.quotes?.[0]?.additionalInfo?.idProjet || '-' }}
+                      </span>
+                    </div>
+                    <div class="flex justify-content-between">
+                      <span class="font-medium">Erreurs:</span>
+                      <span>
+                        {{ quoteResponse.quotes?.[0]?.additionalInfo?.erreurs || '-' }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Échéancier uniquement si hasDetails() renvoie true -->
+                <div class="col-12" *ngIf="hasDetails()">
+                  <div class="mb-3">
+                    <h3 class="text-lg font-medium">Échéancier</h3>
+                    <table class="p-datatable p-component w-full">
+                      <thead>
+                        <tr>
+                          <th>Mois</th>
+                          <th>Date</th>
+                          <th>Prime TTC</th>
+                          <th>Prime DC</th>
+                          <th>Prime IPT</th>
+                          <th>Prime ITT</th>
+                          <th>CRD</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr
+                          *ngFor="let echeance of quoteResponse?.quotes?.[0]?.additionalInfo"
+                        >
+                          <td>{{ echeance.Mois }}</td>
+                          <td>{{ echeance.DateEcheance }}</td>
+                          <td>€{{ echeance.PrimeTTC | number : "1.2-2" }}</td>
+                          <td>€{{ echeance.PrimeDC | number : "1.2-2" }}</td>
+                          <td>€{{ echeance.PrimeIPP | number : "1.2-2" }}</td>
+                          <td>€{{ echeance.PrimeITT | number : "1.2-2" }}</td>
+                          <td>{{ echeance.Crd | number : "1.0-0" }}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Si quoteResponse.success est faux ou inexistant -->
+            <div
+              *ngIf="quoteResponse && !quoteResponse.success"
+              class="p-3 border-1 border-danger-200 border-round bg-danger-50"
+            >
+              <h3 class="text-lg font-medium text-danger">
+                Erreur lors du calcul de tarif
+              </h3>
+              <p>
+                {{
+                  quoteResponse.errorMessage ||
+                    "Aucune proposition de tarif n'a pu être calculée. Veuillez vérifier les informations saisies et réessayer."
+                }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Buttons -->
+      <div class="flex justify-content-between mt-4">
+        <p-button
+          label="Précédent"
+          icon="pi pi-chevron-left"
+          styleClass="p-button-outlined"
+          [disabled]="activeIndex === 0"
+          (click)="previousStep()"
+        ></p-button>
+
+        <p-button
+          *ngIf="activeIndex < 4"
+          label="Suivant"
+          icon="pi pi-chevron-right"
+          iconPos="right"
+          (click)="nextStep()"
+        ></p-button>
+      </div>
+    </form>
+
+    <!-- Loading Overlay -->
+    <div *ngIf="loading" class="loading-overlay">
+      <p-progressSpinner strokeWidth="5"></p-progressSpinner>
+      <div class="mt-3 text-center">
+        <h3>Calcul en cours...</h3>
+        <p>Veuillez patienter pendant que nous calculons votre tarif.</p>
+      </div>
+    </div>
+  </div>
+</div>

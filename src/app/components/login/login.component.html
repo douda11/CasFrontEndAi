@@ -1,0 +1,72 @@
+<div class="mx-auto w-full max-w-sm space-y-6">
+  <div class="flex flex-col space-y-2 text-center">
+    <div class="mx-auto bg-insurance-blue p-2 rounded-full">
+      <!-- Vous pouvez ajouter ici une icône Angular adaptée -->
+      <i class="pi pi-chart-bar text-white text-2xl"></i>
+    </div>
+    <h1 class="text-2xl font-semibold tracking-tight">Brokins CAC</h1>
+    <p class="text-sm text-muted-foreground">
+      Connectez-vous à votre compte pour continuer
+    </p>
+  </div>
+  
+  <div class="space-y-4">
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="space-y-4">
+        <!-- Champ Email -->
+        <div class="space-y-2">
+          <label for="email" class="block text-sm font-medium">Email</label>
+          <input pInputText id="email" type="email" placeholder="votre@email.com"
+                 formControlName="email" 
+                 class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary" />
+          <div *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched" class="text-xs text-red-500">
+            <small *ngIf="loginForm.get('email')?.errors?.['required']">Email est requis.</small>
+            <small *ngIf="loginForm.get('email')?.errors?.['email']">Veuillez saisir un email valide.</small>
+          </div>
+        </div>
+        
+        <!-- Champ Mot de passe -->
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <label for="password" class="block text-sm font-medium">Mot de passe</label>
+            <a href="#" class="text-xs text-primary underline">Mot de passe oublié?</a>
+          </div>
+          <input pPassword id="password" type="password" formControlName="password" required
+                 class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary" 
+                 feedback="false" />
+          <div *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" class="text-xs text-red-500">
+            <small *ngIf="loginForm.get('password')?.errors?.['required']">Mot de passe est requis.</small>
+          </div>
+        </div>
+        
+        <!-- Checkbox Se souvenir de moi -->
+        <div class="flex items-center space-x-2">
+          <p-checkbox id="remember" formControlName="rememberMe" binary="true"></p-checkbox>
+          <label for="remember" class="text-sm">Se souvenir de moi</label>
+        </div>
+        
+        <!-- Bouton Login -->
+        <p-button label="{{ isLoading ? 'Connexion...' : 'Se connecter' }}" type="submit" class="w-full" 
+                  [disabled]="isLoading || loginForm.invalid"></p-button>
+      </div>
+    </form>
+    
+    <!-- Séparateur -->
+    <div class="relative">
+      <div class="absolute inset-0 flex items-center">
+        <div class="w-full border-t"></div>
+      </div>
+      <div class="relative flex justify-center text-xs uppercase">
+        <span class="bg-background px-2 text-muted-foreground">Ou continuer avec</span>
+      </div>
+    </div>
+    
+    <!-- Bouton Connexion via HubSpot -->
+    <p-button variant="outlined" type="button" label="Connexion via HubSpot" class="w-full" (click)="onHubspotLogin()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#ff7a59"
+           class="mr-2 h-4 w-4" viewBox="0 0 512 512">
+        <path d="M488.4 336.5c-27.4 0-49.6 22.5-49.6 49.9 ..."></path>
+      </svg>
+    </p-button>
+  </div>
+</div>

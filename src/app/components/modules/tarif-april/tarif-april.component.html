@@ -1,0 +1,839 @@
+<div class="p-4">
+  <div class="flex justify-content-between align-items-center mb-4">
+    <h1 class="text-2xl font-bold text-primary">Tarification APRIL</h1>
+    <div>
+      <p-button
+        label="Exemple"
+        icon="pi pi-bolt"
+        styleClass="p-button-outlined mr-2"
+        (click)="loadExampleData()"
+      ></p-button>
+      <p-button
+        label="Réinitialiser"
+        icon="pi pi-refresh"
+        styleClass="p-button-secondary"
+        (click)="resetForm()"
+      ></p-button>
+    </div>
+  </div>
+
+  <div class="card">
+    <p-toast></p-toast>
+
+    <form [formGroup]="insuranceForm">
+      <p-steps
+        [model]="steps"
+        [activeIndex]="activeIndex"
+        [readonly]="false"
+      ></p-steps>
+
+      <div class="mt-4 wizard-content">
+        <!-- Step 1: Project Details -->
+        <div *ngIf="activeIndex === 0" class="fadeIn" formGroupName="projectDetails">
+          <div class="card p-4">
+            <h2 class="text-xl font-medium mb-4">Détails du projet</h2>
+            <div class="grid">
+              <div class="col-12 md:col-6">
+                <div class="field">
+                  <label for="projectType">Type de projet *</label>
+                  <p-dropdown
+                    inputId="projectType"
+                    formControlName="projectType"
+                    [options]="projectTypeOptions"
+                    optionLabel="label"
+                    optionValue="value"
+                    placeholder="Sélectionner"
+                    class="w-full"
+                  ></p-dropdown>
+                </div>
+              </div>
+              <div class="col-12 md:col-6">
+                <div class="field">
+                  <label for="effectiveDate">Date d'effet *</label>
+                  <p-calendar
+                    inputId="effectiveDate"
+                    formControlName="effectiveDate"
+                    dateFormat="dd/mm/yy"
+                    showIcon="true"
+                    class="w-full"
+                  ></p-calendar>
+                </div>
+              </div>
+              <div class="col-12 md:col-6">
+                <div class="field">
+                  <label for="commission">Commission (€) *</label>
+                  <p-inputNumber
+                    inputId="commission"
+                    formControlName="commission"
+                    mode="decimal"
+                    class="w-full"
+                  ></p-inputNumber>
+                </div>
+              </div>
+              <div class="col-12 md:col-6">
+                <div class="field">
+                  <label for="email">Email *</label>
+                  <input
+                    pInputText
+                    inputId="email"
+                    formControlName="email"
+                    class="w-full"
+                  />
+                </div>
+              </div>
+              <div class="col-12 md:col-6">
+                <div class="field flex align-items-center gap-2">
+                  <p-checkbox
+                    inputId="moralSubscriber"
+                    formControlName="moralSubscriber"
+                    binary="true"
+                  ></p-checkbox>
+                  <label for="moralSubscriber">Souscripteur moral ?</label>
+                </div>
+              </div>
+              <div class="col-12 md:col-6">
+                <div class="field flex align-items-center gap-2">
+                  <p-checkbox
+                    inputId="cancellation"
+                    formControlName="cancellation"
+                    binary="true"
+                  ></p-checkbox>
+                  <label for="cancellation">Résiliation ?</label>
+                </div>
+              </div>
+              <div class="col-12 md:col-6">
+                <div class="field">
+                  <label for="addressLine1">Adresse *</label>
+                  <input
+                    pInputText
+                    inputId="addressLine1"
+                    formControlName="addressLine1"
+                    class="w-full"
+                  />
+                </div>
+              </div>
+              <div class="col-12 md:col-3">
+                <div class="field">
+                  <label for="postCode">Code postal *</label>
+                  <input
+                    pInputMask
+                    mask="99999"
+                    inputId="postCode"
+                    formControlName="postCode"
+                    class="w-full"
+                  />
+                </div>
+              </div>
+              <div class="col-12 md:col-3">
+                <div class="field">
+                  <label for="city">Ville *</label>
+                  <input
+                    pInputText
+                    inputId="city"
+                    formControlName="city"
+                    class="w-full"
+                  />
+                </div>
+              </div>
+              <div class="col-12 md:col-3">
+                <div class="field">
+                  <label for="countryCode">Pays *</label>
+                  <p-dropdown
+                    inputId="countryCode"
+                    formControlName="countryCode"
+                    [options]="countryOptions"
+                    optionLabel="label"
+                    optionValue="value"
+                    placeholder="Sélectionner"
+                    class="w-full"
+                  ></p-dropdown>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2: Borrowers -->
+        <div *ngIf="activeIndex === 1" class="fadeIn">
+          <div class="card p-4">
+            <div class="flex justify-content-between align-items-center mb-4">
+              <h2 class="text-xl font-medium">Informations emprunteurs</h2>
+              <p-button
+                label="Ajouter un emprunteur"
+                icon="pi pi-plus"
+                styleClass="p-button-outlined"
+                (click)="addBorrower()"
+              ></p-button>
+            </div>
+            <div formArrayName="borrowers">
+              <div
+                *ngFor="let borrowerGroup of borrowers.controls; let i = index"
+                [formGroupName]="i"
+                class="mb-4 p-3 border-1 border-300 border-round"
+              >
+                <div class="grid">
+                  <div class="col-12 md:col-2">
+                    <div class="field">
+                      <label for="title{{ i }}">Civilité *</label>
+                      <p-dropdown
+                        [inputId]="'title' + i"
+                        formControlName="title"
+                        [options]="civilityOptions"
+                        optionLabel="label"
+                        optionValue="value"
+                        placeholder="Sélectionner"
+                        class="w-full"
+                      ></p-dropdown>
+                    </div>
+                  </div>
+                  <div class="col-12 md:col-3">
+                    <div class="field">
+                      <label for="lastName{{ i }}">Nom *</label>
+                      <input
+                        pInputText
+                        id="{{ 'lastName' + i }}"
+                        formControlName="lastName"
+                        class="w-full"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-12 md:col-3">
+                    <div class="field">
+                      <label for="firstName{{ i }}">Prénom *</label>
+                      <input
+                        pInputText
+                        id="{{ 'firstName' + i }}"
+                        formControlName="firstName"
+                        class="w-full"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-12 md:col-2">
+                    <div class="field">
+                      <label for="birthDate{{ i }}">Naissance *</label>
+                      <p-calendar
+                        [id]="'birthDate' + i"
+                        formControlName="birthDate"
+                        dateFormat="dd/mm/yy"
+                        showIcon="true"
+                        class="w-full"
+                      ></p-calendar>
+                    </div>
+                  </div>
+                  <div class="col-12 md:col-2">
+                    <div class="field">
+                      <label for="birthDepartment{{ i }}">Département *</label>
+                      <input
+                        pInputMask
+                        mask="99"
+                        [id]="'birthDepartment' + i"
+                        formControlName="birthDepartment"
+                        class="w-full"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-12 md:col-3">
+                    <div class="field">
+                      <label for="birthCity{{ i }}">Ville *</label>
+                      <input
+                        pInputText
+                        [id]="'birthCity' + i"
+                        formControlName="birthCity"
+                        class="w-full"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-12 md:col-3">
+                    <div class="field">
+                      <label for="nationality{{ i }}">Nationalité *</label>
+                      <p-dropdown
+                        [inputId]="'nationality' + i"
+                        formControlName="nationality"
+                        [options]="countryOptions"
+                        optionLabel="label"
+                        optionValue="value"
+                        placeholder="Sélectionner"
+                        class="w-full"
+                      ></p-dropdown>
+                    </div>
+                  </div>
+                  <div class="col-12 md:col-3">
+                    <div class="field">
+                      <label for="birthCountry{{ i }}">Pays naissance *</label>
+                      <p-dropdown
+                        [inputId]="'birthCountry' + i"
+                        formControlName="birthCountry"
+                        [options]="countryOptions"
+                        optionLabel="label"
+                        optionValue="value"
+                        placeholder="Sélectionner"
+                        class="w-full"
+                      ></p-dropdown>
+                    </div>
+                  </div>
+                  <div class="col-12 md:col-3">
+                    <div class="field">
+                      <label for="professionalCategory{{ i }}">Catégorie *</label>
+                      <p-dropdown
+                        [inputId]="'professionalCategory' + i"
+                        formControlName="professionalCategory"
+                        [options]="professionalCategoryOptions"
+                        optionLabel="label"
+                        optionValue="value"
+                        placeholder="Sélectionner"
+                        class="w-full"
+                      ></p-dropdown>
+                    </div>
+                  </div>
+                  <div class="col-12 md:col-3">
+                    <div class="field">
+                      <label for="profession{{ i }}">Profession *</label>
+                      <p-dropdown
+                        [inputId]="'profession' + i"
+                        formControlName="profession"
+                        [options]="professionOptions"
+                        optionLabel="label"
+                        optionValue="value"
+                        placeholder="Sélectionner"
+                        class="w-full"
+                      ></p-dropdown>
+                    </div>
+                  </div>
+                  <div class="col-12 md:col-2">
+                    <div class="field flex align-items-center gap-2">
+                      <p-checkbox
+                        [inputId]="'abroadTravel' + i"
+                        formControlName="abroadTravel"
+                        binary="true"
+                      ></p-checkbox>
+                      <label for="abroadTravel{{ i }}">Voyages</label>
+                    </div>
+                  </div>
+                  <div class="col-12 md:col-2">
+                    <div class="field flex align-items-center gap-2">
+                      <p-checkbox
+                        [inputId]="'aerialOrLandSport' + i"
+                        formControlName="aerialOrLandSport"
+                        binary="true"
+                      ></p-checkbox>
+                      <label for="aerialOrLandSport{{ i }}">Sports</label>
+                    </div>
+                  </div>
+                  <div class="col-12 md:col-2">
+                    <div class="field flex align-items-center gap-2">
+                      <p-checkbox
+                        [inputId]="'highMileage' + i"
+                        formControlName="highMileage"
+                        binary="true"
+                      ></p-checkbox>
+                      <label for="highMileage{{ i }}">Trajets longs</label>
+                    </div>
+                  </div>
+                  <div class="col-12 md:col-2">
+                    <div class="field flex align-items-center gap-2">
+                      <p-checkbox
+                        [inputId]="'workAtHeight' + i"
+                        formControlName="workAtHeight"
+                        binary="true"
+                      ></p-checkbox>
+                      <label for="workAtHeight{{ i }}">Hauteur</label>
+                    </div>
+                  </div>
+                  <div class="col-12 md:col-2">
+                    <div class="field flex align-items-center gap-2">
+                      <p-checkbox
+                        [inputId]="'heavyLoadHandling' + i"
+                        formControlName="heavyLoadHandling"
+                        binary="true"
+                      ></p-checkbox>
+                      <label for="heavyLoadHandling{{ i }}">Manutention</label>
+                    </div>
+                  </div>
+                  <div class="col-12 md:col-2">
+                    <div class="field flex align-items-center gap-2">
+                      <p-checkbox
+                        [inputId]="'openEndedContractHolder' + i"
+                        formControlName="openEndedContractHolder"
+                        binary="true"
+                      ></p-checkbox>
+                      <label for="openEndedContractHolder{{ i }}">CDI</label>
+                    </div>
+                  </div>
+                  <div class="col-12 md:col-2">
+                    <div class="field flex align-items-center gap-2">
+                      <p-checkbox
+                        [inputId]="'noticeOfTermination' + i"
+                        formControlName="noticeOfTermination"
+                        binary="true"
+                      ></p-checkbox>
+                      <label for="noticeOfTermination{{ i }}">Préavis</label>
+                    </div>
+                  </div>
+                  <div class="col-12 md:col-2">
+                    <div class="field flex align-items-center gap-2">
+                      <p-checkbox
+                        [inputId]="'smoker' + i"
+                        formControlName="smoker"
+                        binary="true"
+                      ></p-checkbox>
+                      <label for="smoker{{ i }}">Fumeur</label>
+                    </div>
+                  </div>
+                  <div class="col-12 md:col-2">
+                    <div class="field flex align-items-center gap-2">
+                      <p-checkbox
+                        [inputId]="'politicallyExposedPerson' + i"
+                        formControlName="politicallyExposedPerson"
+                        binary="true"
+                      ></p-checkbox>
+                      <label for="politicallyExposedPerson{{ i }}">Exposé poli</label>
+                    </div>
+                  </div>
+                  <div class="col-12 md:col-2">
+                    <div class="field flex align-items-center gap-2">
+                      <p-checkbox
+                        [inputId]="'politicallyExposedRelatives' + i"
+                        formControlName="politicallyExposedRelatives"
+                        binary="true"
+                      ></p-checkbox>
+                      <label for="politicallyExposedRelatives{{ i }}">Proche poli</label>
+                    </div>
+                  </div>
+                </div>
+                <div class="flex justify-end mt-2">
+                  <button
+                    pButton
+                    type="button"
+                    icon="pi pi-trash"
+                    label="Supprimer"
+                    class="p-button-rounded p-button-danger"
+                    (click)="removeBorrower(i)"
+                  ></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3: Loans -->
+        <div *ngIf="activeIndex === 2" class="fadeIn">
+          <div class="card p-4">
+            <div class="flex justify-content-between align-items-center mb-4">
+              <h2 class="text-xl font-medium">Informations sur les prêts</h2>
+              <p-button
+                label="Ajouter un prêt"
+                icon="pi pi-plus"
+                styleClass="p-button-outlined"
+                (click)="addLoan()"
+              ></p-button>
+            </div>
+            <div formArrayName="loans">
+              <div
+                *ngFor="let loanGroup of loans.controls; let j = index"
+                [formGroupName]="j"
+                class="mb-4 p-3 border-1 border-300 border-round"
+              >
+                <div class="grid">
+                  <div class="col-12 md:col-3">
+                    <div class="field">
+                      <label for="loanType{{ j }}">Type prêt *</label>
+                      <p-dropdown
+                        [inputId]="'loanType' + j"
+                        formControlName="loanType"
+                        [options]="loanTypeOptions"
+                        optionLabel="label"
+                        optionValue="value"
+                        placeholder="Sélectionner"
+                        class="w-full"
+                      ></p-dropdown>
+                    </div>
+                  </div>
+                  <div class="col-12 md:col-3">
+                    <div class="field">
+                      <label for="borrowedAmount{{ j }}">Montant (€) *</label>
+                      <p-inputNumber
+                        [inputId]="'borrowedAmount' + j"
+                        formControlName="borrowedAmount"
+                        mode="currency"
+                        currency="EUR"
+                        class="w-full"
+                      ></p-inputNumber>
+                    </div>
+                  </div>
+                  <div class="col-12 md:col-2">
+                    <div class="field">
+                      <label for="interestRate{{ j }}">Taux (%) *</label>
+                      <p-inputNumber
+                        [inputId]="'interestRate' + j"
+                        formControlName="interestRate"
+                        mode="decimal"
+                        [min]="0"
+                        [step]="0.01"
+                        class="w-full"
+                      ></p-inputNumber>
+                    </div>
+                  </div>
+                  <div class="col-12 md:col-2">
+                    <div class="field">
+                      <label for="loanDuration{{ j }}">Durée (mois) *</label>
+                      <p-inputNumber
+                        [inputId]="'loanDuration' + j"
+                        formControlName="loanDuration"
+                        [min]="1"
+                        class="w-full"
+                      ></p-inputNumber>
+                    </div>
+                  </div>
+                </div>
+                <div class="flex justify-end mt-2">
+                  <button
+                    pButton
+                    type="button"
+                    icon="pi pi-trash"
+                    label="Supprimer"
+                    class="p-button-rounded p-button-danger"
+                    (click)="removeLoan(j)"
+                  ></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4: Coverages -->
+        <div *ngIf="activeIndex === 3" class="fadeIn">
+          <div class="card p-4">
+            <div class="flex justify-content-between align-items-center mb-4">
+              <h2 class="text-xl font-medium">Garanties</h2>
+              <p-button
+                label="Ajouter une couverture"
+                icon="pi pi-plus"
+                styleClass="p-button-outlined"
+                (click)="addCoverage()"
+              ></p-button>
+            </div>
+            <div formArrayName="coverageOptions">
+              <div
+                *ngFor="let covGroup of coverageOptionsArray.controls; let k = index"
+                [formGroupName]="k"
+                class="mb-4 p-3 border-1 border-300 border-round"
+              >
+                <div class="grid">
+                  <div class="col-12 md:col-3">
+                    <div class="field">
+                      <label for="loanRef{{ k }}">Prêt (réf) *</label>
+                      <p-dropdown
+                        [inputId]="'loanRef' + k"
+                        formControlName="loanRef"
+                        [options]="loanRefOptions"
+                        optionLabel="label"
+                        optionValue="value"
+                        placeholder="Sélectionner"
+                        class="w-full"
+                      ></p-dropdown>
+                    </div>
+                  </div>
+                  <div class="col-12 md:col-3">
+                    <div class="field">
+                      <label for="guaranteeCode{{ k }}">Garantie *</label>
+                      <p-dropdown
+                        [inputId]="'guaranteeCode' + k"
+                        formControlName="guaranteeCode"
+                        [options]="coverageOptionsList"
+                        optionLabel="label"
+                        optionValue="value"
+                        placeholder="Sélectionner"
+                        class="w-full"
+                      ></p-dropdown>
+                    </div>
+                  </div>
+                  <div class="col-12 md:col-2">
+                    <div class="field">
+                      <label for="coveragePercentage{{ k }}">%</label>
+                      <p-inputNumber
+                        [inputId]="'coveragePercentage' + k"
+                        formControlName="coveragePercentage"
+                        [min]="1"
+                        [max]="100"
+                        class="w-full"
+                      ></p-inputNumber>
+                    </div>
+                  </div>
+                  <div class="col-12 md:col-2">
+                    <div class="field">
+                      <label for="deductibleCode{{ k }}">Franchise (jours)</label>
+                      <input
+                        pInputText
+                        [id]="'deductibleCode' + k"
+                        formControlName="deductibleCode"
+                        class="w-full"
+                        placeholder="ex : 030"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-12 md:col-2">
+                    <div class="field">
+                      <label for="levelCode{{ k }}">Niveau</label>
+                      <input
+                        pInputText
+                        [id]="'levelCode' + k"
+                        formControlName="levelCode"
+                        class="w-full"
+                        placeholder="ex : ConfortPlus"
+                      />
+                    </div>
+                  </div>
+                  <div class="col-12 md:col-2">
+                    <div class="field">
+                      <label for="compensationMode{{ k }}">Mode comp.</label>
+                      <input
+                        pInputText
+                        [id]="'compensationMode' + k"
+                        formControlName="compensationMode"
+                        class="w-full"
+                        placeholder="ex : Capital"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="flex justify-end mt-2">
+                  <button
+                    pButton
+                    type="button"
+                    icon="pi pi-trash"
+                    label="Supprimer"
+                    class="p-button-rounded p-button-danger"
+                    (click)="removeCoverage(k)"
+                  ></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 5: Validation & Submit -->
+        <div *ngIf="activeIndex === 4" class="fadeIn">
+          <div class="card p-4">
+            <h2 class="text-xl font-medium mb-4">Récapitulatif</h2>
+            <div class="grid">
+              <!-- Récap Projet -->
+              <div class="col-12 md:col-6">
+                <div class="p-card mb-3">
+                  <div class="p-card-header border-bottom-1 border-300 pb-2 mb-3">
+                    <h3 class="text-lg font-medium">Détails du projet</h3>
+                  </div>
+                  <div class="p-card-body">
+                    <div class="flex flex-column gap-2">
+                      <div class="flex justify-content-between">
+                        <span class="font-medium">Type :</span>
+                        <span>{{ insuranceForm.value.projectDetails.projectType }}</span>
+                      </div>
+                      <div class="flex justify-content-between">
+                        <span class="font-medium">Date :</span>
+                        <span>
+                          {{
+                            insuranceForm.value.projectDetails.effectiveDate
+                              ? (insuranceForm.value.projectDetails.effectiveDate | date: 'dd/MM/yyyy')
+                              : '-'
+                          }}
+                        </span>
+                      </div>
+                      <div class="flex justify-content-between">
+                        <span class="font-medium">Commission :</span>
+                        <span>{{ insuranceForm.value.projectDetails.commission }} €</span>
+                      </div>
+                      <div class="flex justify-content-between">
+                        <span class="font-medium">Email :</span>
+                        <span>{{ insuranceForm.value.projectDetails.email }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Récap Emprunteurs -->
+              <div class="col-12 md:col-6">
+                <div class="p-card mb-3">
+                  <div class="p-card-header border-bottom-1 border-300 pb-2 mb-3">
+                    <h3 class="text-lg font-medium">Emprunteur(s)</h3>
+                  </div>
+                  <div class="p-card-body">
+                    <div *ngFor="let b of insuranceForm.value.borrowers; let i = index" class="mb-3">
+                      <div class="flex justify-content-between">
+                        <span class="font-medium">Emprunteur {{ i + 1 }} :</span>
+                        <span>{{ b.firstName }} {{ b.lastName }}</span>
+                      </div>
+                      <div class="flex justify-content-between">
+                        <span class="font-medium">Naissance :</span>
+                        <span>
+                          {{
+                            b.birthDate ? (b.birthDate | date: 'dd/MM/yyyy') : '-'
+                          }}
+                        </span>
+                      </div>
+                      <div class="flex justify-content-between">
+                        <span class="font-medium">Profession :</span>
+                        <span>{{ b.profession }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Récap Prêts -->
+              <div class="col-12">
+                <div class="p-card mb-3">
+                  <div class="p-card-header border-bottom-1 border-300 pb-2 mb-3">
+                    <h3 class="text-lg font-medium">Prêt(s)</h3>
+                  </div>
+                  <div class="p-card-body">
+                    <div
+                      *ngFor="let ln of insuranceForm.value.loans; let i = index"
+                      class="mb-3 p-2 border-1 border-300 border-round"
+                    >
+                      <div class="flex justify-content-between">
+                        <span class="font-medium">Prêt {{ i + 1 }} :</span>
+                        <span>{{ ln.borrowedAmount | currency: 'EUR' }}</span>
+                      </div>
+                      <div class="flex justify-content-between">
+                        <span class="font-medium">Durée :</span>
+                        <span>{{ ln.loanDuration }} mois</span>
+                      </div>
+                      <div class="flex justify-content-between">
+                        <span class="font-medium">Taux :</span>
+                        <span>{{ ln.interestRate | number: '1.2-2' }}%</span>
+                      </div>
+                      <div class="flex justify-content-between">
+                        <span class="font-medium">Type :</span>
+                        <span>{{ ln.loanType }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Récap Garanties -->
+              <div class="col-12">
+                <div class="p-card mb-3">
+                  <div class="p-card-header border-bottom-1 border-300 pb-2 mb-3">
+                    <h3 class="text-lg font-medium">Garanties sélectionnées</h3>
+                  </div>
+                  <div class="p-card-body">
+                    <div *ngFor="let cov of insuranceForm.value.coverageOptions; let i = index" class="mb-2">
+                      <div class="flex justify-content-between">
+                        <span class="font-medium">{{ cov.guaranteeCode }} (Prêt {{ cov.loanRef }}) :</span>
+                        <span>{{ cov.coveragePercentage }}% / Fran. {{ cov.deductibleCode }} j</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Bouton Calcul -->
+            <div class="flex justify-content-center mt-4">
+              <p-button
+                label="Calculer le tarif"
+                icon="pi pi-calculator"
+                styleClass="p-button-primary"
+                [loading]="submitting"
+                (click)="submitForm()"
+              ></p-button>
+            </div>
+          </div>
+
+          <!-- Résultats -->
+          <div *ngIf="quoteResponse" class="card p-4 mt-4">
+            <h2 class="text-xl font-medium mb-4 text-primary">
+              Résultat de la tarification APRIL
+            </h2>
+
+            <!-- When quotes exist -->
+            <div
+              *ngIf="hasQuotes()"
+              class="result-content p-3 border-1 border-primary border-round bg-primary-50"
+            >
+              <div class="grid">
+                <div class="col-12 md:col-6">
+                  <div class="mb-3">
+                    <h3 class="text-lg font-medium">Détails du tarif</h3>
+                    <div class="flex justify-content-between mt-2">
+                      <span class="font-medium">Prime annuelle :</span>
+                      <span class="text-lg font-bold text-primary">
+                        {{ getAnnualPrice() | currency: 'EUR' }}
+                      </span>
+                    </div>
+                    <div class="flex justify-content-between">
+                      <span class="font-medium">Prime mensuelle :</span>
+                      <span>{{ getMonthlyPrice() | currency: 'EUR' }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  class="col-12 md:col-6"
+                  *ngIf="quoteResponse.quotes[0]?.additionalInfo"
+                >
+                  <div class="mb-3">
+                    <h3 class="text-lg font-medium">Informations complémentaires</h3>
+                    <div
+                      *ngFor="
+                        let info of getAdditionalInfoEntries(
+                          quoteResponse.quotes[0].additionalInfo
+                        )
+                      "
+                      class="flex justify-content-between mt-2"
+                    >
+                      <span class="font-medium">{{ info.key }} :</span>
+                      <span>{{ info.value }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- When error or no quotes -->
+            <div
+              *ngIf="hasError()"
+              class="p-3 border-1 border-danger-200 border-round bg-danger-50"
+            >
+              <h3 class="text-lg font-medium text-danger">
+                Erreur lors du calcul de tarif
+              </h3>
+              <p>{{ getErrorMessage() }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Buttons -->
+      <div class="flex justify-content-between mt-4">
+        <p-button
+          label="Précédent"
+          icon="pi pi-chevron-left"
+          styleClass="p-button-outlined"
+          [disabled]="activeIndex === 0"
+          (click)="previousStep()"
+        ></p-button>
+
+        <p-button
+          *ngIf="activeIndex < steps.length - 1"
+          label="Suivant"
+          icon="pi pi-chevron-right"
+          iconPos="right"
+          (click)="nextStep()"
+        ></p-button>
+      </div>
+    </form>
+
+    <!-- Loading Overlay -->
+    <div *ngIf="loading" class="loading-overlay">
+      <p-progressSpinner strokeWidth="5"></p-progressSpinner>
+      <div class="mt-3 text-center">
+        <h3>Calcul en cours...</h3>
+        <p>Veuillez patienter pendant que nous calculons votre tarif.</p>
+      </div>
+    </div>
+  </div>
+</div>

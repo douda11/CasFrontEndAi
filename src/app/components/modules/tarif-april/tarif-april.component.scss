@@ -1,0 +1,109 @@
+.fadeIn {
+  animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+:host ::ng-deep {
+  // PrimeNG customizations
+  .p-steps .p-steps-item.p-highlight .p-steps-number {
+    background-color: var(--primary-color);
+  }
+  
+  // Card styling
+  .p-card {
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  // Form styling
+  .field {
+    margin-bottom: 1rem;
+    
+    label {
+      font-weight: 500;
+    }
+  }
+  
+  // Result styling
+  .result-content {
+    transition: all 0.3s ease;
+    
+    &:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+  }
+  
+  // Button hover effects
+  .p-button:not(.p-disabled):hover {
+    transform: translateY(-2px);
+    transition: transform 0.2s;
+  }
+}
+
+/* src/app/components/tarif-april/tarif-april.component.scss */
+
+/* Reuse the “fadeIn” animation from UTWIN */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fadeIn {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.wizard-content {
+  min-height: 400px;
+}
+
+/* Simple loading-overlay style */
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+
+// Responsive adjustments
+@media screen and (max-width: 768px) {
+  .p-steps {
+    .p-steps-title {
+      display: none;
+    }
+  }
+}
+

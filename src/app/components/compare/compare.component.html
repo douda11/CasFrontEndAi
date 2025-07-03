@@ -472,7 +472,21 @@
                     </td>
                   </tr>
                   <!-- Footer row for buttons -->
-                  <tr class="footer-row">
+                  <tr>
+                    <td class="font-bold">Correspondance</td>
+                    <td></td>
+                    <td *ngFor="let result of comparisonResults" class="text-center font-bold">
+                        {{ result.correspondencePercentage }}%
+                    </td>
+                </tr>
+                <tr>
+                    <td class="font-bold">Point Faible</td>
+                    <td></td>
+                    <td *ngFor="let result of comparisonResults" class="text-center">
+                        {{ result.weakPoint }}
+                    </td>
+                </tr>
+                <tr class="footer-row">
                     <td></td>
                     <td></td>
                     <td *ngFor="let result of comparisonResults" class="text-center">

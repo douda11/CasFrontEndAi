@@ -113,18 +113,23 @@
 
 // New styles for comparison table
 .comparison-table-container {
-  overflow-x: auto;
+  width: 100%;
+  /* overflow-x: auto; // Supprimé pour empêcher le défilement */
 }
 
 .comparison-table {
+  width: 100%; /* Le tableau prend toute la largeur */
+  table-layout: fixed; /* Les colonnes se partagent la largeur équitablement */
   border-collapse: collapse;
   margin: 1rem 0;
-  font-size: 0.9rem;
-  
+  font-size: 0.85rem; /* Police légèrement réduite */
+
   th, td {
-    padding: 0.75rem 1rem;
+    padding: 0.6rem; /* Espacement réduit */
     border: 1px solid #dee2e6;
     vertical-align: middle;
+    word-wrap: break-word; /* Le texte long va à la ligne */
+    hyphens: auto; /* Aide à couper les mots si nécessaire */
   }
 
   thead th {

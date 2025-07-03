@@ -47,6 +47,8 @@ interface ComparisonResult {
   logo: string;
   prix: string;
   garanties: GuaranteeValues;
+  correspondencePercentage: number;
+  weakPoint: string;
 }
 
 interface GarantieDefinition {
@@ -329,6 +331,9 @@ export class CompareComponent implements OnInit {
       .subscribe({
         next: (response) => {
           if (response && response.table) {
+            console.log('--- RAW MARKDOWN FROM BACKEND ---');
+            console.log(response.table);
+            console.log('---------------------------------');
             this.comparisonResults = this.parseMarkdownTable(response.table);
             if (this.comparisonResults.length === 0) {
               this.messageService.add({ severity: 'error', summary: 'Erreur de données', detail: 'Les résultats de la comparaison sont dans un format inattendu.' });
@@ -374,10 +379,18 @@ export class CompareComponent implements OnInit {
 
     const results = dataRows.map(row => {
       const cells = row.split('|').map(c => c.trim()).slice(1, -1);
-      if (cells.length < 3) return null;
+      console.log('Parsing row. Detected cells:', cells.length, cells);
+      if (cells.length < 4) { // On attend maintenant au moins 4 colonnes
+        console.warn('Skipping row, not enough columns:', row);
+        return null;
+      }
 
       const contratText = cells[0];
+      // Les colonnes ont changé de position
+      const correspondencePercentageText = cells[1] || '0%';
       const pointsFortsText = cells[2];
+      const weakPointText = cells.length > 3 ? cells[3] : ''; // Le point faible est dans la 4ème colonne
+      const allBenefitsText = pointsFortsText + ' ' + weakPointText; // On combine les deux
 
       const contratParts = contratText.split(' ');
       const assurance = contratParts[0] || 'N/A';
@@ -385,30 +398,34 @@ export class CompareComponent implements OnInit {
 
       const guaranteeKeywords = {
         hospitalisation: ['Hospitalisation'],
-        honoraires: ['Honoraires'],
+        honoraires: ['SOINS COURANTS'],
         chambreParticuliere: ['Chambre particulière'],
-        dentaire: ['Dentaire'],
+        dentaire: ['Dentaire', 'Soins dentaires'],
         orthodontie: ['Orthodontie'],
         forfaitDentaire: ['Forfait dentaire', 'implantologie'],
         forfaitOptique: ['Forfait optique', 'Optique']
       };
 
       const garanties: GuaranteeValues = {
-        hospitalisation: extractValue(pointsFortsText, guaranteeKeywords.hospitalisation),
-        honoraires: extractValue(pointsFortsText, guaranteeKeywords.honoraires),
-        chambreParticuliere: extractValue(pointsFortsText, guaranteeKeywords.chambreParticuliere),
-        dentaire: extractValue(pointsFortsText, guaranteeKeywords.dentaire),
-        orthodontie: extractValue(pointsFortsText, guaranteeKeywords.orthodontie),
-        forfaitDentaire: extractValue(pointsFortsText, guaranteeKeywords.forfaitDentaire),
-        forfaitOptique: extractValue(pointsFortsText, guaranteeKeywords.forfaitOptique),
+        hospitalisation: extractValue(allBenefitsText, guaranteeKeywords.hospitalisation),
+        honoraires: extractValue(allBenefitsText, guaranteeKeywords.honoraires),
+        chambreParticuliere: extractValue(allBenefitsText, guaranteeKeywords.chambreParticuliere),
+        dentaire: extractValue(allBenefitsText, guaranteeKeywords.dentaire),
+        orthodontie: extractValue(allBenefitsText, guaranteeKeywords.orthodontie),
+        forfaitDentaire: extractValue(allBenefitsText, guaranteeKeywords.forfaitDentaire),
+        forfaitOptique: extractValue(allBenefitsText, guaranteeKeywords.forfaitOptique),
       };
+
+      const correspondencePercentage = parseFloat(correspondencePercentageText.replace('%', '')) || 0;
 
       return {
         assurance: assurance,
         formule: formule,
-        logo: '', 
-        prix: '', 
+        logo: '',
+        prix: '',
         garanties: garanties,
+        correspondencePercentage: correspondencePercentage,
+        weakPoint: weakPointText || 'N/A', // On affiche le point faible, ou N/A s'il est vide
       };
     }).filter((result): result is ComparisonResult => result !== null);
 

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormArray, AbstractControl, ReactiveFormsModule } from '@angular/forms';
-import { CommonModule, DOCUMENT, formatDate } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 
 // PrimeNG imports
@@ -25,19 +25,41 @@ import { AccordionModule } from 'primeng/accordion';
 import { TabViewModule } from 'primeng/tabview';
 import { MarkdownModule } from 'ngx-markdown';
 
-
 // App services and models
 import { CompareService } from '../../services/compare.service';
-import { ResultatComparaison, BesoinClient } from '../../models/comparateur.model';
+import { BesoinClient } from '../../models/comparateur.model';
 import { MessageService } from 'primeng/api';
 import { startWith, finalize } from 'rxjs/operators';
+
+interface GuaranteeValues {
+  hospitalisation: number;
+  honoraires: number;
+  chambreParticuliere: number;
+  dentaire: number;
+  orthodontie: number;
+  forfaitDentaire: number;
+  forfaitOptique: number;
+}
+
+interface ComparisonResult {
+  assurance: string;
+  formule: string;
+  logo: string;
+  prix: string;
+  garanties: GuaranteeValues;
+}
+
+interface GarantieDefinition {
+  label: string;
+  formControlName: keyof GuaranteeValues;
+  unit: '%' | '€';
+}
 
 @Component({
   selector: 'app-compare',
   templateUrl: './compare.component.html',
   styleUrls: ['./compare.component.scss'],
   standalone: true,
-
   imports: [
     CommonModule,
     HttpClientModule,
@@ -68,8 +90,9 @@ export class CompareComponent implements OnInit {
   steps!: MenuItem[];
   activeIndex = 0;
   submitting = false;
-  markdownResult: string = '';
   minDate: Date;
+  comparisonResults: ComparisonResult[] = [];
+  garanties: GarantieDefinition[] = [];
 
   civiliteOptions = [{ label: 'Monsieur', value: 'Monsieur' }, { label: 'Madame', value: 'Madame' }];
   sexeOptions = [{ label: 'Garçon', value: 'garcon' }, { label: 'Fille', value: 'fille' }];
@@ -108,6 +131,7 @@ export class CompareComponent implements OnInit {
     this.initializeForm();
     this.initializeSteps();
     this.setupConjointListener();
+    this.setupGaranties();
   }
 
   initializeForm(): void {
@@ -118,7 +142,7 @@ export class CompareComponent implements OnInit {
         prenom: ['', Validators.required],
         dateNaissance: [null, Validators.required],
         adresse: ['', Validators.required],
-        complementAdresse: [''], // Champ texte libre, pas de validation requise
+        complementAdresse: [''],
         codePostal: ['', [Validators.required, Validators.pattern(/^\d{5}$/)]],
         ville: ['', Validators.required],
         dateEffet: [null, [Validators.required, this.dateFutureValidator.bind(this)]],
@@ -160,8 +184,20 @@ export class CompareComponent implements OnInit {
           conjointGroup.disable();
         }
       });
-      conjointGroup.disable(); // Désactivé par défaut
+      conjointGroup.disable();
     }
+  }
+
+  setupGaranties(): void {
+    this.garanties = [
+      { label: 'Hospitalisation', formControlName: 'hospitalisation', unit: '%' },
+      { label: 'Honoraires', formControlName: 'honoraires', unit: '%' },
+      { label: 'Orthodontie', formControlName: 'orthodontie', unit: '%' },
+      { label: 'Forfait Optique', formControlName: 'forfaitOptique', unit: '€' },
+      { label: 'Forfait Dentaire', formControlName: 'forfaitDentaire', unit: '€' },
+      { label: 'Dentaire', formControlName: 'dentaire', unit: '%' },
+      { label: 'Chambre Particulière', formControlName: 'chambreParticuliere', unit: '€' },
+    ];
   }
 
   initializeSteps(): void {
@@ -176,7 +212,7 @@ export class CompareComponent implements OnInit {
     if (control.value) {
       const selectedDate = new Date(control.value);
       const today = new Date();
-      today.setHours(0, 0, 0, 0); // Ignorer l'heure pour la comparaison
+      today.setHours(0, 0, 0, 0);
       if (selectedDate <= today) {
         return { 'dateInPast': true };
       }
@@ -230,11 +266,11 @@ export class CompareComponent implements OnInit {
     }
 
     if (this.activeIndex < this.steps.length - 1) {
-        if (this.activeIndex === 1) { // Si on est à l'étape des sliders, on soumet
-            this.submitComparison();
-        } else {
-            this.activeIndex++;
-        }
+      if (this.activeIndex === 1) {
+        this.submitComparison();
+      } else {
+        this.activeIndex++;
+      }
     }
   }
 
@@ -274,37 +310,114 @@ export class CompareComponent implements OnInit {
         summary: 'Formulaire Invalide',
         detail: 'Veuillez remplir tous les champs obligatoires correctement avant de soumettre.',
       });
-      // Naviguer vers la première étape invalide
       for (let i = 0; i <= 1; i++) {
-          const stepGroup = this.getCurrentStepGroup(i);
-          if (stepGroup && stepGroup.invalid) {
-              this.activeIndex = i;
-              break;
-          }
+        const stepGroup = this.getCurrentStepGroup(i);
+        if (stepGroup && stepGroup.invalid) {
+          this.activeIndex = i;
+          break;
+        }
       }
       return;
     }
 
     this.submitting = true;
     const coverageSliders = this.insuranceForm.get('coverageSliders')?.value;
-
     const needs: BesoinClient = coverageSliders;
 
     this.compareService.getComparisonResults(needs)
       .pipe(finalize(() => { this.submitting = false; }))
       .subscribe({
         next: (response) => {
-          this.markdownResult = response.table;
-          this.activeIndex = 2; // Aller à l'étape des résultats
+          if (response && response.table) {
+            this.comparisonResults = this.parseMarkdownTable(response.table);
+            if (this.comparisonResults.length === 0) {
+              this.messageService.add({ severity: 'error', summary: 'Erreur de données', detail: 'Les résultats de la comparaison sont dans un format inattendu.' });
+            }
+          } else {
+            this.comparisonResults = [];
+          }
+          this.activeIndex = 2;
           this.messageService.add({ severity: 'success', summary: 'Comparaison Réussie', detail: `Les résultats sont prêts.` });
         },
         error: (err) => {
-          this.markdownResult = '';
+          this.comparisonResults = [];
           this.submitting = false;
-          this.activeIndex = 2; // Navigate to results page to show feedback
+          this.activeIndex = 2;
           this.messageService.add({ severity: 'error', summary: 'Erreur de Comparaison', detail: 'Aucun résultat trouvé ou une erreur est survenue.' });
         }
       });
+  }
+
+  private parseMarkdownTable(markdown: string): ComparisonResult[] {
+    if (!markdown || typeof markdown !== 'string') {
+      return [];
+    }
+
+    const lines = markdown.trim().split('\n').filter(line => line.trim().startsWith('|'));
+    if (lines.length < 3) {
+      return [];
+    }
+
+    const dataRows = lines.slice(2);
+
+    const extractValue = (text: string, keywords: string[]): number => {
+      for (const keyword of keywords) {
+        const regex = new RegExp(`${keyword}[^\\d]*(\\d+)`, 'i');
+        const match = text.match(regex);
+        if (match && match[1]) {
+          const value = parseFloat(match[1]);
+          return isNaN(value) ? 0 : value;
+        }
+      }
+      return 0;
+    };
+
+    const results = dataRows.map(row => {
+      const cells = row.split('|').map(c => c.trim()).slice(1, -1);
+      if (cells.length < 3) return null;
+
+      const contratText = cells[0];
+      const pointsFortsText = cells[2];
+
+      const contratParts = contratText.split(' ');
+      const assurance = contratParts[0] || 'N/A';
+      const formule = contratParts.slice(1).join(' ') || 'N/A';
+
+      const guaranteeKeywords = {
+        hospitalisation: ['Hospitalisation'],
+        honoraires: ['Honoraires'],
+        chambreParticuliere: ['Chambre particulière'],
+        dentaire: ['Dentaire'],
+        orthodontie: ['Orthodontie'],
+        forfaitDentaire: ['Forfait dentaire', 'implantologie'],
+        forfaitOptique: ['Forfait optique', 'Optique']
+      };
+
+      const garanties: GuaranteeValues = {
+        hospitalisation: extractValue(pointsFortsText, guaranteeKeywords.hospitalisation),
+        honoraires: extractValue(pointsFortsText, guaranteeKeywords.honoraires),
+        chambreParticuliere: extractValue(pointsFortsText, guaranteeKeywords.chambreParticuliere),
+        dentaire: extractValue(pointsFortsText, guaranteeKeywords.dentaire),
+        orthodontie: extractValue(pointsFortsText, guaranteeKeywords.orthodontie),
+        forfaitDentaire: extractValue(pointsFortsText, guaranteeKeywords.forfaitDentaire),
+        forfaitOptique: extractValue(pointsFortsText, guaranteeKeywords.forfaitOptique),
+      };
+
+      return {
+        assurance: assurance,
+        formule: formule,
+        logo: '', 
+        prix: '', 
+        garanties: garanties,
+      };
+    }).filter((result): result is ComparisonResult => result !== null);
+
+    return results;
+  }
+
+  getCoverageClass(coverage: number, needed: number): string {
+    if (needed === 0) return '';
+    return coverage >= needed ? 'coverage-good' : 'coverage-bad';
   }
 
   loadExampleData(): void {
@@ -329,7 +442,7 @@ export class CompareComponent implements OnInit {
       coverageSliders: {
         hospitalisation: 200,
         chambreParticuliere: 70,
-        honorairesSpecialistes: 250,
+        honoraires: 150,
         dentaire: 150,
         orthodontie: 300,
         forfaitDentaire: 500,
@@ -342,14 +455,23 @@ export class CompareComponent implements OnInit {
   resetForm(): void {
     this.insuranceForm.reset();
     this.enfants.clear();
-    this.initializeForm(); // Réinitialise avec les valeurs par défaut
+    this.initializeForm();
     this.setupConjointListener();
     this.activeIndex = 0;
-    this.markdownResult = '';
+    this.comparisonResults = [];
     this.messageService.add({ severity: 'info', summary: 'Formulaire réinitialisé', detail: 'Le formulaire a été vidé.' });
   }
 
   hasResults(): boolean {
-    return this.markdownResult.length > 0;
+    return this.comparisonResults && this.comparisonResults.length > 0;
   }
-} 
+
+  selectOffer(offer: ComparisonResult): void {
+    console.log('Offre sélectionnée :', offer);
+    this.messageService.add({
+      severity: 'success',
+      summary: 'Offre choisie',
+      detail: `Vous avez sélectionné l'offre de ${offer.assurance}.`,
+    });
+  }
+}

@@ -372,21 +372,21 @@
                   </div>
                 </div>
 
-                <!-- Chambre particulière -->
-                <div class="col-12 md:col-6">
-                  <div class="field">
-                    <label for="chambreParticuliere" class="block mb-2">Chambre particulière</label>
-                    <p-slider formControlName="chambreParticuliere" [min]="0" [max]="200" [step]="5"></p-slider>
-                    <span class="ml-2 font-bold">{{ insuranceForm.get('coverageSliders.chambreParticuliere')?.value | currency:'EUR':'symbol':'1.0-0' }}</span>
-                  </div>
-                </div>
-
                 <!-- Honoraires -->
                 <div class="col-12 md:col-6">
                   <div class="field">
                     <label for="honoraires" class="block mb-2">Honoraires</label>
                     <p-slider formControlName="honoraires" [min]="0" [max]="500" [step]="5"></p-slider>
                     <span class="ml-2 font-bold">{{ insuranceForm.get('coverageSliders.honoraires')?.value }}%</span>
+                  </div>
+                </div>
+
+                <!-- Chambre particulière -->
+                <div class="col-12 md:col-6">
+                  <div class="field">
+                    <label for="chambreParticuliere" class="block mb-2">Chambre particulière</label>
+                    <p-slider formControlName="chambreParticuliere" [min]="0" [max]="200" [step]="5"></p-slider>
+                    <span class="ml-2 font-bold">{{ insuranceForm.get('coverageSliders.chambreParticuliere')?.value | currency:'EUR':'symbol':'1.0-0' }}</span>
                   </div>
                 </div>
 
@@ -438,65 +438,101 @@
               Résultats de la comparaison
             </h2>
 
-            <!-- Loading state -->
-            <div *ngIf="submitting" class="text-center p-4">
-              <p-progressSpinner></p-progressSpinner>
-              <p class="mt-3">Comparaison en cours...</p>
+            <div *ngIf="comparisonResults.length > 0; else noResults" class="comparison-table-container">
+              <table class="comparison-table w-full">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th class="text-center">Vos Besoins</th>
+                    <th *ngFor="let result of comparisonResults" class="text-center assurance-header">
+                      {{ result.assurance }}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="font-bold">Formule</td>
+                    <td></td>
+                    <td *ngFor="let result of comparisonResults" class="text-center">
+                      {{ result.formule }}
+                    </td>
+                  </tr>
+                  <tr *ngFor="let garantie of garanties">
+                    <td class="font-bold">{{ garantie.label }}</td>
+                    <td class="text-center">
+                      {{ insuranceForm.get('coverageSliders.' + garantie.formControlName)?.value }}{{ garantie.unit }}
+                    </td>
+                    <td *ngFor="let result of comparisonResults" class="text-center" [ngClass]="getCoverageClass(result.garanties[garantie.formControlName], insuranceForm.get('coverageSliders.' + garantie.formControlName)?.value)">
+                      <ng-container *ngIf="garantie.unit === '%'">
+                        {{ result.garanties[garantie.formControlName] }}%
+                      </ng-container>
+                      <ng-container *ngIf="garantie.unit === '€'">
+                        {{ result.garanties[garantie.formControlName] | currency:'EUR' }}
+                      </ng-container>
+                    </td>
+                  </tr>
+                  <!-- Footer row for buttons -->
+                  <tr class="footer-row">
+                    <td></td>
+                    <td></td>
+                    <td *ngFor="let result of comparisonResults" class="text-center">
+                      <p-button label="Choisir" icon="pi pi-check" (click)="selectOffer(result)"></p-button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
 
-            <!-- No results state -->
-            <div *ngIf="!hasResults() && !submitting" class="text-center p-4">
-              <i class="pi pi-info-circle text-4xl text-primary mb-3"></i>
-              <p class="text-lg">Aucun résultat trouvé pour les critères sélectionnés.</p>
-              <p>Essayez de modifier vos critères de recherche.</p>
-            </div>
-
-            <!-- Results Markdown -->
-            <div *ngIf="hasResults() && !submitting" class="prose max-w-none">
-              <markdown [data]="markdownResult"></markdown>
-            </div>
+            <ng-template #noResults>
+              <div class="text-center p-4">
+                <i class="pi pi-info-circle text-4xl text-primary mb-3"></i>
+                <p class="text-lg">
+                  Aucun résultat pour le moment. Veuillez remplir les étapes
+                  précédentes et cliquer sur "Comparer".
+                </p>
+              </div>
+            </ng-template>
           </div>
         </div>
-      </div>
 
-      <!-- Navigation buttons -->
-      <div class="flex justify-content-between mt-4">
-        <p-button
-          label="Précédent"
-          icon="pi pi-chevron-left"
-          styleClass="p-button-secondary"
-          (click)="prevStep()"
-          [disabled]="activeIndex === 0"
-        ></p-button>
-
-        <div>
+        <!-- Navigation buttons -->
+        <div class="flex justify-content-between mt-4">
           <p-button
-            *ngIf="activeIndex === 0"
-            label="Suivant"
-            icon="pi pi-chevron-right"
-            iconPos="right"
-            (click)="nextStep()"
-            [disabled]="!insuranceForm.get('personalInfo')?.valid"
+            label="Précédent"
+            icon="pi pi-chevron-left"
+            styleClass="p-button-secondary"
+            (click)="prevStep()"
+            [disabled]="activeIndex === 0"
           ></p-button>
 
-          <p-button
-            *ngIf="activeIndex === 1"
-            label="Comparer"
-            icon="pi pi-calculator"
-            iconPos="right"
-            (click)="submitComparison()"
-            [loading]="submitting"
-            [disabled]="!insuranceForm.valid"
-          ></p-button>
+          <div>
+            <p-button
+              *ngIf="activeIndex === 0"
+              label="Suivant"
+              icon="pi pi-chevron-right"
+              iconPos="right"
+              (click)="nextStep()"
+              [disabled]="!insuranceForm.get('personalInfo')?.valid"
+            ></p-button>
 
-          <p-button
-            *ngIf="activeIndex === 2"
-            label="Nouvelle comparaison"
-            icon="pi pi-refresh"
-            (click)="resetForm()"
-          ></p-button>
+            <p-button
+              *ngIf="activeIndex === 1"
+              label="Comparer"
+              icon="pi pi-calculator"
+              iconPos="right"
+              (click)="submitComparison()"
+              [loading]="submitting"
+              [disabled]="!insuranceForm.valid"
+            ></p-button>
+
+            <p-button
+              *ngIf="activeIndex === 2"
+              label="Nouvelle comparaison"
+              icon="pi pi-refresh"
+              (click)="resetForm()"
+            ></p-button>
+          </div>
         </div>
-      </div>
-    </form>
   </div>
-</div>
+
+ 

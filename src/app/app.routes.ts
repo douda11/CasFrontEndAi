@@ -8,19 +8,6 @@ export const routes: Routes = [
   {path: 'project', component: ProjectFormComponent},
   {path: 'compare', component: CompareComponent},
 
-  {
-    path: 'tarif-utwin',
-    loadComponent: () => import('./components/modules/tarif-utwin/tarif-utwin.component')
-      .then(m => m.TarifUtwinComponent)
-  },
-  {
-    path: 'tarif-april',
-    loadComponent: () => import('./components/modules/tarif-april/tarif-april.component')
-      .then(m => m.TarifAprilComponent)
-  },
-  {
-    path: 'tarif-comparison',
-    loadComponent: () => import('./components/modules/tarif-comparison/tarif-comparison.component')
-      .then(m => m.TarifComparisonComponent)
-  }
+ 
+
 ];

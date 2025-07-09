@@ -9,76 +9,64 @@ export interface AprilGettarifRequest {
     addresses: Array<{
       $id: string;
       type: string;
-      postCode: string;
-      city: string;
-      addressLine1?: string;
-      addressLine2?: string;
-      addressLine3?: string;
-      addressLine4?: string;
-      countryCode?: string;
-    }>;
-    email: string;
-    commission: string;
-    moralSubscriber: boolean;
-    effectiveDate: string; // "YYYY-MM-DD"
-    cancellation: boolean;
-    projectType: string;
-  };
-  persons: Array<{
-    $id: string;
-    title: string;
-    lastName: string;
-    firstName: string;
-    birthDate: string; // "YYYY-MM-DD"
-    birthDepartment: string;
-    birthCity: string;
-    nationality: string;
-    birthCountry: string;
-    professionalCategory: string;
-    profession: string;
-    abroadTravel: boolean;
-    aerialOrLandSport: boolean;
-    highMileage: boolean;
-    workAtHeight: boolean;
-    heavyLoadHandling: boolean;
-    openEndedContractHolder: boolean;
-    noticeOfTermination: boolean;
-    remainingAccountLemoine?: number;
-    smoker: boolean;
-    politicallyExposedPerson: boolean;
-    politicallyExposedRelatives: boolean;
-  }>;
-  loans: Array<{
-    $id: string;
-    loanType: string;
-    borrowedAmount: number;
-    interestRate: number;
-    loanDuration: number;
-  }>;
-  lenders: Array<{
-    companyName: string;
-    address: {
       addressLine1: string;
       postCode: string;
       city: string;
+    }>;
+    email: string;
+  };
+  persons: Array<{
+    $id: string;
+    birthDate: string; // "YYYY-MM-DD"
+    title: string;
+    lastName: string;
+    birthName: string;
+    firstName: string;
+    birthDepartment: string;
+    birthCity: string;
+    nationality: string;
+    politicallyExposedPerson: boolean;
+    birthCountry: string;
+    mandatoryScheme: string;
+    professionalCategory: string;
+    familyStatus: string;
+    profession: string;
+    acceptanceRequestPartnersAPRIL: boolean;
+    acreBeneficiary: boolean;
+    companyCreationDate: string; // "YYYY-MM-DD"
+    swissCrossBorderWorker: boolean;
+    businessCreator: boolean;
+    microEntrepreneur: boolean;
+    socialSecurityNumber: string;
+    landlinePhone?: {
+      prefix: string;
+      number: string;
     };
-    loans: Array<{ $ref: string }>;
+    mobilePhone?: {
+      prefix: string;
+      number: string;
+    };
+    email: string;
   }>;
   products: Array<{
     $id: string;
     productCode: string;
-    contributionType: string;
-    insured: {
-      role: 'AssurePrincipal';
-      person: { $ref: string };
+    effectiveDate: string; // "YYYY-MM-DD"
+    commission: string;
+    termination?: {
+      insurer: string;
+      formerContractReference: string;
     };
+    insureds: Array<{
+      $id: string;
+      role: string;
+      person: { $ref: string };
+    }>;
     coverages: Array<{
-      loan: { $ref: string };
+      insured: { $ref: string };
       guaranteeCode: string;
-      coveragePercentage?: number;
-      deductibleCode?: string;
-      levelCode?: string;
-      compensationMode?: string;
+      levelCode: string;
+      eligibleMadelinLaw: boolean;
     }>;
   }>;
 }

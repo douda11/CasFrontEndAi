@@ -156,6 +156,27 @@
 
                 <div class="col-12 md:col-4">
                   <div class="field">
+                    <label for="telephone1" class="block mb-2">Téléphone *</label>
+                    <p-inputMask
+                      id="telephone1"
+                      formControlName="telephone1"
+                      mask="09 99 99 99 99"
+                      placeholder="06 12 34 56 78"
+                      class="w-full"
+                    ></p-inputMask>
+                    <small
+                      *ngIf="
+                        insuranceForm.get('personalInfo.telephone1')?.invalid &&
+                        insuranceForm.get('personalInfo.telephone1')?.touched
+                      "
+                      class="p-error"
+                      >Le numéro de téléphone est requis</small
+                    >
+                  </div>
+                </div>
+
+                <div class="col-12 md:col-4">
+                  <div class="field">
                     <label for="ville" class="block mb-2">Ville *</label>
                     <input
                       id="ville"
@@ -250,6 +271,29 @@
                       "
                       class="p-error"
                       >L'Etat civil est requis</small
+                    >
+                  </div>
+                </div>
+
+                <div class="col-12 md:col-4">
+                  <div class="field">
+                    <label for="regime" class="block mb-2">Régime obligatoire *</label>
+                    <p-dropdown
+                      id="regime"
+                      formControlName="regime"
+                      [options]="regimeOptions"
+                      optionLabel="label"
+                      optionValue="value"
+                      placeholder="Sélectionner"
+                      [style]="{ width: '100%' }"
+                    ></p-dropdown>
+                    <small
+                      *ngIf="
+                        insuranceForm.get('personalInfo.regime')?.invalid &&
+                        insuranceForm.get('personalInfo.regime')?.touched
+                      "
+                      class="p-error"
+                      >Le régime est requis</small
                     >
                   </div>
                 </div>

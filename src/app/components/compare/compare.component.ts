@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormArray, AbstractControl, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 // PrimeNG imports
 import { StepsModule } from 'primeng/steps';
@@ -27,7 +28,9 @@ import { MarkdownModule } from 'ngx-markdown';
 
 // App services and models
 import { CompareService } from '../../services/compare.service';
+import { InsuranceService } from '../../services/insurance.service';
 import { BesoinClient } from '../../models/comparateur.model';
+import { InsuranceQuoteForm, InsuredPerson } from '../../models/project-model';
 import { MessageService } from 'primeng/api';
 import { startWith, finalize } from 'rxjs/operators';
 
@@ -96,8 +99,16 @@ export class CompareComponent implements OnInit {
   comparisonResults: ComparisonResult[] = [];
   garanties: GarantieDefinition[] = [];
 
-  civiliteOptions = [{ label: 'Monsieur', value: 'Monsieur' }, { label: 'Madame', value: 'Madame' }];
-  sexeOptions = [{ label: 'Garçon', value: 'garcon' }, { label: 'Fille', value: 'fille' }];
+  civiliteOptions = [
+    { label: 'Monsieur', value: 'M' },
+    { label: 'Madame', value: 'F' },
+  ];
+
+  regimeOptions = [
+    { label: 'TNS', value: 'TNS' },
+    // Add other options here when available
+  ];
+
   EtatcivilOptions = [
     { label: 'Célibataire', value: 'celibataire' },
     { label: 'Marié(e)', value: 'marie' },
@@ -107,26 +118,17 @@ export class CompareComponent implements OnInit {
     { label: 'Veuf(ve)', value: 'veuf' },
     { label: 'Non déclaré', value: 'situationNonDeclaree' }
   ];
-  regimeOptions = [
-    { label: 'Salarié', value: 'salarie' },
-    { label: 'Travailleur non salarié', value: 'tns' },
-    { label: 'Exploitant agricole', value: 'exploitant_agricole' },
-    { label: 'Salarié agricole', value: 'salarie_agricole' },
-    { label: 'Alsace-Moselle', value: 'alsace_moselle' },
-    { label: 'Fonction publique', value: 'fonction_publique' },
-    { label: 'Retraité salarié', value: 'retraite_salarie' },
-    { label: 'Retraité TNS', value: 'retraite_tns' },
-    { label: 'Retraité Alsace-Moselle', value: 'retraite_alsace_moselle' },
-    { label: 'Étudiant', value: 'etudiant' }
-  ];
+  sexeOptions = [{ label: 'Garçon', value: 'garcon' }, { label: 'Fille', value: 'fille' }];
 
   constructor(
     private fb: FormBuilder,
     private compareService: CompareService,
-    private messageService: MessageService
+    private insuranceService: InsuranceService,
+    private messageService: MessageService,
+    private router: Router
   ) {
-    this.minDate = new Date();
-    this.minDate.setDate(this.minDate.getDate() + 1);
+    const today = new Date();
+    this.minDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
   }
 
   ngOnInit(): void {
@@ -147,17 +149,18 @@ export class CompareComponent implements OnInit {
         complementAdresse: [''],
         codePostal: ['', [Validators.required, Validators.pattern(/^\d{5}$/)]],
         ville: ['', Validators.required],
-        dateEffet: [null, [Validators.required, this.dateFutureValidator.bind(this)]],
+        dateEffet: [this.minDate, Validators.required],
         email: ['', [Validators.required, Validators.email]],
         telephone1: ['', Validators.required],
-        etatCivil: ['celibataire', Validators.required],
+        etatCivil: [null, Validators.required],
+        regime: [null, Validators.required],
         conjoint: this.fb.group({
-          civilite: ['Monsieur'],
+          civilite: [''],
           nom: [''],
           prenom: [''],
           email: ['', Validators.email],
           dateNaissance: [null],
-          regime: ['GENERAL'],
+          regime: ['']
         }),
         enfants: this.fb.array([]),
       }),
@@ -398,7 +401,7 @@ export class CompareComponent implements OnInit {
 
       const guaranteeKeywords = {
         hospitalisation: ['Hospitalisation'],
-        honoraires: ['SOINS COURANTS'],
+        honoraires: ['SOINS COURANTS', 'Honoraires'],
         chambreParticuliere: ['Chambre particulière'],
         dentaire: ['Dentaire', 'Soins dentaires'],
         orthodontie: ['Orthodontie'],
@@ -438,35 +441,29 @@ export class CompareComponent implements OnInit {
   }
 
   loadExampleData(): void {
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-
-    this.insuranceForm.patchValue({
-      personalInfo: {
-        civilite: 'Monsieur',
-        nom: 'Dupont',
-        prenom: 'Jean',
-        dateNaissance: new Date('1985-03-15'),
-        adresse: '123 Rue de la Paix',
-        complementAdresse: 'Apt 101',
-        codePostal: '75001',
-        ville: 'PARIS',
-        email: 'jean.dupont@example.com',
-        telephone1: '0123456789',
-        etatCivil: 'celibataire',
-        dateEffet: tomorrow,
-      },
-      coverageSliders: {
-        hospitalisation: 200,
-        chambreParticuliere: 70,
-        honoraires: 150,
-        dentaire: 150,
-        orthodontie: 300,
-        forfaitDentaire: 500,
-        forfaitOptique: 400,
-      }
+    this.insuranceForm.get('personalInfo')?.patchValue({
+      civilite: 'M',
+      nom: 'Dupont',
+      prenom: 'Jean',
+      dateNaissance: new Date('1980-05-15'),
+      regime: 'TNS',
+      etatCivil: 'celibataire',
+      adresse: '123 Rue de Paris',
+      codePostal: '75001',
+      ville: 'Paris',
+      complementAdresse: 'Apt 101',
+      dateEffet: new Date(),
+      email: 'jean.dupont@example.com',
+      telephone1: '0612345678'
     });
-    this.messageService.add({ severity: 'info', summary: 'Données chargées', detail: 'Les données d\'exemple ont été chargées.' });
+
+    // Clear existing children
+    const enfantsArray = this.insuranceForm.get('personalInfo.enfants') as FormArray;
+    while (enfantsArray.length) {
+      enfantsArray.removeAt(0);
+    }
+
+    this.messageService.add({ severity: 'success', summary: 'Données chargées', detail: 'Les données d\'exemple pour l\'assuré principal ont été chargées.' });
   }
 
   resetForm(): void {
@@ -483,12 +480,110 @@ export class CompareComponent implements OnInit {
     return this.comparisonResults && this.comparisonResults.length > 0;
   }
 
-  selectOffer(offer: ComparisonResult): void {
-    console.log('Offre sélectionnée :', offer);
-    this.messageService.add({
-      severity: 'success',
-      summary: 'Offre choisie',
-      detail: `Vous avez sélectionné l'offre de ${offer.assurance}.`,
+  selectOffer(offer: any): void {
+    console.log('Offre sélectionnée pour tarification :', offer);
+    this.submitting = true;
+
+    const personalInfo = this.insuranceForm.get('personalInfo')?.value;
+    const familyInfo = this.insuranceForm.get('familyInfo')?.value;
+
+    const mainInsured: InsuredPerson = {
+      lastName: personalInfo.nom,
+      firstName: personalInfo.prenom,
+      birthDate: personalInfo.dateNaissance,
+      gender: personalInfo.civilite,
+      address: {
+        street: personalInfo.adresse,
+        postalCode: personalInfo.codePostal,
+        city: personalInfo.ville,
+      },
+      email: personalInfo.email,
+      phoneNumber: personalInfo.telephone1,
+      regime: personalInfo.regime,
+      situation: personalInfo.etatCivil,
+      addressType: personalInfo.addressType,
+    };
+
+    const insuredPersons: InsuredPerson[] = [mainInsured];
+
+    // Add spouse if exists
+    if (personalInfo.etatCivil === 'marie' && personalInfo.conjoint) {
+        const conjoint: InsuredPerson = {
+            lastName: personalInfo.conjoint.nom,
+            firstName: personalInfo.conjoint.prenom,
+            birthDate: personalInfo.conjoint.dateNaissance,
+            gender: personalInfo.conjoint.civilite,
+            address: mainInsured.address, // Assuming same address
+            email: personalInfo.conjoint.email,
+            phoneNumber: '', // No phone for spouse in form
+            regime: personalInfo.conjoint.regime,
+            situation: 'Marie',
+            addressType: mainInsured.addressType // Assuming same address type as main insured
+        };
+        insuredPersons.push(conjoint);
+    }
+
+    // Add children if they exist
+    const enfantsArray = this.insuranceForm.get('familyInfo.enfants') as FormArray;
+    if (enfantsArray && enfantsArray.length > 0) {
+      enfantsArray.controls.forEach(control => {
+        const enfantValue = control.value;
+        const enfant: InsuredPerson = {
+          lastName: personalInfo.nom, // Assuming same last name
+          firstName: enfantValue.prenom,
+          birthDate: enfantValue.dateNaissance,
+          gender: enfantValue.civilite,
+          address: mainInsured.address, // Assuming same address
+          email: '', // No email for children in form
+          phoneNumber: '', // No phone for children in form
+          regime: 'GENERAL', // Default regime for children
+          situation: 'Celibataire',
+          addressType: mainInsured.addressType // Assuming same address type as main insured
+        };
+        insuredPersons.push(enfant);
+      });
+    }
+
+    const quoteForm: InsuranceQuoteForm = {
+      productReference: offer.nomDeLOffre,
+      insuredPersons: insuredPersons,
+      contact: {
+        email: personalInfo.email,
+        phoneNumber: personalInfo.telephone1,
+        address: mainInsured.address,
+      },
+      effectDate: personalInfo.dateEffet,
+      garanties: [],
+      coverageOptions: [] // Added to satisfy interface
+    };
+
+    this.insuranceService.getAprilHealthTarif(quoteForm).pipe(
+      finalize(() => {
+        this.submitting = false;
+      })
+    ).subscribe({
+      next: (response) => {
+        console.log('API Response:', response);
+        // Assuming the response has a 'data' array with pricing info
+        const tarifGlobal = response.data?.find((d: any) => d.priceType === 'TarifGlobal');
+        if (tarifGlobal) {
+            this.messageService.add({
+                severity: 'success',
+                summary: 'Tarif Obtenu',
+                detail: `Le tarif mensuel pour l'offre ${offer.nomDeLOffre} est de ${tarifGlobal.contribution.contributionAmount} €.`
+            });
+        } else {
+            throw new Error('Tarif non trouvé dans la réponse.');
+        }
+      },
+      error: (err) => {
+        console.error('Erreur API:', err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erreur de tarification',
+          detail: 'Une erreur est survenue lors de la récupération du tarif. Veuillez réessayer.'
+        });
+      }
     });
   }
 }

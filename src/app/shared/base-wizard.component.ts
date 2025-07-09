@@ -109,7 +109,7 @@ export class BaseWizardComponent implements OnInit {
 
   // Initialize the form
   initForm(): void {
-    this.insuranceForm = this.formService.createInsuranceForm();
+    this.insuranceForm = this.formService.createHealthInsuranceForm();
   }
 
   // Initialize the steps
@@ -187,54 +187,11 @@ export class BaseWizardComponent implements OnInit {
     }
   }
 
-  // Helper method to get borrowers form array
-  get borrowers(): FormArray {
-    return this.formService.getBorrowersArray(this.insuranceForm);
-  }
-
-  // Helper method to get loans form array
-  get loans(): FormArray {
-    return this.formService.getLoansArray(this.insuranceForm);
-  }
-
-  // Helper method to get coverage options form array
-  get coverageOptions(): FormArray {
-    return this.formService.getCoverageOptionsArray(this.insuranceForm);
-  }
-
-  // Add a borrower
-  addBorrower(): void {
-    this.formService.addBorrower(this.insuranceForm);
-  }
-
-  // Remove a borrower
-  removeBorrower(index: number): void {
-    this.formService.removeBorrower(this.insuranceForm, index);
-  }
-
-  // Add a loan
-  addLoan(): void {
-    this.formService.addLoan(this.insuranceForm);
-  }
-
-  // Remove a loan
-  removeLoan(index: number): void {
-    this.formService.removeLoan(this.insuranceForm, index);
-  }
-
-  // Add a coverage option
-  addCoverageOption(): void {
-    this.formService.addCoverageOption(this.insuranceForm);
-  }
-
-  // Remove a coverage option
-  removeCoverageOption(index: number): void {
-    this.formService.removeCoverageOption(this.insuranceForm, index);
-  }
+  
 
   // Reset the form
   resetForm(): void {
-    this.insuranceForm = this.formService.createInsuranceForm();
+    this.insuranceForm = this.formService.createHealthInsuranceForm();
     this.activeIndex = 0;
     this.quoteResponse = null;
   }

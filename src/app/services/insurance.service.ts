@@ -3,7 +3,7 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BorrowerForm } from '../models/borrower-form.model';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { QuoteResponse, ComparisonResult, InsuranceQuoteForm, AprilPayload, AprilPerson, AprilAddress, AprilMobilePhone, AprilProduct, AprilInsured, AprilCoverage } from '../models/project-model';
 import { formatDate } from '@angular/common';
 
@@ -18,9 +18,9 @@ export class InsuranceService {
   private compareUrl = `${this.apiBasePath}/api/v1/comparisons/compare`;
 
   private aprilProductCodeMap: { [key: string]: string } = {
-    'APRIL Santé Mix Proximité': 'SanteMix',
-    'SANTE PRO APRIL': 'SantePro',
-    'Santé PRO Solution': 'SanteSolution',
+    'Santé Pro Solution': 'SanteSolution', // Plus spécifique en premier
+    'Santé Mix': 'SanteMix',
+    'Santé Pro': 'SantePro',
   };
 
   constructor(
@@ -38,9 +38,8 @@ export class InsuranceService {
   // New method for Health Protection API
 
 
-  private getGuaranteeCoverages(productCode: string, insuredRef: string): AprilCoverage[] {
+  private getGuaranteeCoverages(productCode: string, insuredRef: string, levelCode: string): AprilCoverage[] {
     const coverages: AprilCoverage[] = [];
-    const levelCode = '04'; // This seems to be constant in the examples
 
     const guaranteeMap: { [key: string]: string[] } = {
       'SantePro': ['MaladieChirurgie', 'Surcomplementaire'],
@@ -56,17 +55,23 @@ export class InsuranceService {
         guaranteeCode: guaranteeCode,
         eligibleMadelinLaw: true
       };
-      // Only add levelCode if it's not a 'Surcomplementaire'
-      if (guaranteeCode !== 'Surcomplementaire') {
+
+      // Appliquer le levelCode selon les règles
+      if (productCode === 'SantePro' || productCode === 'SanteSolution') {
+        if (guaranteeCode !== 'Surcomplementaire') {
+          coverage.levelCode = levelCode;
+        }
+      } else if (productCode === 'SanteMix') {
         coverage.levelCode = levelCode;
       }
+      
       coverages.push(coverage);
     });
 
     return coverages;
   }
 
-  private transformToAprilPayload(form: InsuranceQuoteForm, productCode: string): AprilPayload {
+  private transformToAprilPayload(form: InsuranceQuoteForm, productCode: string, levelCode: string): AprilPayload {
     const mainPersonInfo = form.insuredPersons[0];
 
     const persons: AprilPerson[] = form.insuredPersons.map((p, index) => {
@@ -102,7 +107,7 @@ export class InsuranceService {
       };
     });
 
-    const coverages = this.getGuaranteeCoverages(productCode, 'a-1');
+    const coverages = this.getGuaranteeCoverages(productCode, 'a-1', levelCode);
 
     const payload: AprilPayload = {
       $type: 'PrevPro',
@@ -133,10 +138,27 @@ export class InsuranceService {
     return payload;
   }
 
-  getAprilHealthTarif(form: InsuranceQuoteForm): Observable<any> {
-    // Utiliser la référence produit du formulaire
-    const productCode = this.aprilProductCodeMap[form.productReference || ''] || 'SantePro';
-    const payload = this.transformToAprilPayload(form, productCode);
+  getAprilHealthTarif(form: InsuranceQuoteForm, productReference: string, formule: string): Observable<any> {
+    // Extraire le levelCode de la formule (ex: "Formule 3" -> "03")
+    const levelMatch = formule.match(/\d+/);
+    const levelCode = levelMatch ? levelMatch[0].padStart(2, '0') : '01'; // Default à '01' si non trouvé
+
+    // Déterminer le productCode en cherchant une correspondance partielle
+    let productCode: string | null = null;
+    for (const key in this.aprilProductCodeMap) {
+      if (productReference.toLowerCase().includes(key.toLowerCase())) {
+        productCode = this.aprilProductCodeMap[key];
+        break; // Arrêter dès qu'une correspondance est trouvée
+      }
+    }
+
+    // Si aucun productCode n'est trouvé, retourner une erreur
+    if (!productCode) {
+      console.error('Aucun productCode correspondant trouvé pour la référence:', productReference);
+      return throwError(() => new Error(`Aucun produit correspondant trouvé pour "${productReference}"`));
+    }
+
+    const payload = this.transformToAprilPayload(form, productCode, levelCode);
 
     console.log('Sending April Payload:', JSON.stringify(payload, null, 2));
 

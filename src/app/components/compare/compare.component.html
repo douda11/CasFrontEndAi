@@ -494,13 +494,21 @@
                   </tr>
                 </thead>
                 <tbody>
+                  <!-- Row for Formule -->
                   <tr>
                     <td class="font-bold">Formule</td>
                     <td></td>
-                    <td *ngFor="let result of comparisonResults" class="text-center">
+                    <td *ngFor="let result of comparisonResults" 
+                        class="text-center" 
+                        (click)="onFormuleSelect(result.assurance, result.formule)" 
+                        style="cursor: pointer; text-decoration: underline; color: blue;"
+                        pTooltip="Cliquez pour calculer le tarif de cette formule"
+                        tooltipPosition="top">
                       {{ result.formule }}
                     </td>
                   </tr>
+
+                  <!-- Rows for Garanties -->
                   <tr *ngFor="let garantie of garanties">
                     <td class="font-bold">{{ garantie.label }}</td>
                     <td class="text-center">
@@ -515,22 +523,27 @@
                       </ng-container>
                     </td>
                   </tr>
-                  <!-- Footer row for buttons -->
+
+                  <!-- Footer row for Correspondance -->
                   <tr>
                     <td class="font-bold">Correspondance</td>
                     <td></td>
                     <td *ngFor="let result of comparisonResults" class="text-center font-bold">
                         {{ result.correspondencePercentage }}%
                     </td>
-                </tr>
-                <tr>
+                  </tr>
+
+                  <!-- Footer row for Point Faible -->
+                  <tr>
                     <td class="font-bold">Point Faible</td>
                     <td></td>
                     <td *ngFor="let result of comparisonResults" class="text-center">
                         {{ result.weakPoint }}
                     </td>
-                </tr>
-                <tr class="footer-row">
+                  </tr>
+
+                  <!-- Footer row for buttons -->
+                  <tr class="footer-row">
                     <td></td>
                     <td></td>
                     <td *ngFor="let result of comparisonResults" class="text-center">

@@ -307,6 +307,35 @@ export class CompareComponent implements OnInit {
     this.activeIndex = index;
   }
 
+  onFormuleSelect(productReference: string, formule: string): void {
+    this.insuranceForm.markAllAsTouched();
+    if (this.insuranceForm.invalid) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Formulaire Invalide',
+        detail: 'Veuillez remplir tous les champs obligatoires avant de continuer.',
+      });
+      return;
+    }
+
+    this.submitting = true;
+    const formValues = this.transformFormToQuote();
+
+    this.insuranceService.getAprilHealthTarif(formValues, productReference, formule)
+      .pipe(finalize(() => { this.submitting = false; }))
+      .subscribe({
+        next: (response) => {
+          console.log('April API Response:', response);
+          this.messageService.add({ severity: 'success', summary: 'Tarif Calculé', detail: 'Le tarif a été calculé avec succès.' });
+          // Vous pouvez traiter la réponse ici, par exemple, l'afficher dans l'interface utilisateur
+        },
+        error: (err) => {
+          console.error('April API Error:', err);
+          this.messageService.add({ severity: 'error', summary: 'Erreur API', detail: 'Une erreur est survenue lors du calcul du tarif.' });
+        }
+      });
+  }
+
   submitComparison(): void {
     this.insuranceForm.markAllAsTouched();
     if (this.insuranceForm.invalid) {
@@ -354,6 +383,85 @@ export class CompareComponent implements OnInit {
           this.messageService.add({ severity: 'error', summary: 'Erreur de Comparaison', detail: 'Aucun résultat trouvé ou une erreur est survenue.' });
         }
       });
+  }
+
+  private transformFormToQuote(): InsuranceQuoteForm {
+    const personalInfo = this.insuranceForm.get('personalInfo')?.value;
+    const insuredPersons: InsuredPerson[] = [];
+
+    // Main person
+    insuredPersons.push({
+      lastName: personalInfo.nom,
+      firstName: personalInfo.prenom,
+      birthDate: personalInfo.dateNaissance,
+      gender: personalInfo.civilite === 'Monsieur' ? 'M' : 'F',
+      address: {
+        street: personalInfo.adresse,
+        postalCode: personalInfo.codePostal,
+        city: personalInfo.ville
+      },
+      email: personalInfo.email,
+      phoneNumber: personalInfo.telephone1,
+      regime: personalInfo.regime,
+      situation: personalInfo.etatCivil,
+      addressType: 'Actuelle'
+    });
+
+    // Conjoint
+    if (personalInfo.conjoint && (personalInfo.etatCivil === 'marie' || personalInfo.etatCivil === 'unionLibre')) {
+      insuredPersons.push({
+        lastName: personalInfo.conjoint.nom,
+        firstName: personalInfo.conjoint.prenom,
+        birthDate: personalInfo.conjoint.dateNaissance,
+        gender: personalInfo.conjoint.civilite === 'Madame' ? 'F' : 'M',
+        address: {
+          street: personalInfo.adresse, // Assuming same address
+          postalCode: personalInfo.codePostal,
+          city: personalInfo.ville
+        },
+        email: personalInfo.conjoint.email,
+        phoneNumber: '', // No separate phone in form
+        regime: personalInfo.conjoint.regime,
+        situation: personalInfo.etatCivil,
+        addressType: 'Actuelle'
+      });
+    }
+
+    // Enfants
+    personalInfo.enfants.forEach((enfant: any) => {
+      insuredPersons.push({
+        lastName: enfant.nom,
+        firstName: enfant.prenom,
+        birthDate: enfant.dateNaissance,
+        gender: enfant.sexe === 'garcon' ? 'M' : 'F',
+        address: { // Assuming same address
+          street: personalInfo.adresse,
+          postalCode: personalInfo.codePostal,
+          city: personalInfo.ville
+        },
+        email: '', // No email for children in form
+        phoneNumber: '', // No phone for children in form
+        regime: enfant.regime,
+        situation: 'celibataire', // Children are single
+        addressType: 'Actuelle'
+      });
+    });
+
+    return {
+      productReference: '', // This will be set dynamically
+      insuredPersons: insuredPersons,
+      contact: {
+        email: personalInfo.email,
+        phoneNumber: personalInfo.telephone1,
+        address: {
+          street: personalInfo.adresse,
+          postalCode: personalInfo.codePostal,
+          city: personalInfo.ville
+        }
+      },
+      effectDate: personalInfo.dateEffet,
+      garanties: [] // Placeholder
+    };
   }
 
   private parseMarkdownTable(markdown: string): ComparisonResult[] {
@@ -422,7 +530,7 @@ export class CompareComponent implements OnInit {
       const correspondencePercentage = parseFloat(correspondencePercentageText.replace('%', '')) || 0;
 
       return {
-        assurance: assurance,
+        assurance: cells[0].trim().replace(/\*/g, ''), // Nettoyer les astérisques du markdown
         formule: formule,
         logo: '',
         prix: '',
@@ -545,7 +653,7 @@ export class CompareComponent implements OnInit {
     }
 
     const quoteForm: InsuranceQuoteForm = {
-      productReference: offer.nomDeLOffre,
+      productReference: offer.assurance, // Using the assurance name as the reference
       insuredPersons: insuredPersons,
       contact: {
         email: personalInfo.email,
@@ -557,7 +665,7 @@ export class CompareComponent implements OnInit {
       coverageOptions: [] // Added to satisfy interface
     };
 
-    this.insuranceService.getAprilHealthTarif(quoteForm).pipe(
+    this.insuranceService.getAprilHealthTarif(quoteForm, offer.assurance, offer.formule).pipe(
       finalize(() => {
         this.submitting = false;
       })

@@ -24,6 +24,8 @@ import { CardModule } from 'primeng/card';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { AccordionModule } from 'primeng/accordion';
 import { TabViewModule } from 'primeng/tabview';
+import { DialogModule } from 'primeng/dialog';
+import { TableModule } from 'primeng/table';
 import { MarkdownModule } from 'ngx-markdown';
 
 // App services and models
@@ -52,6 +54,11 @@ interface ComparisonResult {
   garanties: GuaranteeValues;
   correspondencePercentage: number;
   weakPoint: string;
+  // Fields for automatic APRIL pricing
+  isAprilProduct?: boolean;
+  isPricingLoading?: boolean;
+  tarifGlobal?: number;
+  tarifDetails?: any[];
 }
 
 interface GarantieDefinition {
@@ -87,6 +94,8 @@ interface GarantieDefinition {
     ProgressSpinnerModule,
     AccordionModule,
     TabViewModule,
+    DialogModule,
+    TableModule,
     MarkdownModule
   ]
 })
@@ -98,6 +107,10 @@ export class CompareComponent implements OnInit {
   minDate: Date;
   comparisonResults: ComparisonResult[] = [];
   garanties: GarantieDefinition[] = [];
+
+  // For Details Modal
+  selectedResultForDetails: ComparisonResult | null = null;
+  isDetailModalVisible = false;
 
   civiliteOptions = [
     { label: 'Monsieur', value: 'M' },
@@ -367,6 +380,8 @@ export class CompareComponent implements OnInit {
             console.log(response.table);
             console.log('---------------------------------');
             this.comparisonResults = this.parseMarkdownTable(response.table);
+            this.fetchAprilPrices();
+
             if (this.comparisonResults.length === 0) {
               this.messageService.add({ severity: 'error', summary: 'Erreur de données', detail: 'Les résultats de la comparaison sont dans un format inattendu.' });
             }
@@ -690,6 +705,48 @@ export class CompareComponent implements OnInit {
           severity: 'error',
           summary: 'Erreur de tarification',
           detail: 'Une erreur est survenue lors de la récupération du tarif. Veuillez réessayer.'
+        });
+      }
+    });
+  }
+
+  public getInsurerName(assurance: string): string {
+    if (!assurance) {
+      return '';
+    }
+    return assurance.split(' ')[0];
+  }
+
+  public showDetails(result: ComparisonResult): void {
+    this.selectedResultForDetails = result;
+    this.isDetailModalVisible = true;
+  }
+
+  private fetchAprilPrices(): void {
+    const quoteForm = this.transformFormToQuote();
+
+    this.comparisonResults.forEach(result => {
+      if (result.assurance?.toLowerCase().includes('april')) {
+        result.isAprilProduct = true;
+        result.isPricingLoading = true;
+
+        this.insuranceService.getAprilHealthTarif(quoteForm, result.assurance, result.formule).pipe(
+          finalize(() => {
+            result.isPricingLoading = false;
+          })
+        ).subscribe({
+          next: (response) => {
+            const tarifGlobal = response.data?.find((d: any) => d.priceType === 'TarifGlobal');
+            if (tarifGlobal) {
+              result.tarifGlobal = tarifGlobal.contribution.contributionAmount;
+              result.tarifDetails = response.data?.filter((d: any) => d.priceType === 'TarifDetaille');
+            } else {
+              console.error('Tarif non trouvé pour', result.assurance);
+            }
+          },
+          error: (err) => {
+            console.error('Erreur API pour', result.assurance, err);
+          }
         });
       }
     });

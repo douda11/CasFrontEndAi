@@ -173,6 +173,15 @@ export class InsuranceService {
     return this.http.post(url, payload, { params });
   }
 
-  
+  getUtwinTarif(form: InsuranceQuoteForm, formule: string): Observable<any> {
+    const payload = {
+      form_data: form, // Le backend s'attend peut-être à une structure spécifique
+      formule: formule
+    };
+
+    console.log('Sending Utwin Payload:', JSON.stringify(payload, null, 2));
+
+    return this.http.post(this.utwinUrl, payload);
   }
+}
 

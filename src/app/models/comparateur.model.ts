@@ -25,6 +25,14 @@ export interface ResultatComparaison {
 }
 
 // Interface for the request payload sent to the backend comparator API.
+// Interface for an individual to be insured.
+export interface Assure {
+  role: string; // e.g., 'AssurePrincipal', 'Conjoint'
+  dateDeNaissance: string; // ISO 8601 format
+  regime: string; // e.g., 'RG', 'TNS'
+}
+
+// Interface for the request payload sent to the backend comparator API.
 export interface BesoinClient {
   hospitalisation: number;
   chambreParticuliere: number;
@@ -32,5 +40,10 @@ export interface BesoinClient {
   dentaire: number;
   orthodontie: number;
   forfaitDentaire: number;
-  forfaitOptique: number;
+    forfaitOptique: number;
+
+  // User and contract details
+  codePostal: string;
+  dateEffet: string; // ISO 8601 format
+  assures: Assure[];
 }

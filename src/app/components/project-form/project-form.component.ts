@@ -109,7 +109,7 @@ export class ProjectFormComponent implements OnInit {
     { label: 'Sélectionner un produit', value: null },
     { label: 'APRIL Santé Mix Proximité', value: 'APRIL Santé Mix Proximité' },
     { label: 'SANTE PRO APRIL', value: 'SANTE PRO APRIL' },
-    { label: 'Santé PRO Solution', value: 'Santé PRO Solution' },
+    { label: 'SanteProStartV1', value: 'SanteProStartV1' },
   ];
 
   today = new Date();

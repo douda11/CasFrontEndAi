@@ -111,12 +111,15 @@ export interface AprilPayload {
 
 export interface ComparisonResult {
   assurance: string;
+  formule: string;
   logo: string;
-  nomDeLOffre: string;
-  prix: number;
-  avantages: string[];
-  details?: any;
-  score: number;
+  prix: number | string;
+  correspondencePercentage: number;
+  weakPoint: string;
+  pointsForts: string;
+  garanties: any; 
+  isPricingLoading: boolean;
+  tarifGlobal?: number;
 }
 
 

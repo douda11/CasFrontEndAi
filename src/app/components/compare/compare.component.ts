@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormArray, AbstractControl, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 
 // PrimeNG imports
@@ -261,7 +261,10 @@ export class CompareComponent implements OnInit {
         next: (response: any) => {
           if (response && response.table) {
             this.comparisonResults = this.parseMarkdownTable(response.table);
-            this.fetchAprilPrices();
+            setTimeout(() => {
+              this.fetchAprilPrices();
+              this.fetchAllUtwinPrices();
+            });
 
             if (response.utwinResponse) {
               if (response.utwinResponse.propositions) {
@@ -275,7 +278,7 @@ export class CompareComponent implements OnInit {
           this.activeIndex = 2;
           this.messageService.add({ severity: 'success', summary: 'Comparaison Terminée', detail: 'Les résultats sont disponibles.' });
         },
-        error: (err) => {
+        error: (err: HttpErrorResponse) => {
           this.submitting = false;
           this.activeIndex = 2;
           if (err.status === 400 && err.error) {
@@ -287,7 +290,10 @@ export class CompareComponent implements OnInit {
             }
             if (err.error.table) { // Handle markdown table even in case of 400 error
                 this.comparisonResults = this.parseMarkdownTable(err.error.table);
-                this.fetchAprilPrices();
+                setTimeout(() => {
+                  this.fetchAprilPrices();
+                  this.fetchAllUtwinPrices();
+                });
             }
           } else {
             this.messageService.add({ severity: 'error', summary: 'Erreur Technique', detail: 'Une erreur inattendue est survenue.' });
@@ -399,32 +405,34 @@ export class CompareComponent implements OnInit {
     };
 
     return dataRows.map((row): ComparisonResult | null => {
-      const cells = row.split('|').map(c => c.trim()).slice(1, -1);
-      if (cells.length < 4) return null;
+      const cells = row.split('|').map(cell => cell.trim()).filter(cell => cell);
+      if (cells.length < 3) return null;
 
-      const contratText = cells[0];
-      const correspondencePercentageText = cells[1] || '0%';
-      const pointsFortsText = cells[2];
-      const weakPointText = cells.length > 3 ? cells[3] : '';
+      const [contratText, correspondencePercentageText, pointsFortsText, weakPointText = ''] = cells;
       const allBenefitsText = pointsFortsText + ' ' + weakPointText;
 
       const contratParts = contratText.split(' ');
-      const formule = contratParts.slice(1).join(' ') || 'N/A';
+      const assurance = contratParts[0] || 'N/A';
+      let formule = contratParts.slice(1).join(' ') || 'N/A';
+
+      if (assurance.toLowerCase().includes('utwin')) {
+        formule = `UTWIN - ${formule}`;
+      }
 
       const guaranteeKeywords = {
         hospitalisation: ['Hospitalisation'],
-        honoraires: ['SOINS COURANTS', 'Honoraires'],
         chambreParticuliere: ['Chambre particulière'],
+        honoraires: ['SOINS COURANTS', 'Honoraires'],
         dentaire: ['Dentaire', 'Soins dentaires'],
-        forfaitDentaire: ['Forfait dentaire', 'implantologie'],
         orthodontie: ['Orthodontie'],
+        forfaitDentaire: ['Forfait dentaire', 'implantologie'],
         forfaitOptique: ['Forfait optique', 'Optique']
       };
 
       const garanties: GuaranteeValues = {
         hospitalisation: extractValue(allBenefitsText, guaranteeKeywords.hospitalisation),
-        honoraires: extractValue(allBenefitsText, guaranteeKeywords.honoraires),
         chambreParticuliere: extractValue(allBenefitsText, guaranteeKeywords.chambreParticuliere),
+        honoraires: extractValue(allBenefitsText, guaranteeKeywords.honoraires),
         dentaire: extractValue(allBenefitsText, guaranteeKeywords.dentaire),
         orthodontie: extractValue(allBenefitsText, guaranteeKeywords.orthodontie),
         forfaitDentaire: extractValue(allBenefitsText, guaranteeKeywords.forfaitDentaire),
@@ -432,9 +440,9 @@ export class CompareComponent implements OnInit {
       };
 
       return {
-        assurance: cells[0].trim().replace(/\*/g, ''),
+        assurance: assurance,
         formule: formule,
-        logo: '',
+        logo: `assets/logos/${assurance.toLowerCase().replace(/\s/g, '')}.png`,
         prix: 'N/A',
         correspondencePercentage: parseFloat(correspondencePercentageText.replace('%', '')) || 0,
         weakPoint: weakPointText || 'N/A',
@@ -443,86 +451,50 @@ export class CompareComponent implements OnInit {
     }).filter((result): result is ComparisonResult => result !== null);
   }
 
-  onFormuleSelect(offer: any): void {
-    console.log('Offre sélectionnée pour tarification :', offer);
-    this.submitting = true;
+  onFormuleSelect(offer: ComparisonResult): void {
+    this.fetchPriceForOffer(offer);
+  }
 
+  private fetchAllUtwinPrices(): void {
+    const utwinOffers = this.comparisonResults.filter(r => r.assurance.toLowerCase().includes('utwin'));
+    utwinOffers.forEach(offer => this.fetchPriceForOffer(offer));
+  }
+
+  private fetchPriceForOffer(offer: ComparisonResult): void {
+    if (offer.isPricingLoading) return; // Do not fetch if already fetching
+
+    offer.isPricingLoading = true;
     const quoteForm = this.transformFormToQuote();
+    quoteForm.productReference = offer.formule;
 
-    const tarifService = offer.assurance.toLowerCase().includes('utwin')
-      ? this.insuranceService.getUtwinTarif(quoteForm, offer.formule)
-      : this.insuranceService.getAprilHealthTarif(quoteForm, offer.assurance, offer.formule);
-
-    tarifService.pipe(
-      finalize(() => { this.submitting = false; })
-    ).subscribe({
-      next: (response: any) => {
-        console.log('API Response for ' + offer.assurance + ':', response);
-        let tarifAmount: number | null = null;
-
-        if (offer.assurance.toLowerCase().includes('utwin')) {
-          // Handle UTWIN response, which might be an array or an object with a 'propositions' key
-          const propositions = Array.isArray(response) ? response : response?.propositions;
-          if (propositions && Array.isArray(propositions)) {
-            // Parse the formula string, e.g., "MULTI' Santé - Niveau 3"
-            const formulaParts = offer.formule.match(/(.+) Niveau (\d+)/);
-
-            if (formulaParts && formulaParts.length === 3) {
-              const libelleProduit = formulaParts[1].trim();
-              const niveau = formulaParts[2];
-              const codeFormuleToFind = `N${niveau}`; // e.g., "N3"
-
-              console.log(`Searching for: libelleProduit='${libelleProduit}', codeFormule='${codeFormuleToFind}'`);
-
-              const proposition = propositions.find((p: any) => 
-                p.libelleProduit === libelleProduit && p.codeFormule === codeFormuleToFind
-              );
-
-              if (proposition && proposition.cotisationMensuelleEuros) {
-                tarifAmount = proposition.cotisationMensuelleEuros;
-              }
-            } else {
-                console.warn(`Formule format not recognized: ${offer.formule}`);
-            }
-          }
-        } else {
-          // Handle APRIL response
-          const tarifGlobal = response.data?.find((d: any) => d.priceType === 'TarifGlobal');
-          if (tarifGlobal && tarifGlobal.contribution?.contributionAmount) {
-            tarifAmount = tarifGlobal.contribution.contributionAmount;
+    this.insuranceService.getUtwinTarif(quoteForm, offer.formule)
+      .pipe(finalize(() => { offer.isPricingLoading = false; }))
+      .subscribe({
+        next: (res: any) => {
+          this.updateOfferPrice(offer, res.propositions || []);
+        },
+        error: (err: HttpErrorResponse) => {
+          if (err.status === 400 && err.error && err.error.propositions) {
+            this.updateOfferPrice(offer, err.error.propositions);
+          } else {
+            this.messageService.add({ severity: 'error', summary: 'Erreur de Tarification', detail: `Impossible de récupérer le tarif pour ${offer.formule}.` });
           }
         }
+      });
+  }
 
-        if (tarifAmount !== null) {
-          // Find the offer in the main results list and update its price
-          const resultToUpdate = this.comparisonResults.find((r: ComparisonResult) => r.assurance === offer.assurance && r.formule === offer.formule);
-          if (resultToUpdate) {
-            resultToUpdate.prix = tarifAmount;
-          }
+  private updateOfferPrice(offer: ComparisonResult, propositions: any[]): void {
+    let tarifAmount: string | number = 'N/A';
+    const proposition = propositions.find((p: any) => p.libelleCommercial === offer.formule);
 
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Tarif Obtenu',
-            detail: `Le tarif mensuel pour l'offre ${offer.formule} est de ${tarifAmount} €.`
-          });
-        } else {
-          console.error('Tarif non trouvé pour', offer.assurance);
-          this.messageService.add({
-            severity: 'warn',
-            summary: 'Tarif non disponible',
-            detail: `Le tarif pour l'offre ${offer.formule} n'a pas pu être récupéré.`
-          });
-        }
-      },
-      error: (err: any) => {
-        console.error('Erreur API pour', offer.assurance, err);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erreur de tarification',
-          detail: 'Une erreur est survenue lors de la récupération du tarif. Veuillez réessayer.'
-        });
-      }
-    });
+    if (proposition && proposition.cotisationMensuelleEuros) {
+      tarifAmount = proposition.cotisationMensuelleEuros;
+    }
+
+    const resultToUpdate = this.comparisonResults.find(r => r.formule === offer.formule);
+    if (resultToUpdate) {
+      resultToUpdate.prix = tarifAmount;
+    }
   }
 
   private fetchAprilPrices(): void {
@@ -538,9 +510,17 @@ export class CompareComponent implements OnInit {
             const tarifGlobal = response.data?.find((d: any) => d.priceType === 'TarifGlobal');
             if (tarifGlobal) {
               result.tarifGlobal = tarifGlobal.contribution.contributionAmount;
+              result.prix = tarifGlobal.contribution.contributionAmount;
             }
           },
-          error: (err: any) => { console.error('Erreur API pour', result.assurance, err); }
+          error: (err: HttpErrorResponse) => {
+            console.error('Erreur API pour', result.assurance, err);
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Erreur de tarification',
+              detail: `Une erreur est survenue lors de la récupération du tarif pour ${result.formule}.`
+            });
+          }
         });
       }
     });

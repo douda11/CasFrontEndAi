@@ -6,6 +6,7 @@ import { BorrowerForm } from '../models/borrower-form.model';
 import { Observable, throwError, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { QuoteResponse, ComparisonResult, InsuranceQuoteForm, AprilPayload, AprilPerson, AprilAddress, AprilMobilePhone, AprilProduct, AprilInsured, AprilCoverage } from '../models/project-model';
+import { BesoinClient } from '../models/comparateur.model';
 import { formatDate } from '@angular/common';
 
 import { AprilGetTarifResponse } from '../models/april-models';

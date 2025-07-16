@@ -24,8 +24,6 @@ import { CardModule } from 'primeng/card';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { AccordionModule } from 'primeng/accordion';
 import { TabViewModule } from 'primeng/tabview';
-import { DialogModule } from 'primeng/dialog';
-import { TableModule } from 'primeng/table';
 import { MarkdownModule } from 'ngx-markdown';
 
 // App services and models
@@ -38,8 +36,8 @@ import { startWith, finalize } from 'rxjs/operators';
 
 interface GuaranteeValues {
   hospitalisation: number;
-  honoraires: number;
   chambreParticuliere: number;
+  honoraires: number;
   dentaire: number;
   orthodontie: number;
   forfaitDentaire: number;
@@ -50,15 +48,13 @@ interface ComparisonResult {
   assurance: string;
   formule: string;
   logo: string;
-  prix: string;
+  prix: string | number;
   garanties: GuaranteeValues;
   correspondencePercentage: number;
   weakPoint: string;
-  // Fields for automatic APRIL pricing
   isAprilProduct?: boolean;
   isPricingLoading?: boolean;
   tarifGlobal?: number;
-  tarifDetails?: any[];
 }
 
 interface GarantieDefinition {
@@ -73,29 +69,9 @@ interface GarantieDefinition {
   styleUrls: ['./compare.component.scss'],
   standalone: true,
   imports: [
-    CommonModule,
-    HttpClientModule,
-    ReactiveFormsModule,
-    StepsModule,
-    ToastModule,
-    SliderModule,
-    PanelModule,
-    DropdownModule,
-    RadioButtonModule,
-    CalendarModule,
-    InputTextModule,
-    InputMaskModule,
-    ButtonModule,
-    DividerModule,
-    TooltipModule,
-    InputNumberModule,
-    CheckboxModule,
-    CardModule,
-    ProgressSpinnerModule,
-    AccordionModule,
-    TabViewModule,
-    DialogModule,
-    TableModule,
+    CommonModule, HttpClientModule, ReactiveFormsModule, StepsModule, ToastModule, SliderModule, PanelModule,
+    DropdownModule, RadioButtonModule, CalendarModule, InputTextModule, InputMaskModule, ButtonModule, DividerModule,
+    TooltipModule, InputNumberModule, CheckboxModule, CardModule, ProgressSpinnerModule, AccordionModule, TabViewModule,
     MarkdownModule
   ]
 })
@@ -108,27 +84,12 @@ export class CompareComponent implements OnInit {
   comparisonResults: ComparisonResult[] = [];
   garanties: GarantieDefinition[] = [];
 
-  // For Details Modal
-  selectedResultForDetails: ComparisonResult | null = null;
-  isDetailModalVisible = false;
-
-  civiliteOptions = [
-    { label: 'Monsieur', value: 'M' },
-    { label: 'Madame', value: 'F' },
-  ];
-
-  regimeOptions = [
-    { label: 'TNS', value: 'TNS' },
-    // Add other options here when available
-  ];
-
+  civiliteOptions = [{ label: 'Monsieur', value: 'M' }, { label: 'Madame', value: 'F' }];
+  regimeOptions = [{ label: 'TNS', value: 'TNS' }];
   EtatcivilOptions = [
-    { label: 'Célibataire', value: 'celibataire' },
-    { label: 'Marié(e)', value: 'marie' },
-    { label: 'Parent isolé', value: 'parentIsole' },
-    { label: 'Séparé(e)', value: 'separe' },
-    { label: 'Union libre', value: 'unionLibre' },
-    { label: 'Veuf(ve)', value: 'veuf' },
+    { label: 'Célibataire', value: 'celibataire' }, { label: 'Marié(e)', value: 'marie' },
+    { label: 'Parent isolé', value: 'parentIsole' }, { label: 'Séparé(e)', value: 'separe' },
+    { label: 'Union libre', value: 'unionLibre' }, { label: 'Veuf(ve)', value: 'veuf' },
     { label: 'Non déclaré', value: 'situationNonDeclaree' }
   ];
   sexeOptions = [{ label: 'Garçon', value: 'garcon' }, { label: 'Fille', value: 'fille' }];
@@ -149,6 +110,31 @@ export class CompareComponent implements OnInit {
     this.initializeSteps();
     this.setupConjointListener();
     this.setupGaranties();
+
+    const navigation = this.router.getCurrentNavigation();
+    const state = navigation?.extras.state as { insuranceData: InsuranceQuoteForm };
+
+    if (state?.insuranceData) {
+      const data = state.insuranceData;
+      const mainInsured = data.insuredPersons[0];
+
+      this.insuranceForm.patchValue({
+        personalInfo: {
+          civilite: mainInsured.gender,
+          nom: mainInsured.lastName,
+          prenom: mainInsured.firstName,
+          dateNaissance: new Date(mainInsured.birthDate),
+          email: mainInsured.email,
+          telephone1: mainInsured.phoneNumber,
+          codePostal: mainInsured.address.postalCode,
+          regime: mainInsured.regime,
+          dateEffet: new Date(data.effectDate),
+          etatCivil: mainInsured.situation
+        }
+      });
+
+      this.submitComparison();
+    }
   }
 
   initializeForm(): void {
@@ -168,23 +154,14 @@ export class CompareComponent implements OnInit {
         etatCivil: [null, Validators.required],
         regime: [null, Validators.required],
         conjoint: this.fb.group({
-          civilite: [''],
-          nom: [''],
-          prenom: [''],
-          email: ['', Validators.email],
-          dateNaissance: [null],
-          regime: ['']
+          civilite: [''], nom: [''], prenom: [''],
+          email: ['', Validators.email], dateNaissance: [null], regime: ['']
         }),
         enfants: this.fb.array([]),
       }),
       coverageSliders: this.fb.group({
-        hospitalisation: [0],
-        chambreParticuliere: [50],
-        honoraires: [0],
-        dentaire: [0],
-        orthodontie: [0],
-        forfaitDentaire: [100],
-        forfaitOptique: [100],
+        hospitalisation: [0], chambreParticuliere: [50], honoraires: [0],
+        dentaire: [0], orthodontie: [0], forfaitDentaire: [100], forfaitOptique: [100],
       }),
     });
   }
@@ -198,7 +175,7 @@ export class CompareComponent implements OnInit {
         if (etatCivil === 'marie' || etatCivil === 'unionLibre') {
           conjointGroup.enable();
         } else {
-          conjointGroup.reset({ civilite: 'Monsieur', nom: '', prenom: '', email: '', dateNaissance: null, regime: 'GENERAL' });
+          conjointGroup.reset();
           conjointGroup.disable();
         }
       });
@@ -209,12 +186,12 @@ export class CompareComponent implements OnInit {
   setupGaranties(): void {
     this.garanties = [
       { label: 'Hospitalisation', formControlName: 'hospitalisation', unit: '%' },
-      { label: 'Honoraires', formControlName: 'honoraires', unit: '%' },
-      { label: 'Orthodontie', formControlName: 'orthodontie', unit: '%' },
-      { label: 'Forfait Optique', formControlName: 'forfaitOptique', unit: '€' },
-      { label: 'Forfait Dentaire', formControlName: 'forfaitDentaire', unit: '€' },
-      { label: 'Dentaire', formControlName: 'dentaire', unit: '%' },
       { label: 'Chambre Particulière', formControlName: 'chambreParticuliere', unit: '€' },
+      { label: 'Honoraires', formControlName: 'honoraires', unit: '%' },
+      { label: 'Dentaire', formControlName: 'dentaire', unit: '%' },
+      { label: 'Forfait Optique', formControlName: 'forfaitOptique', unit: '€' },
+      { label: 'Orthodontie', formControlName: 'orthodontie', unit: '%' },
+      { label: 'Forfait Dentaire', formControlName: 'forfaitDentaire', unit: '€' },
     ];
   }
 
@@ -226,34 +203,18 @@ export class CompareComponent implements OnInit {
     ];
   }
 
-  dateFutureValidator(control: AbstractControl): { [key: string]: boolean } | null {
-    if (control.value) {
-      const selectedDate = new Date(control.value);
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      if (selectedDate <= today) {
-        return { 'dateInPast': true };
-      }
-    }
-    return null;
-  }
-
   get enfants(): FormArray {
     return this.insuranceForm.get('personalInfo.enfants') as FormArray;
   }
 
-  createEnfantFormGroup(): FormGroup {
-    return this.fb.group({
+  addEnfant(): void {
+    this.enfants.push(this.fb.group({
       civilite: ['Monsieur', Validators.required],
       nom: ['', Validators.required],
       prenom: ['', Validators.required],
       dateNaissance: [null, Validators.required],
       regime: ['GENERAL', Validators.required],
-    });
-  }
-
-  addEnfant(): void {
-    this.enfants.push(this.createEnfantFormGroup());
+    }));
   }
 
   removeEnfant(index: number): void {
@@ -265,24 +226,7 @@ export class CompareComponent implements OnInit {
     return stepGroups[stepIndex] ? this.insuranceForm.get(stepGroups[stepIndex]) as FormGroup : null;
   }
 
-  private markStepAsTouched(stepIndex: number): void {
-    const group = this.getCurrentStepGroup(stepIndex);
-    if (group) {
-      group.markAllAsTouched();
-    }
-  }
-
   nextStep(): void {
-    const currentGroup = this.getCurrentStepGroup(this.activeIndex);
-    if (currentGroup && !currentGroup.valid) {
-      this.markStepAsTouched(this.activeIndex);
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Champs manquants ou invalides',
-        detail: 'Certains champs sont requis. Vous pouvez continuer, mais le formulaire final sera invalide.',
-      });
-    }
-
     if (this.activeIndex < this.steps.length - 1) {
       if (this.activeIndex === 1) {
         this.submitComparison();
@@ -299,105 +243,72 @@ export class CompareComponent implements OnInit {
   }
 
   goToStep(index: number): void {
-    if (index < this.activeIndex) {
-      this.activeIndex = index;
-      return;
-    }
-
-    for (let i = 0; i < index; i++) {
-      const stepGroup = this.getCurrentStepGroup(i);
-      if (stepGroup && stepGroup.invalid) {
-        this.activeIndex = i;
-        this.markStepAsTouched(i);
-        this.messageService.add({
-          severity: 'warn',
-          summary: 'Étape précédente invalide',
-          detail: 'Veuillez compléter les étapes précédentes avant de continuer.',
-        });
-        return;
-      }
-    }
     this.activeIndex = index;
-  }
-
-  onFormuleSelect(productReference: string, formule: string): void {
-    this.insuranceForm.markAllAsTouched();
-    if (this.insuranceForm.invalid) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Formulaire Invalide',
-        detail: 'Veuillez remplir tous les champs obligatoires avant de continuer.',
-      });
-      return;
-    }
-
-    this.submitting = true;
-    const formValues = this.transformFormToQuote();
-
-    this.insuranceService.getAprilHealthTarif(formValues, productReference, formule)
-      .pipe(finalize(() => { this.submitting = false; }))
-      .subscribe({
-        next: (response) => {
-          console.log('April API Response:', response);
-          this.messageService.add({ severity: 'success', summary: 'Tarif Calculé', detail: 'Le tarif a été calculé avec succès.' });
-          // Vous pouvez traiter la réponse ici, par exemple, l'afficher dans l'interface utilisateur
-        },
-        error: (err) => {
-          console.error('April API Error:', err);
-          this.messageService.add({ severity: 'error', summary: 'Erreur API', detail: 'Une erreur est survenue lors du calcul du tarif.' });
-        }
-      });
   }
 
   submitComparison(): void {
     this.insuranceForm.markAllAsTouched();
     if (this.insuranceForm.invalid) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Formulaire Invalide',
-        detail: 'Veuillez remplir tous les champs obligatoires correctement avant de soumettre.',
-      });
-      for (let i = 0; i <= 1; i++) {
-        const stepGroup = this.getCurrentStepGroup(i);
-        if (stepGroup && stepGroup.invalid) {
-          this.activeIndex = i;
-          break;
-        }
-      }
+      this.messageService.add({ severity: 'error', summary: 'Formulaire Invalide', detail: 'Veuillez remplir tous les champs.' });
       return;
     }
-
     this.submitting = true;
-    const coverageSliders = this.insuranceForm.get('coverageSliders')?.value;
-    const needs: BesoinClient = coverageSliders;
+    const needs: BesoinClient = this.insuranceForm.get('coverageSliders')?.value;
 
     this.compareService.getComparisonResults(needs)
       .pipe(finalize(() => { this.submitting = false; }))
       .subscribe({
-        next: (response) => {
+        next: (response: any) => {
           if (response && response.table) {
-            console.log('--- RAW MARKDOWN FROM BACKEND ---');
-            console.log(response.table);
-            console.log('---------------------------------');
             this.comparisonResults = this.parseMarkdownTable(response.table);
             this.fetchAprilPrices();
 
-            if (this.comparisonResults.length === 0) {
-              this.messageService.add({ severity: 'error', summary: 'Erreur de données', detail: 'Les résultats de la comparaison sont dans un format inattendu.' });
+            if (response.utwinResponse) {
+              if (response.utwinResponse.propositions) {
+                this.handleUtwinSuccess(response.utwinResponse);
+              }
+              if (response.utwinResponse.messages) {
+                this.handleUtwinBusinessErrors(response.utwinResponse.messages);
+              }
             }
-          } else {
-            this.comparisonResults = [];
           }
           this.activeIndex = 2;
-          this.messageService.add({ severity: 'success', summary: 'Comparaison Réussie', detail: `Les résultats sont prêts.` });
+          this.messageService.add({ severity: 'success', summary: 'Comparaison Terminée', detail: 'Les résultats sont disponibles.' });
         },
         error: (err) => {
-          this.comparisonResults = [];
           this.submitting = false;
           this.activeIndex = 2;
-          this.messageService.add({ severity: 'error', summary: 'Erreur de Comparaison', detail: 'Aucun résultat trouvé ou une erreur est survenue.' });
+          if (err.status === 400 && err.error) {
+            if (err.error.messages) {
+              this.handleUtwinBusinessErrors(err.error.messages);
+            }
+            if (err.error.propositions && err.error.propositions.length > 0) {
+              this.handleUtwinSuccess(err.error);
+            }
+            if (err.error.table) { // Handle markdown table even in case of 400 error
+                this.comparisonResults = this.parseMarkdownTable(err.error.table);
+                this.fetchAprilPrices();
+            }
+          } else {
+            this.messageService.add({ severity: 'error', summary: 'Erreur Technique', detail: 'Une erreur inattendue est survenue.' });
+          }
         }
       });
+  }
+
+  private handleUtwinSuccess(utwinResponse: any): void {
+    utwinResponse.propositions.forEach((prop: any) => {
+      const resultToUpdate = this.comparisonResults.find(r => prop.libelleCommercial.toLowerCase().includes(r.formule.toLowerCase()));
+      if (resultToUpdate) {
+        resultToUpdate.prix = prop.cotisationMensuelleEuros;
+      }
+    });
+  }
+
+  private handleUtwinBusinessErrors(messages: any[]): void {
+    messages.forEach(msg => {
+      this.messageService.add({ severity: 'warn', summary: `Avertissement Utwin: ${msg.code}`, detail: msg.libelle, sticky: true });
+    });
   }
 
   private transformFormToQuote(): InsuranceQuoteForm {
@@ -409,7 +320,7 @@ export class CompareComponent implements OnInit {
       lastName: personalInfo.nom,
       firstName: personalInfo.prenom,
       birthDate: personalInfo.dateNaissance,
-      gender: personalInfo.civilite === 'Monsieur' ? 'M' : 'F',
+      gender: personalInfo.civilite,
       address: {
         street: personalInfo.adresse,
         postalCode: personalInfo.codePostal,
@@ -428,14 +339,10 @@ export class CompareComponent implements OnInit {
         lastName: personalInfo.conjoint.nom,
         firstName: personalInfo.conjoint.prenom,
         birthDate: personalInfo.conjoint.dateNaissance,
-        gender: personalInfo.conjoint.civilite === 'Madame' ? 'F' : 'M',
-        address: {
-          street: personalInfo.adresse, // Assuming same address
-          postalCode: personalInfo.codePostal,
-          city: personalInfo.ville
-        },
+        gender: personalInfo.conjoint.civilite,
+        address: insuredPersons[0].address,
         email: personalInfo.conjoint.email,
-        phoneNumber: '', // No separate phone in form
+        phoneNumber: '',
         regime: personalInfo.conjoint.regime,
         situation: personalInfo.etatCivil,
         addressType: 'Actuelle'
@@ -449,45 +356,33 @@ export class CompareComponent implements OnInit {
         firstName: enfant.prenom,
         birthDate: enfant.dateNaissance,
         gender: enfant.sexe === 'garcon' ? 'M' : 'F',
-        address: { // Assuming same address
-          street: personalInfo.adresse,
-          postalCode: personalInfo.codePostal,
-          city: personalInfo.ville
-        },
-        email: '', // No email for children in form
-        phoneNumber: '', // No phone for children in form
+        address: insuredPersons[0].address,
+        email: '',
+        phoneNumber: '',
         regime: enfant.regime,
-        situation: 'celibataire', // Children are single
+        situation: 'celibataire',
         addressType: 'Actuelle'
       });
     });
 
     return {
-      productReference: '', // This will be set dynamically
+      productReference: '',
       insuredPersons: insuredPersons,
       contact: {
         email: personalInfo.email,
         phoneNumber: personalInfo.telephone1,
-        address: {
-          street: personalInfo.adresse,
-          postalCode: personalInfo.codePostal,
-          city: personalInfo.ville
-        }
+        address: insuredPersons[0].address
       },
       effectDate: personalInfo.dateEffet,
-      garanties: [] // Placeholder
+      garanties: []
     };
   }
 
   private parseMarkdownTable(markdown: string): ComparisonResult[] {
-    if (!markdown || typeof markdown !== 'string') {
-      return [];
-    }
+    if (!markdown || typeof markdown !== 'string') return [];
 
     const lines = markdown.trim().split('\n').filter(line => line.trim().startsWith('|'));
-    if (lines.length < 3) {
-      return [];
-    }
+    if (lines.length < 3) return [];
 
     const dataRows = lines.slice(2);
 
@@ -503,23 +398,17 @@ export class CompareComponent implements OnInit {
       return 0;
     };
 
-    const results = dataRows.map(row => {
+    return dataRows.map((row): ComparisonResult | null => {
       const cells = row.split('|').map(c => c.trim()).slice(1, -1);
-      console.log('Parsing row. Detected cells:', cells.length, cells);
-      if (cells.length < 4) { // On attend maintenant au moins 4 colonnes
-        console.warn('Skipping row, not enough columns:', row);
-        return null;
-      }
+      if (cells.length < 4) return null;
 
       const contratText = cells[0];
-      // Les colonnes ont changé de position
       const correspondencePercentageText = cells[1] || '0%';
       const pointsFortsText = cells[2];
-      const weakPointText = cells.length > 3 ? cells[3] : ''; // Le point faible est dans la 4ème colonne
-      const allBenefitsText = pointsFortsText + ' ' + weakPointText; // On combine les deux
+      const weakPointText = cells.length > 3 ? cells[3] : '';
+      const allBenefitsText = pointsFortsText + ' ' + weakPointText;
 
       const contratParts = contratText.split(' ');
-      const assurance = contratParts[0] || 'N/A';
       const formule = contratParts.slice(1).join(' ') || 'N/A';
 
       const guaranteeKeywords = {
@@ -527,8 +416,8 @@ export class CompareComponent implements OnInit {
         honoraires: ['SOINS COURANTS', 'Honoraires'],
         chambreParticuliere: ['Chambre particulière'],
         dentaire: ['Dentaire', 'Soins dentaires'],
-        orthodontie: ['Orthodontie'],
         forfaitDentaire: ['Forfait dentaire', 'implantologie'],
+        orthodontie: ['Orthodontie'],
         forfaitOptique: ['Forfait optique', 'Optique']
       };
 
@@ -542,51 +431,130 @@ export class CompareComponent implements OnInit {
         forfaitOptique: extractValue(allBenefitsText, guaranteeKeywords.forfaitOptique),
       };
 
-      const correspondencePercentage = parseFloat(correspondencePercentageText.replace('%', '')) || 0;
-
       return {
-        assurance: cells[0].trim().replace(/\*/g, ''), // Nettoyer les astérisques du markdown
+        assurance: cells[0].trim().replace(/\*/g, ''),
         formule: formule,
         logo: '',
-        prix: '',
+        prix: 'N/A',
+        correspondencePercentage: parseFloat(correspondencePercentageText.replace('%', '')) || 0,
+        weakPoint: weakPointText || 'N/A',
         garanties: garanties,
-        correspondencePercentage: correspondencePercentage,
-        weakPoint: weakPointText || 'N/A', // On affiche le point faible, ou N/A s'il est vide
       };
     }).filter((result): result is ComparisonResult => result !== null);
-
-    return results;
   }
 
-  getCoverageClass(coverage: number, needed: number): string {
-    if (needed === 0) return '';
-    return coverage >= needed ? 'coverage-good' : 'coverage-bad';
+  onFormuleSelect(offer: any): void {
+    console.log('Offre sélectionnée pour tarification :', offer);
+    this.submitting = true;
+
+    const quoteForm = this.transformFormToQuote();
+
+    const tarifService = offer.assurance.toLowerCase().includes('utwin')
+      ? this.insuranceService.getUtwinTarif(quoteForm, offer.formule)
+      : this.insuranceService.getAprilHealthTarif(quoteForm, offer.assurance, offer.formule);
+
+    tarifService.pipe(
+      finalize(() => { this.submitting = false; })
+    ).subscribe({
+      next: (response: any) => {
+        console.log('API Response for ' + offer.assurance + ':', response);
+        let tarifAmount: number | null = null;
+
+        if (offer.assurance.toLowerCase().includes('utwin')) {
+          // Handle UTWIN response, which might be an array or an object with a 'propositions' key
+          const propositions = Array.isArray(response) ? response : response?.propositions;
+          if (propositions && Array.isArray(propositions)) {
+            // Parse the formula string, e.g., "MULTI' Santé - Niveau 3"
+            const formulaParts = offer.formule.match(/(.+) Niveau (\d+)/);
+
+            if (formulaParts && formulaParts.length === 3) {
+              const libelleProduit = formulaParts[1].trim();
+              const niveau = formulaParts[2];
+              const codeFormuleToFind = `N${niveau}`; // e.g., "N3"
+
+              console.log(`Searching for: libelleProduit='${libelleProduit}', codeFormule='${codeFormuleToFind}'`);
+
+              const proposition = propositions.find((p: any) => 
+                p.libelleProduit === libelleProduit && p.codeFormule === codeFormuleToFind
+              );
+
+              if (proposition && proposition.cotisationMensuelleEuros) {
+                tarifAmount = proposition.cotisationMensuelleEuros;
+              }
+            } else {
+                console.warn(`Formule format not recognized: ${offer.formule}`);
+            }
+          }
+        } else {
+          // Handle APRIL response
+          const tarifGlobal = response.data?.find((d: any) => d.priceType === 'TarifGlobal');
+          if (tarifGlobal && tarifGlobal.contribution?.contributionAmount) {
+            tarifAmount = tarifGlobal.contribution.contributionAmount;
+          }
+        }
+
+        if (tarifAmount !== null) {
+          // Find the offer in the main results list and update its price
+          const resultToUpdate = this.comparisonResults.find((r: ComparisonResult) => r.assurance === offer.assurance && r.formule === offer.formule);
+          if (resultToUpdate) {
+            resultToUpdate.prix = tarifAmount;
+          }
+
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Tarif Obtenu',
+            detail: `Le tarif mensuel pour l'offre ${offer.formule} est de ${tarifAmount} €.`
+          });
+        } else {
+          console.error('Tarif non trouvé pour', offer.assurance);
+          this.messageService.add({
+            severity: 'warn',
+            summary: 'Tarif non disponible',
+            detail: `Le tarif pour l'offre ${offer.formule} n'a pas pu être récupéré.`
+          });
+        }
+      },
+      error: (err: any) => {
+        console.error('Erreur API pour', offer.assurance, err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Erreur de tarification',
+          detail: 'Une erreur est survenue lors de la récupération du tarif. Veuillez réessayer.'
+        });
+      }
+    });
+  }
+
+  private fetchAprilPrices(): void {
+    const quoteForm = this.transformFormToQuote();
+    this.comparisonResults.forEach(result => {
+      if (result.assurance?.toLowerCase().includes('april')) {
+        result.isAprilProduct = true;
+        result.isPricingLoading = true;
+        this.insuranceService.getAprilHealthTarif(quoteForm, result.assurance, result.formule).pipe(
+          finalize(() => { result.isPricingLoading = false; })
+        ).subscribe({
+          next: (response: any) => {
+            const tarifGlobal = response.data?.find((d: any) => d.priceType === 'TarifGlobal');
+            if (tarifGlobal) {
+              result.tarifGlobal = tarifGlobal.contribution.contributionAmount;
+            }
+          },
+          error: (err: any) => { console.error('Erreur API pour', result.assurance, err); }
+        });
+      }
+    });
   }
 
   loadExampleData(): void {
     this.insuranceForm.get('personalInfo')?.patchValue({
-      civilite: 'M',
-      nom: 'Dupont',
-      prenom: 'Jean',
-      dateNaissance: new Date('1980-05-15'),
-      regime: 'TNS',
-      etatCivil: 'celibataire',
-      adresse: '123 Rue de Paris',
-      codePostal: '75001',
-      ville: 'Paris',
-      complementAdresse: 'Apt 101',
-      dateEffet: new Date(),
-      email: 'jean.dupont@example.com',
-      telephone1: '0612345678'
+      civilite: 'M', nom: 'Dupont', prenom: 'Jean', dateNaissance: new Date('1980-05-15'),
+      regime: 'TNS', etatCivil: 'celibataire', adresse: '123 Rue de Paris', codePostal: '75001', ville: 'Paris',
+      complementAdresse: 'Apt 101', dateEffet: new Date(), email: 'jean.dupont@example.com', telephone1: '0612345678'
     });
-
-    // Clear existing children
     const enfantsArray = this.insuranceForm.get('personalInfo.enfants') as FormArray;
-    while (enfantsArray.length) {
-      enfantsArray.removeAt(0);
-    }
-
-    this.messageService.add({ severity: 'success', summary: 'Données chargées', detail: 'Les données d\'exemple pour l\'assuré principal ont été chargées.' });
+    while (enfantsArray.length) { enfantsArray.removeAt(0); }
+    this.messageService.add({ severity: 'success', summary: 'Données chargées', detail: 'Les données d\'exemple ont été chargées.' });
   }
 
   resetForm(): void {
@@ -603,152 +571,21 @@ export class CompareComponent implements OnInit {
     return this.comparisonResults && this.comparisonResults.length > 0;
   }
 
-  selectOffer(offer: any): void {
-    console.log('Offre sélectionnée pour tarification :', offer);
-    this.submitting = true;
-
-    const personalInfo = this.insuranceForm.get('personalInfo')?.value;
-    const familyInfo = this.insuranceForm.get('familyInfo')?.value;
-
-    const mainInsured: InsuredPerson = {
-      lastName: personalInfo.nom,
-      firstName: personalInfo.prenom,
-      birthDate: personalInfo.dateNaissance,
-      gender: personalInfo.civilite,
-      address: {
-        street: personalInfo.adresse,
-        postalCode: personalInfo.codePostal,
-        city: personalInfo.ville,
-      },
-      email: personalInfo.email,
-      phoneNumber: personalInfo.telephone1,
-      regime: personalInfo.regime,
-      situation: personalInfo.etatCivil,
-      addressType: personalInfo.addressType,
-    };
-
-    const insuredPersons: InsuredPerson[] = [mainInsured];
-
-    // Add spouse if exists
-    if (personalInfo.etatCivil === 'marie' && personalInfo.conjoint) {
-        const conjoint: InsuredPerson = {
-            lastName: personalInfo.conjoint.nom,
-            firstName: personalInfo.conjoint.prenom,
-            birthDate: personalInfo.conjoint.dateNaissance,
-            gender: personalInfo.conjoint.civilite,
-            address: mainInsured.address, // Assuming same address
-            email: personalInfo.conjoint.email,
-            phoneNumber: '', // No phone for spouse in form
-            regime: personalInfo.conjoint.regime,
-            situation: 'Marie',
-            addressType: mainInsured.addressType // Assuming same address type as main insured
-        };
-        insuredPersons.push(conjoint);
-    }
-
-    // Add children if they exist
-    const enfantsArray = this.insuranceForm.get('familyInfo.enfants') as FormArray;
-    if (enfantsArray && enfantsArray.length > 0) {
-      enfantsArray.controls.forEach(control => {
-        const enfantValue = control.value;
-        const enfant: InsuredPerson = {
-          lastName: personalInfo.nom, // Assuming same last name
-          firstName: enfantValue.prenom,
-          birthDate: enfantValue.dateNaissance,
-          gender: enfantValue.civilite,
-          address: mainInsured.address, // Assuming same address
-          email: '', // No email for children in form
-          phoneNumber: '', // No phone for children in form
-          regime: 'GENERAL', // Default regime for children
-          situation: 'Celibataire',
-          addressType: mainInsured.addressType // Assuming same address type as main insured
-        };
-        insuredPersons.push(enfant);
-      });
-    }
-
-    const quoteForm: InsuranceQuoteForm = {
-      productReference: offer.assurance, // Using the assurance name as the reference
-      insuredPersons: insuredPersons,
-      contact: {
-        email: personalInfo.email,
-        phoneNumber: personalInfo.telephone1,
-        address: mainInsured.address,
-      },
-      effectDate: personalInfo.dateEffet,
-      garanties: [],
-      coverageOptions: [] // Added to satisfy interface
-    };
-
-    this.insuranceService.getAprilHealthTarif(quoteForm, offer.assurance, offer.formule).pipe(
-      finalize(() => {
-        this.submitting = false;
-      })
-    ).subscribe({
-      next: (response) => {
-        console.log('API Response:', response);
-        // Assuming the response has a 'data' array with pricing info
-        const tarifGlobal = response.data?.find((d: any) => d.priceType === 'TarifGlobal');
-        if (tarifGlobal) {
-            this.messageService.add({
-                severity: 'success',
-                summary: 'Tarif Obtenu',
-                detail: `Le tarif mensuel pour l'offre ${offer.nomDeLOffre} est de ${tarifGlobal.contribution.contributionAmount} €.`
-            });
-        } else {
-            throw new Error('Tarif non trouvé dans la réponse.');
-        }
-      },
-      error: (err) => {
-        console.error('Erreur API:', err);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erreur de tarification',
-          detail: 'Une erreur est survenue lors de la récupération du tarif. Veuillez réessayer.'
-        });
-      }
-    });
-  }
-
   public getInsurerName(assurance: string): string {
-    if (!assurance) {
-      return '';
-    }
+    if (!assurance) return '';
     return assurance.split(' ')[0];
   }
 
-  public showDetails(result: ComparisonResult): void {
-    this.selectedResultForDetails = result;
-    this.isDetailModalVisible = true;
+
+
+  public getCoverageClass(value: number): string {
+    if (value >= 300) return 'coverage-high';
+    if (value >= 150) return 'coverage-medium';
+    if (value > 0) return 'coverage-low';
+    return '';
   }
 
-  private fetchAprilPrices(): void {
-    const quoteForm = this.transformFormToQuote();
-
-    this.comparisonResults.forEach(result => {
-      if (result.assurance?.toLowerCase().includes('april')) {
-        result.isAprilProduct = true;
-        result.isPricingLoading = true;
-
-        this.insuranceService.getAprilHealthTarif(quoteForm, result.assurance, result.formule).pipe(
-          finalize(() => {
-            result.isPricingLoading = false;
-          })
-        ).subscribe({
-          next: (response) => {
-            const tarifGlobal = response.data?.find((d: any) => d.priceType === 'TarifGlobal');
-            if (tarifGlobal) {
-              result.tarifGlobal = tarifGlobal.contribution.contributionAmount;
-              result.tarifDetails = response.data?.filter((d: any) => d.priceType === 'TarifDetaille');
-            } else {
-              console.error('Tarif non trouvé pour', result.assurance);
-            }
-          },
-          error: (err) => {
-            console.error('Erreur API pour', result.assurance, err);
-          }
-        });
-      }
-    });
+  public isNumeric(value: any): boolean {
+    return value !== null && value !== undefined && !isNaN(parseFloat(value)) && isFinite(value);
   }
 }

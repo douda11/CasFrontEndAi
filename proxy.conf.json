@@ -1,11 +1,14 @@
 {
-  "/april": {
+  "/api": {
     "target": "http://localhost:8081",
     "secure": false,
-    "logLevel": "debug",
     "changeOrigin": true,
-    "pathRewrite": {
-      "^/april": "/healthProtection/projects"
-    }
+    "logLevel": "debug"
+  },
+  "/healthProtection": {
+    "target": "http://localhost:8081",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
   }
 }

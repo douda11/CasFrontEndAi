@@ -8,6 +8,14 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const messageService = inject(MessageService);
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
+      // This is a special case for the Utwin API.
+      // It returns a 400 Bad Request status even when it provides a valid list of propositions.
+      // We bypass the global error handler here to allow the specific service (`insurance.service.ts`)
+      // to catch this error and handle it as a successful response.
+      if (error.status === 400 && error.url?.includes('/api/Sante/v1/Tarifs')) {
+        return throwError(() => error); // Pass the original error to the service's error handler.
+      }
+
       let errorMessage = 'Une erreur est survenue';
       let errorSummary = `Erreur ${error.status}`;
       

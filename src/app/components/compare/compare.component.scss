@@ -1,4 +1,43 @@
-// Main container for the comparison section
+/* General styles for the comparison table */
+.comparison-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+
+  th, td {
+    padding: 0.75rem;
+    text-align: center;
+    border-bottom: 1px solid #dee2e6;
+  }
+
+  th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+  }
+
+  .assurance-header {
+    font-size: 1.1rem;
+    color: var(--primary-color);
+  }
+}
+
+/* Coverage level styling */
+.coverage-high {
+  background-color: #d4edda; /* Light green */
+  color: #155724; /* Dark green */
+  font-weight: bold;
+}
+
+.coverage-medium {
+  background-color: #fff3cd; /* Light yellow */
+  color: #856404; /* Dark yellow */
+}
+
+.coverage-low {
+  background-color: #f8d7da; /* Light red */
+  color: #721c24; /* Dark red */
+}
+
 .comparison-container {
   width: 100%;
   overflow-x: auto; // Enable horizontal scrolling to handle wide content

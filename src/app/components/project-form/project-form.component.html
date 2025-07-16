@@ -16,7 +16,7 @@
       <!-- Effective Date -->
       <div class="col-12 md:col-6">
         <label for="dateEffetSouhaitee" class="block mb-1">Date d’effet souhaitée *</label>
-        <p-calendar inputId="dateEffetSouhaitee" formControlName="dateEffetSouhaitee" dateFormat="dd/mm/yy" showIcon="true" class="w-full"></p-calendar>
+        <p-calendar inputId="dateEffetSouhaitee" formControlName="dateEffetSouhaitee" dateFormat="dd/mm/yy" [showIcon]="true" [minDate]="minDate" class="w-full"></p-calendar>
       </div>
     </div>
   </p-panel>

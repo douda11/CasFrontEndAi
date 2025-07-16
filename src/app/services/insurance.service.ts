@@ -1,9 +1,10 @@
 // src/app/services/insurance.service.ts
 
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BorrowerForm } from '../models/borrower-form.model';
-import { Observable, throwError } from 'rxjs';
+import { Observable, throwError, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { QuoteResponse, ComparisonResult, InsuranceQuoteForm, AprilPayload, AprilPerson, AprilAddress, AprilMobilePhone, AprilProduct, AprilInsured, AprilCoverage } from '../models/project-model';
 import { formatDate } from '@angular/common';
 
@@ -14,7 +15,7 @@ export class InsuranceService {
   private apiBasePath = '';
   private aprilUrl = `${this.apiBasePath}/api/v1/comparisons/april/projects/prices`;
   private healthProtectionUrl = `${this.apiBasePath}/healthProtection/projects/prices`; // New endpoint
-  private utwinUrl = `${this.apiBasePath}/api/v1/comparisons/utwin/get-tarif`;
+  private utwinUrl = `${this.apiBasePath}/api/Sante/v1/Tarifs`;
   private compareUrl = `${this.apiBasePath}/api/v1/comparisons/compare`;
 
   private aprilProductCodeMap: { [key: string]: string } = {
@@ -162,7 +163,7 @@ export class InsuranceService {
 
     console.log('Sending April Payload:', JSON.stringify(payload, null, 2));
 
-    const url = `${this.apiBasePath}/april/prices`; // Endpoint du backend
+    const url = this.healthProtectionUrl; // Utiliser l'URL correcte du backend
 
     // Ajout des paramètres de requête attendus par le backend
     const params = new HttpParams()
@@ -174,14 +175,57 @@ export class InsuranceService {
   }
 
   getUtwinTarif(form: InsuranceQuoteForm, formule: string): Observable<any> {
+    // Helper function to format date to ISO string format
+    const formatDate = (date: Date): string => {
+      return date.toISOString();
+    };
+
+    // Helper for regime mapping based on user requirements
+    const mapRegime = (regime: string): string => {
+      if (regime.toUpperCase() === 'TNS') {
+        return 'SSI'; // 'TNS' in form becomes 'SSI' for Utwin
+      }
+      return 'RG'; // Default or 'GENERAL' becomes 'RG'
+    };
+
     const payload = {
-      form_data: form, // Le backend s'attend peut-être à une structure spécifique
-      formule: formule
+      souscripteur: {
+        adresse: {
+          codePostal: form.contact.address.postalCode
+        }
+      },
+      besoin: {
+        dateEffet: formatDate(form.effectDate)
+      },
+      assures: form.insuredPersons.map((person, index) => {
+        let codeTypeRole = 'Enfant';
+        if (index === 0) {
+          codeTypeRole = 'AssurePrincipal';
+        } else if (index === 1) {
+          codeTypeRole = 'Conjoint';
+        }
+
+        return {
+          codeRegimeObligatoire: mapRegime(person.regime),
+          codeTypeRole: codeTypeRole,
+          dateDeNaissance: formatDate(person.birthDate)
+        };
+      })
     };
 
     console.log('Sending Utwin Payload:', JSON.stringify(payload, null, 2));
 
-    return this.http.post(this.utwinUrl, payload);
-  }
+    return this.http.post(this.utwinUrl, payload).pipe(
+      catchError((error: HttpErrorResponse) => {
+        // Check if the error is a 400 Bad Request and has a response body
+        if (error.status === 400 && error.error) {
+          // Treat it as a successful response by returning the error body
+          console.warn('Backend returned 400, but treating as success:', error.error);
+          return of(error.error);
+        }
+        // For all other errors, propagate the error
+        return throwError(() => error);
+      })
+    );
+  }  
 }
-

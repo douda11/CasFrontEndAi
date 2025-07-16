@@ -114,6 +114,7 @@ export class ProjectFormComponent implements OnInit {
 
   today = new Date();
   defaultDateEffet!: Date;
+  minDate!: Date;
 
   constructor(
     private fb: FormBuilder,
@@ -122,17 +123,12 @@ export class ProjectFormComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.computeDefaultDateEffet();
-    this.buildForm();
-  }
+    const tomorrow = new Date();
+    tomorrow.setDate(this.today.getDate() + 1);
+    this.defaultDateEffet = tomorrow;
+    this.minDate = tomorrow; // Empêche la sélection de dates passées
 
-  private computeDefaultDateEffet(): void {
-    const year = this.today.getFullYear();
-    let month = this.today.getMonth() + 2;
-    if (month > 11) {
-      month = month - 12;
-    }
-    this.defaultDateEffet = new Date(year, month, 5);
+    this.buildForm();
   }
 
   private buildForm(): void {

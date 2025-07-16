@@ -500,7 +500,7 @@
                     <td></td>
                     <td *ngFor="let result of comparisonResults" 
                         class="text-center" 
-                        (click)="onFormuleSelect(result.assurance, result.formule)" 
+                        (click)="onFormuleSelect(result)" 
                         style="cursor: pointer; text-decoration: underline; color: blue;"
                         pTooltip="Cliquez pour calculer le tarif de cette formule"
                         tooltipPosition="top">
@@ -514,13 +514,11 @@
                     <td class="text-center">
                       {{ insuranceForm.get('coverageSliders.' + garantie.formControlName)?.value }}{{ garantie.unit }}
                     </td>
-                    <td *ngFor="let result of comparisonResults" class="text-center" [ngClass]="getCoverageClass(result.garanties[garantie.formControlName], insuranceForm.get('coverageSliders.' + garantie.formControlName)?.value)">
-                      <ng-container *ngIf="garantie.unit === '%'">
-                        {{ result.garanties[garantie.formControlName] }}%
+                    <td *ngFor="let result of comparisonResults" class="text-center" [ngClass]="getCoverageClass(result.garanties[garantie.formControlName])">
+                      <ng-container *ngIf="result.garanties[garantie.formControlName] > 0; else noValue">
+                        {{ result.garanties[garantie.formControlName] }}{{ garantie.unit }}
                       </ng-container>
-                      <ng-container *ngIf="garantie.unit === '€'">
-                        {{ result.garanties[garantie.formControlName] | currency:'EUR' }}
-                      </ng-container>
+                      <ng-template #noValue>-</ng-template>
                     </td>
                   </tr>
 
@@ -542,6 +540,8 @@
                     </td>
                   </tr>
 
+                
+
                   <!-- Row for Automatic APRIL Pricing -->
                   <tr class="border-b">
                     <td class="font-bold">Prix</td>
@@ -549,14 +549,14 @@
                     <td *ngFor="let result of comparisonResults" class="text-center">
                       <ng-container *ngIf="result.isAprilProduct">
                         <p-progressSpinner *ngIf="result.isPricingLoading" [style]="{width: '25px', height: '25px'}"></p-progressSpinner>
-                        <div *ngIf="!result.isPricingLoading && result.tarifGlobal">
+                        <div *ngIf="!result.isPricingLoading && isNumeric(result.tarifGlobal)">
                           <span class="font-bold text-lg">{{ result.tarifGlobal | currency:'EUR':'symbol':'1.2-2' }}</span>
-                          <button pButton type="button" label="Détails" class="p-button-sm p-button-text ml-2" (click)="showDetails(result)"></button>
                         </div>
-                        <span *ngIf="!result.isPricingLoading && !result.tarifGlobal">-</span>
+                        <span *ngIf="!result.isPricingLoading && !isNumeric(result.tarifGlobal)">-</span>
                       </ng-container>
                       <ng-container *ngIf="!result.isAprilProduct">
-                        N/A
+                        <span *ngIf="isNumeric(result.prix)" class="font-bold text-lg">{{ result.prix | currency:'EUR':'symbol':'1.2-2' }}</span>
+                        <span *ngIf="!isNumeric(result.prix)">{{ result.prix }}</span>
                       </ng-container>
                     </td>
                   </tr>
@@ -566,7 +566,7 @@
                     <td></td>
                     <td></td>
                     <td *ngFor="let result of comparisonResults" class="text-center">
-                      <p-button label="Choisir" icon="pi pi-check" (click)="selectOffer(result)"></p-button>
+                      <p-button label="Choisir" icon="pi pi-check" (click)="onFormuleSelect(result)"></p-button>
                     </td>
                   </tr>
                 </tbody>
@@ -625,42 +625,8 @@
         </div>
   </div>
 
-<!-- Pricing Details Modal -->
-<p-dialog header="Détails de la Tarification" [(visible)]="isDetailModalVisible" [modal]="true" [style]="{width: '50vw'}" [draggable]="false" [resizable]="false">
-  <ng-container *ngIf="selectedResultForDetails">
-    <h3 class="font-bold text-xl mb-3">{{ selectedResultForDetails.assurance }} - {{ selectedResultForDetails.formule }}</h3>
-    
-    <div class="mb-4">
-      <span class="text-lg">Tarif Global: </span>
-      <span class="font-bold text-2xl text-primary">{{ selectedResultForDetails.tarifGlobal | currency:'EUR':'symbol':'1.2-2' }}</span>
-      <span class="text-lg">/ mois</span>
-    </div>
 
-    <p-table [value]="selectedResultForDetails.tarifDetails ?? []" styleClass="p-datatable-sm">
-      <ng-template pTemplate="header">
-        <tr>
-          <th>Garantie</th>
-          <th class="text-right">Contribution Mensuelle</th>
-        </tr>
-      </ng-template>
-      <ng-template pTemplate="body" let-detail>
-        <tr>
-          <td>{{ detail.guaranteeCode }}</td>
-          <td class="text-right font-semibold">{{ detail.contribution.contributionAmount | currency:'EUR':'symbol':'1.2-2' }}</td>
-        </tr>
-      </ng-template>
-      <ng-template pTemplate="footer">
-        <tr>
-            <td class="text-right font-bold">Total</td>
-            <td class="text-right font-bold text-primary">{{ selectedResultForDetails.tarifGlobal | currency:'EUR':'symbol':'1.2-2' }}</td>
-        </tr>
-    </ng-template>
-    </p-table>
 
-  </ng-container>
-  <ng-template pTemplate="footer">
-    <button pButton type="button" label="Fermer" (click)="isDetailModalVisible=false" class="p-button-text"></button>
-  </ng-template>
-</p-dialog>
+
 
  

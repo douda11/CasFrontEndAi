@@ -7,6 +7,7 @@ export const routes: Routes = [
   {path: 'login', component: LoginComponent},
   {path: 'project', component: ProjectFormComponent},
   {path: 'compare', component: CompareComponent},
+  {path: 'tarif-utwin', component: ProjectFormComponent},
 
  
 

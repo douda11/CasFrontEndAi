@@ -500,7 +500,7 @@
                     <td></td>
                     <td *ngFor="let result of comparisonResults" 
                         class="text-center" 
-                        (click)="onFormuleSelect(result)" 
+                        (click)="onFormuleSelect(result, result.formule)" 
                         style="cursor: pointer; text-decoration: underline; color: blue;"
                         pTooltip="Cliquez pour calculer le tarif de cette formule"
                         tooltipPosition="top">
@@ -566,7 +566,7 @@
                     <td></td>
                     <td></td>
                     <td *ngFor="let result of comparisonResults" class="text-center">
-                      <p-button label="Choisir" icon="pi pi-check" (click)="onFormuleSelect(result)"></p-button>
+                      <p-button label="Choisir" icon="pi pi-check" (click)="onFormuleSelect(result, result.formule)"></p-button>
                     </td>
                   </tr>
                 </tbody>

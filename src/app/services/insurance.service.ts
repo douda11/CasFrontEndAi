@@ -3,7 +3,7 @@
 import { HttpClient, HttpHeaders, HttpParams, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BorrowerForm } from '../models/borrower-form.model';
-import { Observable, throwError, of } from 'rxjs';
+import { Observable, throwError, EMPTY, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { QuoteResponse, ComparisonResult, InsuranceQuoteForm, AprilPayload, AprilPerson, AprilAddress, AprilMobilePhone, AprilProduct, AprilInsured, AprilCoverage } from '../models/project-model';
 import { formatDate } from '@angular/common';
@@ -13,6 +13,7 @@ import { AprilGetTarifResponse } from '../models/april-models';
 @Injectable({ providedIn: 'root' })
 export class InsuranceService {
   private apiBasePath = '';
+  private apiUrl = '/api/v1/tarification';
   private aprilUrl = `${this.apiBasePath}/api/v1/comparisons/april/projects/prices`;
   private healthProtectionUrl = `${this.apiBasePath}/healthProtection/projects/prices`; // New endpoint
   private utwinUrl = `${this.apiBasePath}/api/Sante/v1/Tarifs`;
@@ -27,6 +28,10 @@ export class InsuranceService {
   constructor(
     private http: HttpClient
   ) {}
+
+  getApiviaTarif(data: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/apivia`, data);
+  }
 
   // For the new wizard-based forms
   
@@ -153,10 +158,14 @@ export class InsuranceService {
       }
     }
 
-    // Si aucun productCode n'est trouvé, retourner une erreur
+    // Si aucun productCode n'est trouvé pour un produit April, retourner une erreur
     if (!productCode) {
-      console.error('Aucun productCode correspondant trouvé pour la référence:', productReference);
-      return throwError(() => new Error(`Aucun produit correspondant trouvé pour "${productReference}"`));
+      // Ne pas traiter comme une erreur si ce n'est pas un produit April, retourner simplement un observable vide.
+      if (!productReference.toLowerCase().includes('april')) {
+        return EMPTY;
+      }
+      console.error('Aucun productCode APRIL correspondant trouvé pour la référence:', productReference);
+      return throwError(() => new Error(`Aucun produit APRIL correspondant trouvé pour "${productReference}"`));
     }
 
     const payload = this.transformToAprilPayload(form, productCode, levelCode);

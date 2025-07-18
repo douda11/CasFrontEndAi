@@ -34,6 +34,13 @@ import { InsuranceQuoteForm, InsuredPerson } from '../../models/project-model';
 import { MessageService } from 'primeng/api';
 import { startWith, finalize } from 'rxjs/operators';
 
+interface ApiviaBeneficiaire {
+  typeBeneficiaire: string;
+  dateDeNaissance: string;
+  typeRegime: string;
+  regimeSocial: string;
+}
+
 interface GuaranteeValues {
   hospitalisation: number;
   honoraires: number;
@@ -264,12 +271,12 @@ export class CompareComponent implements OnInit {
             setTimeout(() => {
               this.fetchAprilPrices();
               this.fetchAllUtwinPrices(); // Automatic fetch for Utwin
+              this.fetchApiviaPrices(); // Automatic fetch for APIVIA
             });
 
             if (response.utwinResponse) {
               if (response.utwinResponse.messages) {
-                this.handleUtwinBusinessErrors(response.utwinResponse.messages);
-              }
+}
             }
           }
           this.activeIndex = 2;
@@ -280,14 +287,14 @@ export class CompareComponent implements OnInit {
           this.activeIndex = 2;
           if (err.status === 400 && err.error) {
             if (err.error.messages) {
-              this.handleUtwinBusinessErrors(err.error.messages);
-            }
+}
           
             if (err.error.table) { // Handle markdown table even in case of 400 error
                 this.comparisonResults = this.parseMarkdownTable(err.error.table);
                 setTimeout(() => {
                   this.fetchAprilPrices();
                   this.fetchAllUtwinPrices(); // Automatic fetch for Utwin
+                  this.fetchApiviaPrices(); // Automatic fetch for APIVIA
                 });
             }
           } else {
@@ -297,11 +304,107 @@ export class CompareComponent implements OnInit {
       });
   }
 
-  private handleUtwinBusinessErrors(messages: any[]): void {
-    messages.forEach(msg => {
-      this.messageService.add({ severity: 'warn', summary: `Avertissement Utwin: ${msg.code}`, detail: msg.libelle, sticky: true });
+  private fetchApiviaPrices(): void {
+    const personalInfo = this.insuranceForm.get('personalInfo')?.value;
+
+    const formatDate = (date: any): string => {
+      if (!date) return '';
+      const d = new Date(date);
+      const day = (`0${d.getDate()}`).slice(-2);
+      const month = (`0${d.getMonth() + 1}`).slice(-2);
+      const year = d.getFullYear();
+      return `${day}/${month}/${year}`;
+    };
+
+    const apiviaProducts = this.comparisonResults.filter(result => {
+      const assuranceName = result.assurance?.toLowerCase() || '';
+      return assuranceName.includes('apivia');
+    });
+
+    if (apiviaProducts.length === 0) {
+      return; // No Apivia products, no need to proceed or notify
+    }
+
+    const beneficiaires: ApiviaBeneficiaire[] = [];
+
+    // Main Insured
+    beneficiaires.push({
+      typeBeneficiaire: 'PRINCIPAL',
+      dateDeNaissance: formatDate(personalInfo.dateNaissance),
+      typeRegime: 'GE',
+      regimeSocial: personalInfo.regime
+    });
+
+    // Conjoint
+    if (personalInfo.conjoint && (personalInfo.etatCivil === 'marie' || personalInfo.etatCivil === 'unionLibre') && personalInfo.conjoint.dateNaissance) {
+        beneficiaires.push({
+            typeBeneficiaire: 'CONJOINT',
+            dateDeNaissance: formatDate(personalInfo.conjoint.dateNaissance),
+            typeRegime: 'GE',
+            regimeSocial: personalInfo.conjoint.regime || 'GE' // Default to GE if not provided
+        });
+    }
+
+    // Enfants
+    personalInfo.enfants.forEach((enfant: any) => {
+        beneficiaires.push({
+            typeBeneficiaire: 'AUTRE',
+            dateDeNaissance: formatDate(enfant.dateNaissance),
+            typeRegime: 'GE',
+            regimeSocial: enfant.regime || 'GE' // Default to GE if not provided
+        });
+    });
+
+    apiviaProducts.forEach(result => {
+        result.isPricingLoading = true;
+
+        // Extract formula number from the result
+        const formulaMatch = result.formule.match(/Formule (\d+)|Niveau (\d+)/i);
+        const formulaNumber = formulaMatch ? (formulaMatch[1] || formulaMatch[2]) : '*';
+
+        const apiviaPayload = {
+          action: 'tarification',
+          format: 'json',
+          produits: 'VITAMM3', // Assuming VITAMM3 for all Apivia products for now
+          formules: formulaNumber,
+          renforts: '*',
+          codePostal: personalInfo.codePostal,
+          dateEffet: formatDate(personalInfo.dateEffet),
+          beneficiaires: beneficiaires
+        };
+
+        console.log('Sending APIVIA Payload:', apiviaPayload);
+
+        this.insuranceService.getApiviaTarif(apiviaPayload).pipe(
+          finalize(() => { result.isPricingLoading = false; })
+        ).subscribe({
+          next: (response: any) => {
+            console.log('APIVIA Response:', response);
+            if (response.status === 'success' && response.list && response.list.length > 0) {
+                // Find the correct pricing from the list
+                const pricingInfo = response.list.find((item: any) => item.formule === formulaNumber);
+                if (pricingInfo && pricingInfo.cotisation_mensuelle) {
+                    result.prix = parseFloat(pricingInfo.cotisation_mensuelle);
+                    this.messageService.add({ severity: 'success', summary: 'Tarif APIVIA Récupéré', detail: `Prix pour ${result.formule} mis à jour.` });
+                } else {
+                    result.prix = 'N/A';
+                    this.messageService.add({ severity: 'warn', summary: 'Tarif APIVIA', detail: `Aucun prix trouvé pour la formule ${formulaNumber}.` });
+                }
+            } else {
+                result.prix = 'Erreur';
+                const errorMessages = response.list ? response.list.join(', ') : 'Erreur inconnue.';
+                this.messageService.add({ severity: 'error', summary: 'Erreur APIVIA', detail: `La tarification a échoué: ${errorMessages}` });
+            }
+          },
+          error: (err) => {
+            result.prix = 'Erreur';
+            this.messageService.add({ severity: 'error', summary: 'Erreur APIVIA', detail: 'Une erreur est survenue lors de la récupération du tarif.' });
+            console.error('APIVIA pricing error:', err);
+          }
+        });
     });
   }
+
 
   private transformFormToQuote(): InsuranceQuoteForm {
     const personalInfo = this.insuranceForm.get('personalInfo')?.value;
@@ -438,7 +541,8 @@ export class CompareComponent implements OnInit {
   private fetchAllUtwinPrices(): void {
     const quoteForm = this.transformFormToQuote();
     this.comparisonResults.forEach(result => {
-      if (result.assurance?.toLowerCase().includes('utwin')) {
+      const assuranceName = result.assurance?.toLowerCase() || '';
+      if (assuranceName.includes('utwin')) {
         result.isPricingLoading = true;
         this.insuranceService.getUtwinTarif(quoteForm, result.formule).pipe(
           finalize(() => { result.isPricingLoading = false; })
@@ -464,6 +568,151 @@ export class CompareComponent implements OnInit {
     });
   }
 
+  private normalizeUtwinProductName(name: string): string {
+    return name
+      .replace(/\(Niveau \d+\)/i, '') // Remove '(Niveau X)' pattern
+      .replace(/'/g, ' ')
+      .replace(/,/g, '')  // Remove commas
+      .replace(/\s+/g, ' ')
+      .replace(/-/g, ' ')
+      .trim()
+      .toUpperCase();
+  }
+
+    onFormuleSelect(result: any, formule: string): void {
+    console.log('onFormuleSelect triggered for:', result.assurance, 'with formula:', formule);
+
+    const assuranceName = result.assurance?.toLowerCase() || '';
+    result.isPricingLoading = true;
+
+    // APIVIA LOGIC
+        if (assuranceName.includes('apivia')) {
+      console.log('APIVIA product detected. Starting tarification process.');
+      const personalInfo = this.insuranceForm.get('personalInfo')?.value;
+      const formatDate = (date: any): string => {
+        if (!date) return '';
+        const d = new Date(date);
+        const day = (`0${d.getDate()}`).slice(-2);
+        const month = (`0${d.getMonth() + 1}`).slice(-2);
+        const year = d.getFullYear();
+        return `${day}/${month}/${year}`;
+      };
+
+      const beneficiaires: ApiviaBeneficiaire[] = [];
+      beneficiaires.push({
+        typeBeneficiaire: 'PRINCIPAL',
+        dateDeNaissance: formatDate(personalInfo.dateNaissance),
+        typeRegime: 'GE',
+        regimeSocial: personalInfo.regime
+      });
+
+      if (personalInfo.conjoint && (personalInfo.etatCivil === 'marie' || personalInfo.etatCivil === 'unionLibre') && personalInfo.conjoint.dateNaissance) {
+          beneficiaires.push({
+              typeBeneficiaire: 'CONJOINT',
+              dateDeNaissance: formatDate(personalInfo.conjoint.dateNaissance),
+              typeRegime: 'GE',
+              regimeSocial: personalInfo.conjoint.regime || 'GE'
+          });
+      }
+
+      personalInfo.enfants.forEach((enfant: any) => {
+          beneficiaires.push({
+              typeBeneficiaire: 'AUTRE',
+              dateDeNaissance: formatDate(enfant.dateNaissance),
+              typeRegime: 'GE',
+              regimeSocial: enfant.regime || 'GE'
+          });
+      });
+
+      const formulaMatch = formule.match(/Formule (\d+)|Niveau (\d+)/i);
+      const formulaNumber = formulaMatch ? (formulaMatch[1] || formulaMatch[2]) : '*';
+
+      const apiviaPayload = {
+        action: 'tarification',
+        format: 'json',
+        produits: 'VITAMM3',
+        formules: formulaNumber,
+        renforts: '*',
+        codePostal: personalInfo.codePostal,
+        dateEffet: formatDate(personalInfo.dateEffet),
+        beneficiaires: beneficiaires
+      };
+
+      this.insuranceService.getApiviaTarif(apiviaPayload).pipe(
+        finalize(() => { result.isPricingLoading = false; })
+      ).subscribe({
+        next: (response: any) => {
+          if (response.status === 'success' && response.list && response.list.length > 0) {
+            const product = response.list[0];
+            if (product && product.formules && product.formules[formulaNumber]) {
+              const formulaData = product.formules[formulaNumber];
+              if (formulaData.total && typeof formulaData.total.complete === 'number') {
+                result.prix = formulaData.total.complete;
+              } else {
+                result.prix = 'N/A';
+              }
+            } else {
+              result.prix = 'N/A';
+            }
+          } else {
+            result.prix = 'Erreur';
+          }
+        },
+        error: (err) => {
+          result.prix = 'Erreur';
+          console.error('APIVIA pricing error on select:', err);
+        }
+      });
+
+    // APRIL LOGIC
+    } else if (assuranceName.includes('april')) {
+      const quoteForm = this.transformFormToQuote();
+      this.insuranceService.getAprilHealthTarif(quoteForm, result.assurance, formule).pipe(
+        finalize(() => { result.isPricingLoading = false; })
+      ).subscribe({
+        next: (response: any) => {
+          const tarifGlobal = response.data?.find((d: any) => d.priceType === 'TarifGlobal');
+          if (tarifGlobal) {
+            result.prix = tarifGlobal.contribution.contributionAmount;
+          }
+        },
+        error: (err: any) => {
+          console.error('Erreur API pour', result.assurance, err);
+          result.prix = 'Erreur';
+        }
+      });
+
+    // UTWIN LOGIC
+    } else if (assuranceName.includes('utwin')) {
+      const quoteForm = this.transformFormToQuote();
+      this.insuranceService.getUtwinTarif(quoteForm, formule).pipe(
+        finalize(() => { result.isPricingLoading = false; })
+      ).subscribe({
+        next: (response: any) => {
+          const matchingProposition = response.propositions.find((p: any) => {
+            const normalizedApiName = this.normalizeUtwinProductName(p.libelle);
+            const normalizedOfferName = this.normalizeUtwinProductName(result.assurance);
+            return normalizedApiName === normalizedOfferName;
+          });
+
+          if (matchingProposition) {
+            result.prix = matchingProposition.cotisationTTC;
+          } else {
+            result.prix = 'N/A';
+          }
+        },
+        error: (err: any) => {
+          console.error('Erreur API pour', result.assurance, err);
+          result.prix = 'Erreur';
+        }
+      });
+
+    } else {
+      result.isPricingLoading = false;
+      console.warn('No specific pricing logic for:', result.assurance);
+    }
+  }
+
   private updateUtwinPrice(offer: ComparisonResult, propositions: any[]): void {
     const formulaParts = offer.formule.match(/(.+) Niveau (\d+)/);
     if (!formulaParts || formulaParts.length !== 3) {
@@ -475,9 +724,11 @@ export class CompareComponent implements OnInit {
     const niveau = formulaParts[2];
     const codeFormuleToFind = `N${niveau}`; // e.g., "N3"
 
-    const proposition = propositions.find((p: any) =>
-      p.libelleProduit === libelleProduit && p.codeFormule === codeFormuleToFind
-    );
+    const proposition = propositions.find((p: any) => {
+      const normalizedApiProduct = this.normalizeUtwinProductName(p.libelleProduit);
+      const normalizedOfferProduct = this.normalizeUtwinProductName(libelleProduit);
+      return normalizedApiProduct === normalizedOfferProduct && p.codeFormule === codeFormuleToFind;
+    });
 
     if (proposition && proposition.cotisationMensuelleEuros) {
       offer.prix = proposition.cotisationMensuelleEuros;
@@ -486,70 +737,13 @@ export class CompareComponent implements OnInit {
     }
   }
 
-  onFormuleSelect(offer: any): void {
-    console.log('Offre sélectionnée pour tarification :', offer);
-    this.submitting = true;
 
-    const quoteForm = this.transformFormToQuote();
-
-    const tarifService = offer.assurance.toLowerCase().includes('utwin')
-      ? this.insuranceService.getUtwinTarif(quoteForm, offer.formule)
-      : this.insuranceService.getAprilHealthTarif(quoteForm, offer.assurance, offer.formule);
-
-    tarifService.pipe(
-      finalize(() => { this.submitting = false; })
-    ).subscribe({
-      next: (response: any) => {
-        console.log('API Response for ' + offer.assurance + ':', response);
-        let tarifAmount: number | null = null;
-
-        if (offer.assurance.toLowerCase().includes('utwin')) {
-          const propositions = Array.isArray(response) ? response : response?.propositions;
-          if (propositions) {
-            this.updateUtwinPrice(offer, propositions);
-          } else {
-            console.warn('Utwin response does not contain propositions array:', response);
-          }
-        } else {
-          // Handle APRIL response
-          const tarifGlobal = response.data?.find((d: any) => d.priceType === 'TarifGlobal');
-          if (tarifGlobal && tarifGlobal.contribution?.contributionAmount) {
-            offer.prix = tarifGlobal.contribution.contributionAmount;
-            tarifAmount = offer.prix;
-          }
-        }
-
-        if (tarifAmount !== null) {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Tarif Obtenu',
-            detail: `Le tarif mensuel pour l'offre ${offer.formule} est de ${tarifAmount} €.`
-          });
-        } else {
-          console.error('Tarif non trouvé pour', offer.assurance);
-          this.messageService.add({
-            severity: 'warn',
-            summary: 'Tarif non disponible',
-            detail: `Le tarif pour l'offre ${offer.formule} n'a pas pu être récupéré.`
-          });
-        }
-      },
-      error: (err: any) => {
-        console.error('Erreur API pour', offer.assurance, err);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Erreur de tarification',
-          detail: 'Une erreur est survenue lors de la récupération du tarif. Veuillez réessayer.'
-        });
-      }
-    });
-  }
 
   private fetchAprilPrices(): void {
     const quoteForm = this.transformFormToQuote();
     this.comparisonResults.forEach(result => {
-      if (result.assurance?.toLowerCase().includes('april')) {
-        result.isAprilProduct = true;
+      const assuranceName = result.assurance?.toLowerCase() || '';
+      if (assuranceName.includes('april') && !assuranceName.includes('apivia')) {
         result.isPricingLoading = true;
         this.insuranceService.getAprilHealthTarif(quoteForm, result.assurance, result.formule).pipe(
           finalize(() => { result.isPricingLoading = false; })

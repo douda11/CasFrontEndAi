@@ -19,7 +19,7 @@ export class InsuranceService {
   private compareUrl = `${this.apiBasePath}/api/v1/comparisons/compare`;
 
   private aprilProductCodeMap: { [key: string]: string } = {
-    'Santé Pro Solution': 'SanteSolution', // Plus spécifique en premier
+    'Santé PRO Start APRIL': 'SanteProStartV1', // Plus spécifique en premier
     'Santé Mix': 'SanteMix',
     'Santé Pro': 'SantePro',
   };

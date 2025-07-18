@@ -465,7 +465,7 @@ export class CompareComponent implements OnInit {
   }
 
   private updateUtwinPrice(offer: ComparisonResult, propositions: any[]): void {
-    const formulaParts = offer.formule.match(/(.+) - Niveau (\d+)/);
+    const formulaParts = offer.formule.match(/(.+) Niveau (\d+)/);
     if (!formulaParts || formulaParts.length !== 3) {
       console.warn(`Formule format not recognized for automatic pricing: ${offer.formule}`);
       return;

@@ -1,0 +1,91 @@
+<div class="container mt-4">
+  <h2>Tarification ACHEEL</h2>
+  <form [formGroup]="tarifForm" (ngSubmit)="onSubmit()">
+
+    <!-- Subscriber Info -->
+    <div class="row">
+      <div class="col-md-6 mb-3">
+        <label for="subscriber_year_of_birth" class="form-label">Année de naissance du souscripteur</label>
+        <input id="subscriber_year_of_birth" type="text" formControlName="subscriber_year_of_birth" class="form-control">
+      </div>
+      <div class="col-md-6 mb-3">
+        <label for="subscriber_social_system" class="form-label">Régime social du souscripteur</label>
+        <input id="subscriber_social_system" type="text" formControlName="subscriber_social_system" class="form-control">
+      </div>
+    </div>
+
+    <!-- Partner Info -->
+    <div class="row">
+        <div class="col-md-6 mb-3">
+          <label for="partner_year_of_birth" class="form-label">Année de naissance du conjoint</label>
+          <input id="partner_year_of_birth" type="text" formControlName="partner_year_of_birth" class="form-control">
+        </div>
+        <div class="col-md-6 mb-3">
+          <label for="partner_social_system" class="form-label">Régime social du conjoint</label>
+          <input id="partner_social_system" type="text" formControlName="partner_social_system" class="form-control">
+        </div>
+      </div>
+
+    <!-- Other Info -->
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label for="postal_code" class="form-label">Code Postal</label>
+            <input id="postal_code" type="text" formControlName="postal_code" class="form-control">
+        </div>
+        <div class="col-md-4 mb-3">
+            <label for="city_id" class="form-label">ID Ville</label>
+            <input id="city_id" type="text" formControlName="city_id" class="form-control">
+        </div>
+        <div class="col-md-4 mb-3">
+            <label for="wish_effective_date" class="form-label">Date d'effet souhaitée</label>
+            <input id="wish_effective_date" type="date" formControlName="wish_effective_date" class="form-control">
+        </div>
+    </div>
+
+    <!-- Additional Members -->
+    <hr>
+    <h4>Autres assurés</h4>
+    <div formArrayName="additional_member">
+      <div *ngFor="let member of additionalMembers.controls; let i=index" [formGroupName]="i" class="row align-items-center mb-2">
+        <div class="col-md-4">
+          <input type="text" formControlName="year_of_birth" class="form-control" placeholder="Année de naissance">
+        </div>
+        <div class="col-md-4">
+          <input type="text" formControlName="social_system" class="form-control" placeholder="Régime social">
+        </div>
+        <div class="col-md-3">
+          <input type="text" formControlName="status" class="form-control" placeholder="Statut">
+        </div>
+        <div class="col-md-1">
+          <button type="button" (click)="removeAdditionalMember(i)" class="btn btn-danger btn-sm">X</button>
+        </div>
+      </div>
+    </div>
+    <button type="button" (click)="addAdditionalMember()" class="btn btn-secondary mt-2">Ajouter un assuré</button>
+
+    <!-- Submit Button -->
+    <hr>
+    <button type="submit" [disabled]="!tarifForm.valid" class="btn btn-primary mt-3">Obtenir le tarif</button>
+  </form>
+
+  <!-- Results -->
+  <div *ngIf="tarifResponse" class="mt-4">
+    <h3>Résultats de la tarification</h3>
+    <p><strong>ID Tarif Global:</strong> {{ tarifResponse.idGlobalTarif }}</p>
+    <div *ngFor="let formula of tarifResponse.formulas | keyvalue" class="card mb-2">
+        <div class="card-header">
+            {{ formula.key }}
+        </div>
+        <ul class="list-group list-group-flush">
+            <li *ngFor="let attr of formula.value.responseAttributes" class="list-group-item">
+                <strong>{{ attr.responseAttributeName }}:</strong> {{ attr.responseAttributeValue }}
+            </li>
+        </ul>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="alert alert-danger mt-4">
+    {{ errorMessage }}
+  </div>
+</div>

@@ -89,6 +89,7 @@ export class CompareComponent implements OnInit {
   submitting = false;
   minDate: Date;
   comparisonResults: ComparisonResult[] = [];
+  aprilPricingPayload: any = null;
   garanties: GarantieDefinition[] = [];
 
   civiliteOptions = [{ label: 'Monsieur', value: 'M' }, { label: 'Madame', value: 'F' }];
@@ -676,10 +677,7 @@ export class CompareComponent implements OnInit {
             result.prix = tarifGlobal.contribution.contributionAmount;
           }
         },
-        error: (err: any) => {
-          console.error('Erreur API pour', result.assurance, err);
-          result.prix = 'Erreur';
-        }
+        error: (err: any) => { console.error('Erreur API pour', result.assurance, err); }
       });
 
     // UTWIN LOGIC
@@ -741,6 +739,7 @@ export class CompareComponent implements OnInit {
 
   private fetchAprilPrices(): void {
     const quoteForm = this.transformFormToQuote();
+    this.aprilPricingPayload = quoteForm;
     this.comparisonResults.forEach(result => {
       const assuranceName = result.assurance?.toLowerCase() || '';
       if (assuranceName.includes('april') && !assuranceName.includes('apivia')) {
@@ -798,6 +797,125 @@ export class CompareComponent implements OnInit {
   }
 
   public isNumeric(value: any): boolean {
-    return value !== null && value !== undefined && !isNaN(parseFloat(value)) && isFinite(value);
+    return !isNaN(parseFloat(value)) && isFinite(value);
+  }
+
+  generateQuote(result: ComparisonResult): void {
+    const payload = this.getQuotePayload(result);
+    if (!payload) {
+      this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Impossible de générer le devis, données manquantes.' });
+      return;
+    }
+
+    if (result.assurance.toLowerCase().includes('april')) {
+      console.log('April Quote Payload:', payload);
+      this.insuranceService.sendAprilQuoteByEmail(payload).subscribe({
+        next: () => this.messageService.add({ severity: 'success', summary: 'Email envoyé', detail: 'Le devis April a été envoyé par email.' }),
+        error: () => this.messageService.add({ severity: 'error', summary: 'Erreur Email', detail: 'Impossible d\'envoyer le devis April.' })
+      });
+    } else if (result.assurance.toLowerCase().includes('apivia')) {
+      this.insuranceService.downloadApiviaQuotePdf(payload).subscribe({
+        next: (blob) => {
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `devis-apivia.pdf`;
+          a.click();
+          window.URL.revokeObjectURL(url);
+          this.messageService.add({ severity: 'success', summary: 'Téléchargement', detail: 'Le devis Apivia est en cours de téléchargement.' });
+        },
+        error: () => this.messageService.add({ severity: 'error', summary: 'Erreur PDF', detail: 'Impossible de télécharger le devis Apivia.' })
+      });
+    }
+  }
+
+  private buildAprilQuotePayload(result: ComparisonResult): any {
+    const personalInfo = this.insuranceForm.get('personalInfo')?.value;
+    if (!personalInfo) return null;
+
+    const formatDate = (date: any): string => {
+      if (!date) return '';
+      const d = new Date(date);
+      return d.toISOString().split('T')[0];
+    };
+
+    const formula = result.formule || '';
+    const levelCodeMatch = formula.match(/FORMULE (\d+)/);
+    const levelCode = levelCodeMatch ? `0${levelCodeMatch[1]}` : '01';
+
+    const mainInsuredId = 'i-1';
+    const persons = [{
+      '$id': mainInsuredId,
+      birthDate: formatDate(personalInfo.dateNaissance),
+      title: personalInfo.civilite === 'M' ? 'Monsieur' : 'Madame',
+      lastName: personalInfo.nom,
+      firstName: personalInfo.prenom,
+      mandatoryScheme: personalInfo.regime,
+      familyStatus: personalInfo.etatCivil,
+      mobilePhone: { number: personalInfo.telephone1 },
+      email: personalInfo.email
+    }];
+
+    const mainApplicantId = 'a-1';
+    const insureds = [{
+      '$id': mainApplicantId,
+      role: 'AssurePrincipal',
+      person: { '$ref': mainInsuredId }
+    }];
+
+    return {
+      '$type': 'PrevPro',
+      properties: {
+        addresses: [{
+          '$id': 'adr-1',
+          type: 'Actuelle',
+          addressLine1: personalInfo.adresse,
+          postCode: personalInfo.codePostal,
+          city: personalInfo.ville
+        }],
+        email: personalInfo.email
+      },
+      persons: persons,
+      products: [{
+        '$id': 'p-1',
+        productCode: 'SantePro',
+        effectiveDate: formatDate(personalInfo.dateEffet),
+        insureds: insureds,
+        coverages: [{
+          insured: { '$ref': mainApplicantId },
+          guaranteeCode: 'MaladieChirurgie',
+          eligibleMadelinLaw: true,
+          levelCode: levelCode
+        }, {
+          insured: { '$ref': mainApplicantId },
+          guaranteeCode: 'Surcomplementaire',
+          eligibleMadelinLaw: true
+        }]
+      }],
+      marketingParameters: {
+        requestType: 'Quotation'
+      }
+    };
+  }
+
+  private getQuotePayload(result: ComparisonResult): any {
+    const personalInfo = this.insuranceForm.get('personalInfo')?.value;
+    if (!personalInfo) return null;
+
+    const assuranceName = result.assurance?.toLowerCase() || '';
+    if (assuranceName.includes('april') && !assuranceName.includes('apivia')) {
+      return this.buildAprilQuotePayload(result);
+    }
+
+    // Default payload structure for other providers like Apivia
+    return {
+      personalInfo: personalInfo,
+      quoteDetails: {
+        assurance: result.assurance,
+        formule: result.formule,
+        prix: result.prix,
+        garanties: result.garanties
+      }
+    };
   }
 }

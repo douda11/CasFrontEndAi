@@ -18,6 +18,9 @@ export class InsuranceService {
   private healthProtectionUrl = `${this.apiBasePath}/healthProtection/projects/prices`; // New endpoint
   private utwinUrl = `${this.apiBasePath}/api/Sante/v1/Tarifs`;
   private compareUrl = `${this.apiBasePath}/api/v1/comparisons/compare`;
+  private apiviaDevisUrl = `${this.apiBasePath}/api/apivia/generate-devis`;
+  private aprilQuoteUrl = `${this.apiBasePath}/healthProtection/projects`;
+  private apiviaPdfUrl = `${this.apiBasePath}/api/apivia/generate-devis`;
 
   private aprilProductCodeMap: { [key: string]: string } = {
     'Santé PRO Start APRIL': 'SanteProStartV1', // Plus spécifique en premier
@@ -33,13 +36,21 @@ export class InsuranceService {
     return this.http.post<any>(`${this.apiUrl}/apivia`, data);
   }
 
-  // For the new wizard-based forms
-  
+  generateApiviaDevisPdf(devisRequest: any, test: boolean = false): Observable<any> {
+    const params = new HttpParams().set('test', test.toString());
+    return this.http.post(this.apiviaDevisUrl, devisRequest, { params });
+  }
 
+  sendAprilQuoteByEmail(payload: any): Observable<any> {
+    const params = new HttpParams().set('marketingParameters.requestType', 'Quotation');
+    return this.http.post(this.aprilQuoteUrl, payload, { params });
+  }
 
-
-
- 
+  downloadApiviaQuotePdf(payload: any): Observable<Blob> {
+    return this.http.post(this.apiviaPdfUrl, payload, {
+      responseType: 'blob'
+    });
+  }
 
   // New method for Health Protection API
 

@@ -905,17 +905,103 @@ export class CompareComponent implements OnInit {
     const assuranceName = result.assurance?.toLowerCase() || '';
     if (assuranceName.includes('april') && !assuranceName.includes('apivia')) {
       return this.buildAprilQuotePayload(result);
+    } else if (assuranceName.includes('apivia')) {
+      return this.buildApiviaQuotePayload(result);
     }
 
-    // Default payload structure for other providers like Apivia
+    // Default payload for any other case
+    return {};
+  }
+
+  private buildApiviaQuotePayload(result: ComparisonResult): any {
+    const personalInfo = this.insuranceForm.get('personalInfo')?.value;
+    if (!personalInfo) return null;
+
+    const formatDate = (date: any): string => {
+      if (!date) return '';
+      const d = new Date(date);
+      const day = ('0' + d.getDate()).slice(-2);
+      const month = ('0' + (d.getMonth() + 1)).slice(-2);
+      const year = d.getFullYear();
+      return `${day}/${month}/${year}`;
+    };
+
+    const getProductCode = (productName: string): string => {
+        if (productName && productName.toLowerCase().includes('apivia')) return 'VITAMT3';
+        return productName; // Fallback
+    };
+
+    const getFormulaCode = (formulaName: string): string => {
+        if (!formulaName) return '';
+        const match = formulaName.match(/\d+/);
+        return match ? match[0] : formulaName;
+    };
+
+    const beneficiaires: any[] = [];
+
+    beneficiaires.push({
+      typeBeneficiaire: 'PRINCIPAL',
+      dateDeNaissance: formatDate(personalInfo.dateNaissance),
+      typeRegime: 'GE',
+      regimeSocial: personalInfo.regime || 'TNS'
+    });
+
+    if (personalInfo.conjoint && (personalInfo.etatCivil === 'marie' || personalInfo.etatCivil === 'unionLibre')) {
+      beneficiaires.push({
+        typeBeneficiaire: 'CONJOINT',
+        dateDeNaissance: formatDate(personalInfo.conjoint.dateNaissance),
+        typeRegime: 'GE',
+        regimeSocial: personalInfo.conjoint.regime || 'TNS'
+      });
+    }
+
+    personalInfo.enfants.forEach((enfant: any) => {
+      beneficiaires.push({
+        typeBeneficiaire: 'ENFANT',
+        dateDeNaissance: formatDate(enfant.dateNaissance),
+        typeRegime: 'GE',
+        regimeSocial: enfant.regime || 'TNS'
+      });
+    });
+
     return {
-      personalInfo: personalInfo,
-      quoteDetails: {
-        assurance: result.assurance,
-        formule: result.formule,
-        prix: result.prix,
-        garanties: result.garanties
-      }
+      action: 'generate_pdf_devis',
+      beneficiaires: beneficiaires,
+      cle: 'f85d0eb55e8e069acb908c1d11af4c6e',
+      conseiller: {
+        nom: 'Dupont',
+        prenom: 'Jean',
+        typeConseiller: 'SALAR',
+        orias: '12345678'
+      },
+      dateEffet: formatDate(personalInfo.dateEffet),
+      dejaAssurance: true,
+      format: 'json',
+      formule: getFormulaCode(result.formule),
+      frais: '15',
+      isResiliationPourCompte: true,
+      options: [],
+      produit: getProductCode(result.assurance),
+      renforts: [],
+      souscripteur: {
+        typeCivilite: personalInfo.civilite === 'M' ? 'M' : 'MME',
+        nom: personalInfo.nom,
+        prenom: personalInfo.prenom,
+        telephone: personalInfo.telephone1,
+        mobile: personalInfo.telephone1, // Assuming mobile is same as phone1
+        email: personalInfo.email,
+        adresse: {
+          numero: '', // Not available in form
+          codeBtq: '', // Not available in form
+          natureVoie: '', // Not available in form
+          nomVoie: personalInfo.adresse,
+          complement: '', // Not available in form
+          codePostal: personalInfo.codePostal,
+          ville: personalInfo.ville,
+          isAdresseComplete: true
+        }
+      },
+      tarif: result.tarifGlobal || 0
     };
   }
 }

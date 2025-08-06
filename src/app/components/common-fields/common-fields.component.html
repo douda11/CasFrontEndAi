@@ -1,0 +1,164 @@
+<div class="grid flex-wrap gap-4">
+  <!-- Civilité -->
+  <div class="col-12 md:col-2">
+    <label for="civilite" class="block mb-1">Civilité *</label>
+    <p-dropdown
+      inputId="civilite"
+      formControlName="civilite"
+      [options]="civiliteOptions"
+      optionLabel="label"
+      placeholder="Sélectionner"
+      class="w-full"
+    ></p-dropdown>
+  </div>
+
+  <!-- Nom / Prénom -->
+  <div class="col-12 md:col-3">
+    <label for="nom" class="block mb-1">Nom de famille *</label>
+    <input
+      pInputText
+      id="nom"
+      formControlName="nom"
+      class="w-full"
+      placeholder="Saisir le nom"
+    />
+  </div>
+
+  <div class="col-12 md:col-3">
+    <label for="prenom" class="block mb-1">Prénom *</label>
+    <input
+      pInputText
+      id="prenom"
+      formControlName="prenom"
+      class="w-full"
+      placeholder="Saisir le prénom"
+    />
+  </div>
+
+  <!-- Date de naissance -->
+  <div class="col-12 md:col-2">
+    <label for="dateNaissance" class="block mb-1">Date de naissance *</label>
+    <p-calendar
+      inputId="dateNaissance"
+      formControlName="dateNaissance"
+      dateFormat="dd/mm/yy"
+      showIcon="true"
+      placeholder="JJ/MM/AAAA"
+      class="w-full"
+    ></p-calendar>
+  </div>
+
+  <!-- Profession / Catégorie professionnelle -->
+  <div class="col-12 md:col-2">
+    <label for="profession" class="block mb-1">Profession *</label>
+    <p-dropdown
+      inputId="profession"
+      formControlName="profession"
+      [options]="professionOptions"
+      optionLabel="label"
+      placeholder="Sélectionner"
+      class="w-full"
+    ></p-dropdown>
+  </div>
+
+  <!-- Adresse / Complément -->
+  <div class="col-12 md:col-6">
+    <label for="adresse" class="block mb-1">Adresse *</label>
+    <input
+      pInputText
+      id="adresse"
+      formControlName="adresse"
+      class="w-full"
+      placeholder="Saisir l’adresse"
+    />
+  </div>
+
+  <div class="col-12 md:col-6">
+    <label for="complementAdresse" class="block mb-1">Complément d’adresse</label>
+    <input
+      pInputText
+      id="complementAdresse"
+      formControlName="complementAdresse"
+      class="w-full"
+      placeholder="Complément (ex. étage)"
+    />
+  </div>
+
+  <!-- Code Postal / Ville / Pays -->
+  <div class="col-12 md:col-2">
+    <label for="codePostal" class="block mb-1">Code postal *</label>
+    <input
+      pInputMask
+      id="codePostal"
+      formControlName="codePostal"
+      mask="99999"
+      class="w-full"
+      placeholder="75000"
+    />
+  </div>
+
+  <div class="col-12 md:col-4">
+    <label for="ville" class="block mb-1">Ville *</label>
+    <input
+      pInputText
+      id="ville"
+      formControlName="ville"
+      class="w-full"
+      placeholder="Saisir la ville"
+    />
+  </div>
+
+  <div class="col-12 md:col-6">
+    <label for="pays" class="block mb-1">Pays *</label>
+    <p-dropdown
+      inputId="pays"
+      formControlName="pays"
+      [options]="paysOptions"
+      optionLabel="label"
+      placeholder="Sélectionner un pays"
+      class="w-full"
+    ></p-dropdown>
+  </div>
+
+  <!-- Téléphones / Email -->
+  <div class="col-12 md:col-6">
+    <label for="telephone1" class="flex align-items-center mb-1">
+      <i class="pi pi-phone mr-1" pTooltip="+33" tooltipPosition="top"></i>
+      Numéro de téléphone *
+    </label>
+    <input
+      pInputMask
+      id="telephone1"
+      formControlName="telephone1"
+      mask="+33 99 99 99 99 99"
+      class="w-full"
+      placeholder="+33 XX XX XX XX XX"
+    />
+  </div>
+
+  <div class="col-12 md:col-6">
+    <label for="telephone2" class="flex align-items-center mb-1">
+      <i class="pi pi-phone mr-1" pTooltip="+33" tooltipPosition="top"></i>
+      Numéro de téléphone 2
+    </label>
+    <input
+      pInputMask
+      id="telephone2"
+      formControlName="telephone2"
+      mask="+33 99 99 99 99 99"
+      class="w-full"
+      placeholder="+33 XX XX XX XX XX"
+    />
+  </div>
+
+  <div class="col-12 md:col-6">
+    <label for="email" class="block mb-1">Email *</label>
+    <input
+      pInputText
+      id="email"
+      formControlName="email"
+      class="w-full"
+      placeholder="nom@exemple.com"
+    />
+  </div>
+</div>

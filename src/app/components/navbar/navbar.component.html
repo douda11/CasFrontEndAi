@@ -1,0 +1,16 @@
+<div class="wizard-nav-container">
+  <p-menubar [model]="items">
+    <ng-template pTemplate="start">
+      <div class="logo mr-3">
+        <img src="https://github.com/seifeddinerezgui/CAC/blob/master/cac-frontend/src/assets/logo.png" alt="Logo" height="40" class="mr-2">
+        <span class="font-bold text-lg">CAS Brokins</span>
+      </div>
+    </ng-template>
+    <ng-template pTemplate="end">
+      <div class="flex align-items-center">
+        <button pButton label="Accueil" icon="pi pi-home" class="p-button-text mr-2" routerLink="/home"></button>
+        <app-theme-switcher></app-theme-switcher>
+      </div>
+    </ng-template>
+  </p-menubar>
+</div>

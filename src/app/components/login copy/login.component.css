@@ -1,0 +1,137 @@
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.login-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #7e22ce;
+  height: 100vh;
+}
+
+.login-container {
+  display: flex;
+  width: 800px;
+  height: 450px;
+  background-color: white;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.login-form {
+  width: 50%;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.login-form h2 {
+  margin-bottom: 30px;
+  font-size: 28px;
+  position: relative;
+}
+
+.login-form h2::after {
+  content: '';
+  width: 40px;
+  height: 3px;
+  background-color: #7e22ce;
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  border-radius: 5px;
+}
+
+.input-group {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.input-group .icon {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  color: #7e22ce;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 10px 10px 10px 35px;
+  border: none;
+  border-bottom: 2px solid #ccc;
+  outline: none;
+  font-size: 14px;
+}
+
+.input-group input:focus {
+  border-color: #7e22ce;
+}
+
+.forgot-link {
+  font-size: 13px;
+  color: #7e22ce;
+  margin-bottom: 20px;
+  display: inline-block;
+  text-decoration: none;
+}
+
+.login-button {
+  background-color: #7e22ce;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.login-button:hover {
+  background-color: #6b21a8;
+}
+
+.signup-text {
+  margin-top: 20px;
+  font-size: 13px;
+}
+
+.signup-text a {
+  color: #7e22ce;
+  text-decoration: none;
+}
+
+.error-message {
+  margin-top: 10px;
+  color: red;
+  font-size: 13px;
+}
+
+.login-info {
+  width: 50%;
+  background-image: url('C:/Users/seif/Desktop/CAC_Brokins/frontend/src/app/assets/images/file.png') ;/* mets ici ton image locale */
+  background-size: cover;
+  background-position: center;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 40px;
+  text-align: center;
+}
+
+.login-info .headline {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.login-info .subtext {
+  font-size: 15px;
+  margin-top: 10px;
+}

@@ -1,0 +1,234 @@
+/* General styles for the comparison table */
+.comparison-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+
+  th, td {
+    padding: 0.75rem;
+    text-align: center;
+    border-bottom: 1px solid #dee2e6;
+  }
+
+  th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+  }
+
+  .assurance-header {
+    font-size: 1.1rem;
+    color: var(--primary-color);
+  }
+}
+
+/* Coverage level styling */
+.coverage-high {
+  background-color: #d4edda; /* Light green */
+  color: #155724; /* Dark green */
+  font-weight: bold;
+}
+
+.coverage-medium {
+  background-color: #fff3cd; /* Light yellow */
+  color: #856404; /* Dark yellow */
+}
+
+.coverage-low {
+  background-color: #f8d7da; /* Light red */
+  color: #721c24; /* Dark red */
+}
+
+.comparison-container {
+  width: 100%;
+  overflow-x: auto; // Enable horizontal scrolling to handle wide content
+  -webkit-overflow-scrolling: touch; // Smooth scrolling on iOS
+  padding: 2rem 0;
+}
+
+// The flexbox grid for the table
+.comparison-grid {
+  display: flex;
+  min-width: 1000px; // A sensible minimum width
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  overflow: hidden;
+  font-size: 0.9rem;
+}
+
+// First column (Garanties)
+.garanties-column {
+  flex: 0 0 200px;
+  display: flex;
+  flex-direction: column;
+  background-color: #f8f9fa;
+  border-right: 1px solid #dee2e6;
+}
+
+// Offer columns
+.offer-card {
+  flex: 1 1 auto; // Allow cards to grow but not shrink below content size
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff;
+  border-left: 1px solid #dee2e6;
+  text-align: center;
+}
+
+// General cell styling
+.grid-cell {
+  padding: 0.5rem 0.75rem;
+  min-height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 1px solid #dee2e6;
+  &:last-of-type {
+    border-bottom: none;
+  }
+}
+
+// Specific styling for the first column's cells
+.garanties-column .grid-cell {
+  justify-content: flex-start;
+  text-align: left;
+  color: #343a40;
+}
+
+// Header and Footer styling
+.grid-header, .card-header, .grid-footer, .card-footer {
+  padding: 0.75rem;
+  background-color: #f8f9fa;
+}
+
+.grid-header, .card-header {
+  font-weight: bold;
+  border-bottom: 1px solid #dee2e6;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.grid-footer, .card-footer {
+  margin-top: auto;
+  border-top: 1px solid #dee2e6;
+}
+
+.card-header {
+  font-size: 1.1rem;
+}
+
+// Row-specific styling
+.assureur-row, .produit-row {
+  text-align: left;
+  justify-content: flex-start;
+  font-weight: bold;
+  white-space: nowrap; // Keep content on a single line
+}
+
+.assureur-row {
+  color: #eb29d4 !important; // Baby pink
+}
+
+.produit-row {
+  color: rgb(66, 154, 242) !important; // Blue
+}
+
+.formule-row {
+  color: #495057; // Light black
+  font-weight: bold !important; // Ensure this is always bold
+}
+
+// Cell highlighting
+.cell-good {
+  background-color: #d4edda !important;
+  color: #0cc838 !important;
+}
+
+.cell-bad {
+  background-color: #f8d7da !important;
+  color: #df1227 !important;
+}
+
+// New styles for comparison table
+.comparison-table-container {
+  width: 100%;
+  /* overflow-x: auto; // Supprimé pour empêcher le défilement */
+}
+
+.comparison-table {
+  width: 100%; /* Le tableau prend toute la largeur */
+  table-layout: fixed; /* Les colonnes se partagent la largeur équitablement */
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: 0.85rem; /* Police légèrement réduite */
+
+  th, td {
+    padding: 0.6rem; /* Espacement réduit */
+    border: 1px solid #dee2e6;
+    vertical-align: middle;
+    word-wrap: break-word; /* Le texte long va à la ligne */
+    hyphens: auto; /* Aide à couper les mots si nécessaire */
+  }
+
+  thead th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+  }
+
+  .assurance-header {
+    color: var(--primary-color);
+    font-size: 1.1rem;
+  }
+
+  tbody tr:nth-child(even) {
+    background-color: #f8f9fa;
+  }
+
+  .font-bold {
+    font-weight: 600;
+  }
+
+  .coverage-good {
+    background-color: #d4edda; // Green
+    color: #155724;
+    font-weight: bold;
+  }
+
+  .coverage-bad {
+    background-color: #f8d7da; // Red
+    color: #721c24;
+    font-weight: bold;
+  }
+
+  .footer-row td {
+    border: none;
+    padding-top: 1rem;
+    background-color: transparent;
+  }
+}
+
+// Animation for content fade-in
+.fadeIn {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.custom-table {
+  min-width: 1200px; 
+  table-layout: fixed;
+  width: 100%;
+}

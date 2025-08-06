@@ -1,0 +1,659 @@
+<div class="p-4">
+  <div class="flex justify-content-between align-items-center mb-4">
+    <h1 class="text-2xl font-bold text-primary">
+      Comparateur d'Assurance Santé
+    </h1>
+    <div>
+      <p-button
+        label="Exemple"
+        icon="pi pi-bolt"
+        styleClass="p-button-outlined mr-2"
+        (click)="loadExampleData()"
+      ></p-button>
+      <p-button
+        label="Réinitialiser"
+        icon="pi pi-refresh"
+        styleClass="p-button-secondary"
+        (click)="resetForm()"
+      ></p-button>
+    </div>
+  </div>
+
+  <div class="card">
+    <p-toast></p-toast>
+
+    <form [formGroup]="insuranceForm">
+      <p-steps
+        [model]="steps"
+        [activeIndex]="activeIndex"
+        [readonly]="false"
+        (activeIndexChange)="goToStep($event)"
+      ></p-steps>
+
+      <div class="mt-4 wizard-content">
+        <!-- Step 1: Informations personnelles -->
+        <div *ngIf="activeIndex === 0" class="fadeIn">
+          <div formGroupName="personalInfo">
+            <div class="card p-4">
+              <h2 class="text-xl font-medium mb-4">
+                <i class="pi pi-user mr-2"></i>
+                Informations personnelles
+              </h2>
+
+              <div class="grid">
+                <div class="col-12 md:col-4">
+                  <div class="field">
+                    <label for="civilite" class="block mb-2">Civilité *</label>
+                    <p-dropdown
+                      id="civilite"
+                      formControlName="civilite"
+                      [options]="civiliteOptions"
+                      optionLabel="label"
+                      optionValue="value"
+                      placeholder="Sélectionner"
+                      [style]="{ width: '100%' }"
+                    ></p-dropdown>
+                    <small
+                      *ngIf="
+                        insuranceForm.get('personalInfo.civilite')?.invalid &&
+                        insuranceForm.get('personalInfo.civilite')?.touched
+                      "
+                      class="p-error"
+                      >La civilité est requise</small
+                    >
+                  </div>
+                </div>
+
+                <div class="col-12 md:col-4">
+                  <div class="field">
+                    <label for="nom" class="block mb-2">Nom *</label>
+                    <input
+                      id="nom"
+                      formControlName="nom"
+                      pInputText
+                      class="w-full"
+                      placeholder="Votre nom"
+                    />
+                    <small
+                      *ngIf="
+                        insuranceForm.get('personalInfo.nom')?.invalid &&
+                        insuranceForm.get('personalInfo.nom')?.touched
+                      "
+                      class="p-error"
+                      >Le nom est requis</small
+                    >
+                  </div>
+                </div>
+
+                <div class="col-12 md:col-4">
+                  <div class="field">
+                    <label for="prenom" class="block mb-2">Prénom *</label>
+                    <input
+                      id="prenom"
+                      formControlName="prenom"
+                      pInputText
+                      class="w-full"
+                      placeholder="Votre prénom"
+                    />
+                    <small
+                      *ngIf="
+                        insuranceForm.get('personalInfo.prenom')?.invalid &&
+                        insuranceForm.get('personalInfo.prenom')?.touched
+                      "
+                      class="p-error"
+                      >Le prénom est requis</small
+                    >
+                  </div>
+                </div>
+
+                <div class="col-12 md:col-4">
+                  <div class="field">
+                    <label for="dateNaissance" class="block mb-2"
+                      >Date de naissance *</label
+                    >
+                    <p-calendar
+                      id="dateNaissance"
+                      formControlName="dateNaissance"
+                      [showIcon]="true"
+                      dateFormat="dd/mm/yy"
+                      [style]="{ width: '100%' }"
+                      placeholder="JJ/MM/AAAA"
+                    ></p-calendar>
+                    <small
+                      *ngIf="
+                        insuranceForm.get('personalInfo.dateNaissance')
+                          ?.invalid &&
+                        insuranceForm.get('personalInfo.dateNaissance')?.touched
+                      "
+                      class="p-error"
+                      >La date de naissance est requise</small
+                    >
+                  </div>
+                </div>
+
+                <div class="col-12 md:col-4">
+                  <div class="field">
+                    <label for="codePostal" class="block mb-2"
+                      >Code postal *</label
+                    >
+                    <input
+                      id="codePostal"
+                      formControlName="codePostal"
+                      pInputText
+                      class="w-full"
+                      placeholder="75001"
+                    />
+                    <small
+                      *ngIf="
+                        insuranceForm.get('personalInfo.codePostal')?.invalid &&
+                        insuranceForm.get('personalInfo.codePostal')?.touched
+                      "
+                      class="p-error"
+                      >Code postal valide requis (5 chiffres)</small
+                    >
+                  </div>
+                </div>
+
+                <div class="col-12 md:col-4">
+                  <div class="field">
+                    <label for="telephone1" class="block mb-2">Téléphone *</label>
+                    <p-inputMask
+                      id="telephone1"
+                      formControlName="telephone1"
+                      mask="09 99 99 99 99"
+                      placeholder="06 12 34 56 78"
+                      class="w-full"
+                    ></p-inputMask>
+                    <small
+                      *ngIf="
+                        insuranceForm.get('personalInfo.telephone1')?.invalid &&
+                        insuranceForm.get('personalInfo.telephone1')?.touched
+                      "
+                      class="p-error"
+                      >Le numéro de téléphone est requis</small
+                    >
+                  </div>
+                </div>
+
+                <div class="col-12 md:col-4">
+                  <div class="field">
+                    <label for="email" class="block mb-2">Email *</label>
+                    <input
+                      id="email"
+                      type="email"
+                      formControlName="email"
+                      pInputText
+                      class="w-full"
+                      placeholder="exemple@domaine.com"
+                    />
+                    <small
+                      *ngIf="
+                        insuranceForm.get('personalInfo.email')?.invalid &&
+                        insuranceForm.get('personalInfo.email')?.touched
+                      "
+                      class="p-error"
+                    >
+                      <span *ngIf="insuranceForm.get('personalInfo.email')?.errors?.['required']"
+                        >L'email est requis.</span
+                      >
+                      <span *ngIf="insuranceForm.get('personalInfo.email')?.errors?.['email']"
+                        >L'email est invalide.</span
+                      >
+                    </small>
+                  </div>
+                </div>
+
+                <div class="col-12 md:col-4">
+                  <div class="field">
+                    <label for="ville" class="block mb-2">Ville *</label>
+                    <input
+                      id="ville"
+                      formControlName="ville"
+                      pInputText
+                      class="w-full"
+                      placeholder="Votre ville"
+                    />
+                    <small
+                      *ngIf="
+                        insuranceForm.get('personalInfo.ville')?.invalid &&
+                        insuranceForm.get('personalInfo.ville')?.touched
+                      "
+                      class="p-error"
+                      >La ville est requise</small
+                    >
+                  </div>
+                </div>
+
+                <div class="col-12 md:col-4">
+                  <div class="field">
+                    <label for="dateEffet" class="block mb-2">Date d'effet *</label>
+                    <p-calendar
+                      id="dateEffet"
+                      formControlName="dateEffet"
+                      dateFormat="dd/mm/yy"
+                      [showIcon]="true"
+                      placeholder="JJ/MM/AAAA"
+                      [style]="{ width: '100%' }"
+                    ></p-calendar>
+                    <small
+                      *ngIf="
+                        insuranceForm.get('personalInfo.dateEffet')?.invalid &&
+                        insuranceForm.get('personalInfo.dateEffet')?.touched
+                      "
+                      class="p-error"
+                      >La date d'effet est requise.</small
+                    >
+                  </div>
+                </div>
+
+                <div class="col-12">
+                  <div class="field">
+                    <label for="adresse" class="block mb-2">Adresse *</label>
+                    <input
+                      id="adresse"
+                      formControlName="adresse"
+                      pInputText
+                      class="w-full"
+                      placeholder="123 Rue de la Paix"
+                    />
+                     <small
+                      *ngIf="
+                        insuranceForm.get('personalInfo.adresse')?.invalid &&
+                        insuranceForm.get('personalInfo.adresse')?.touched
+                      "
+                      class="p-error"
+                      >L'adresse est requise</small
+                    >
+                  </div>
+                </div>
+
+                <div class="col-12 md:col-4">
+                  <div class="field">
+                    <label for="complementAdresse" class="block mb-2">Complément d'adresse</label>
+                    <input
+                      id="complementAdresse"
+                      formControlName="complementAdresse"
+                      pInputText
+                      class="w-full"
+                      placeholder="Appartement, bâtiment..."
+                    />
+                  </div>
+                </div>
+
+                <div class="col-12 md:col-4">
+                  <div class="field">
+                    <label for="etatCivil" class="block mb-2">Etat civil *</label>
+                    <p-dropdown
+                      id="etatCivil"
+                      formControlName="etatCivil"
+                      [options]="EtatcivilOptions"
+                      optionLabel="label"
+                      optionValue="value"
+                      placeholder="Sélectionner"
+                      [style]="{ width: '100%' }"
+                    ></p-dropdown>
+                     <small
+                      *ngIf="
+                        insuranceForm.get('personalInfo.etatCivil')?.invalid &&
+                        insuranceForm.get('personalInfo.etatCivil')?.touched
+                      "
+                      class="p-error"
+                      >L'Etat civil est requis</small
+                    >
+                  </div>
+                </div>
+
+                <div class="col-12 md:col-4">
+                  <div class="field">
+                    <label for="regime" class="block mb-2">Régime obligatoire *</label>
+                    <p-dropdown
+                      id="regime"
+                      formControlName="regime"
+                      [options]="regimeOptions"
+                      optionLabel="label"
+                      optionValue="value"
+                      placeholder="Sélectionner"
+                      [style]="{ width: '100%' }"
+                    ></p-dropdown>
+                    <small
+                      *ngIf="
+                        insuranceForm.get('personalInfo.regime')?.invalid &&
+                        insuranceForm.get('personalInfo.regime')?.touched
+                      "
+                      class="p-error"
+                      >Le régime est requis</small
+                    >
+                  </div>
+                </div>
+
+                <!-- Section Conjoint -->
+                <div *ngIf="insuranceForm.get('personalInfo.etatCivil')?.value === 'marie' || insuranceForm.get('personalInfo.etatCivil')?.value === 'unionLibre'" formGroupName="conjoint" class="col-12">
+                  <div class="card p-4 mt-4 border-1 border-gray-200">
+                    <h3 class="text-lg font-medium mb-3">
+                      <i class="pi pi-heart mr-2"></i>
+                      Informations du conjoint
+                    </h3>
+                    <div class="grid">
+                      <div class="col-12 md:col-4">
+                        <div class="field">
+                            <label for="conjointCivilite" class="block mb-2">Civilité</label>
+                            <p-dropdown id="conjointCivilite" formControlName="civilite" [options]="civiliteOptions" optionLabel="label" optionValue="value" placeholder="- Choisir -" [style]="{ width: '100%' }"></p-dropdown>
+                        </div>
+                      </div>
+                      <div class="col-12 md:col-4">
+                        <div class="field">
+                          <label for="conjointNom" class="block mb-2">Nom de famille</label>
+                          <input id="conjointNom" formControlName="nom" pInputText class="w-full" placeholder="Nom de famille" />
+                        </div>
+                      </div>
+                      <div class="col-12 md:col-4">
+                        <div class="field">
+                          <label for="conjointPrenom" class="block mb-2">Prénom</label>
+                          <input id="conjointPrenom" formControlName="prenom" pInputText class="w-full" placeholder="Prénom" />
+                        </div>
+                      </div>
+                      <div class="col-12 md:col-4">
+                        <div class="field">
+                          <label for="conjointEmail" class="block mb-2">Email</label>
+                          <input id="conjointEmail" type="email" formControlName="email" pInputText class="w-full" placeholder="Email" />
+                        </div>
+                      </div>
+                      <div class="col-12 md:col-4">
+                        <div class="field">
+                          <label for="conjointDateNaissance" class="block mb-2">Date de naissance</label>
+                          <p-calendar id="conjointDateNaissance" formControlName="dateNaissance" [showIcon]="true" dateFormat="dd/mm/yy" [style]="{ width: '100%' }" placeholder="--/--/----"></p-calendar>
+                        </div>
+                      </div>
+                      <div class="col-12 md:col-4">
+                        <div class="field">
+                            <label for="conjointRegime" class="block mb-2">Régime</label>
+                            <p-dropdown id="conjointRegime" formControlName="regime" [options]="regimeOptions" optionLabel="label" optionValue="value" placeholder="- Choisir -" [style]="{ width: '100%' }"></p-dropdown>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Section Enfants -->
+                <div class="col-12">
+                    <div class="card p-4 mt-4 border-1 border-gray-200">
+                        <h3 class="text-lg font-medium mb-3">
+                            <i class="pi pi-users mr-2"></i>
+                            Enfants à charge
+                        </h3>
+                        <div formArrayName="enfants">
+                            <div *ngFor="let enfant of enfants.controls; let i = index" [formGroupName]="i" class="grid align-items-center p-2 mb-2 border-1 border-gray-200 rounded-md bg-gray-50">
+                                <div class="col-12 md:col-4">
+                                    <div class="field mb-0">
+                                        <label [for]="'enfantCivilite' + i" class="block mb-2 text-sm">Civilité</label>
+                                        <p-dropdown [id]="'enfantCivilite' + i" formControlName="civilite" [options]="civiliteOptions" optionLabel="label" optionValue="value" placeholder="- Choisir -" [style]="{ width: '100%' }"></p-dropdown>
+                                    </div>
+                                </div>
+                                <div class="col-12 md:col-4">
+                                    <div class="field mb-0">
+                                        <label [for]="'enfantNom' + i" class="block mb-2 text-sm">Nom de famille</label>
+                                        <input [id]="'enfantNom' + i" formControlName="nom" pInputText class="w-full" placeholder="Nom de famille" />
+                                    </div>
+                                </div>
+                                <div class="col-12 md:col-4">
+                                    <div class="field mb-0">
+                                        <label [for]="'enfantPrenom' + i" class="block mb-2 text-sm">Prénom</label>
+                                        <input [id]="'enfantPrenom' + i" formControlName="prenom" pInputText class="w-full" placeholder="Prénom" />
+                                    </div>
+                                </div>
+                                <div class="col-12 md:col-6">
+                                    <div class="field mb-0">
+                                        <label [for]="'enfantDateNaissance' + i" class="block mb-2 text-sm">Date de naissance</label>
+                                        <p-calendar [id]="'enfantDateNaissance' + i" formControlName="dateNaissance" [showIcon]="true" dateFormat="dd/mm/yy" [style]="{ width: '100%' }" placeholder="--/--/----"></p-calendar>
+                                    </div>
+                                </div>
+                                <div class="col-12 md:col-5">
+                                    <div class="field mb-0">
+                                        <label [for]="'enfantRegime' + i" class="block mb-2 text-sm">Régime</label>
+                                        <p-dropdown [id]="'enfantRegime' + i" formControlName="regime" [options]="regimeOptions" optionLabel="label" optionValue="value" placeholder="- Choisir -" [style]="{ width: '100%' }"></p-dropdown>
+                                    </div>
+                                </div>
+                                <div class="col-12 md:col-1 flex align-items-center justify-content-end">
+                                    <p-button icon="pi pi-trash" styleClass="p-button-danger p-button-text" (click)="removeEnfant(i)"></p-button>
+                                </div>
+                            </div>
+                        </div>
+                        <p-button label="Ajouter un enfant" icon="pi pi-plus" styleClass="p-button-outlined p-button-sm mt-2" (click)="addEnfant()"></p-button>
+                    </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2: Comparer -->
+        <div *ngIf="activeIndex === 1" class="fadeIn">
+          <div formGroupName="coverageSliders">
+            <div class="card p-4">
+              <h2 class="text-xl font-medium mb-4">
+                <i class="pi pi-sliders-h mr-2"></i>
+                Comparer les garanties
+              </h2>
+              <div class="grid">
+                <!-- Hospitalisation -->
+                <div class="col-12 md:col-6">
+                  <div class="field">
+                    <label for="hospitalisation" class="block mb-2">Hospitalisation</label>
+                    <p-slider formControlName="hospitalisation" [min]="0" [max]="1000" [step]="5"></p-slider>
+                    <span class="ml-2 font-bold">{{ insuranceForm.get('coverageSliders.hospitalisation')?.value }}%</span>
+                  </div>
+                </div>
+
+                <!-- Honoraires -->
+                <div class="col-12 md:col-6">
+                  <div class="field">
+                    <label for="honoraires" class="block mb-2">Honoraires</label>
+                    <p-slider formControlName="honoraires" [min]="0" [max]="500" [step]="5"></p-slider>
+                    <span class="ml-2 font-bold">{{ insuranceForm.get('coverageSliders.honoraires')?.value }}%</span>
+                  </div>
+                </div>
+
+                <!-- Chambre particulière -->
+                <div class="col-12 md:col-6">
+                  <div class="field">
+                    <label for="chambreParticuliere" class="block mb-2">Chambre particulière</label>
+                    <p-slider formControlName="chambreParticuliere" [min]="0" [max]="200" [step]="5"></p-slider>
+                    <span class="ml-2 font-bold">{{ insuranceForm.get('coverageSliders.chambreParticuliere')?.value | currency:'EUR':'symbol':'1.0-0' }}</span>
+                  </div>
+                </div>
+
+                <!-- Dentaire -->
+                <div class="col-12 md:col-6">
+                  <div class="field">
+                    <label for="dentaire" class="block mb-2">Dentaire</label>
+                    <p-slider formControlName="dentaire" [min]="0" [max]="1000" [step]="5"></p-slider>
+                    <span class="ml-2 font-bold">{{ insuranceForm.get('coverageSliders.dentaire')?.value }}%</span>
+                  </div>
+                </div>
+
+                <!-- Orthodontie -->
+                <div class="col-12 md:col-6">
+                  <div class="field">
+                    <label for="orthodontie" class="block mb-2">Orthodontie</label>
+                    <p-slider formControlName="orthodontie" [min]="0" [max]="1000" [step]="5"></p-slider>
+                    <span class="ml-2 font-bold">{{ insuranceForm.get('coverageSliders.orthodontie')?.value }}%</span>
+                  </div>
+                </div>
+
+                <!-- Forfait dentaire -->
+                <div class="col-12 md:col-6">
+                  <div class="field">
+                    <label for="forfaitDentaire" class="block mb-2">Forfait dentaire</label>
+                    <p-slider formControlName="forfaitDentaire" [min]="0" [max]="1000" [step]="5"></p-slider>
+                    <span class="ml-2 font-bold">{{ insuranceForm.get('coverageSliders.forfaitDentaire')?.value | currency:'EUR':'symbol':'1.0-0' }}</span>
+                  </div>
+                </div>
+
+                <!-- Forfait optique -->
+                <div class="col-12 md:col-6">
+                  <div class="field">
+                    <label for="forfaitOptique" class="block mb-2">Forfait optique</label>
+                    <p-slider formControlName="forfaitOptique" [min]="0" [max]="1000" [step]="5"></p-slider>
+                    <span class="ml-2 font-bold">{{ insuranceForm.get('coverageSliders.forfaitOptique')?.value | currency:'EUR':'symbol':'1.0-0' }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3: Résultats -->
+        <div *ngIf="activeIndex === 2" class="fadeIn">
+          <div class="card p-4">
+            <h2 class="text-xl font-medium mb-4">
+              <i class="pi pi-chart-bar mr-2"></i>
+              Résultats de la comparaison
+            </h2>
+
+            <div *ngIf="comparisonResults.length > 0; else noResults" class="comparison-table-container">
+              <table class="w-full comparison-table custom-table">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th class="text-center">Vos Besoins</th>
+                    <th *ngFor="let result of comparisonResults" class="text-center assurance-header">
+                      {{ getInsurerName(result.assurance) }}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <!-- Row for Assurance and Formule -->
+                  <tr class="border-b">
+                    <td class="font-bold">Assurance</td>
+                    <td></td>
+                    <td *ngFor="let result of comparisonResults" class="text-center" [innerHTML]="formatFormula(result.formule, result.assurance)">
+                    </td>
+                  </tr>
+
+                  <!-- Rows for Garanties -->
+                  <tr *ngFor="let garantie of garanties">
+                    <td class="font-bold">{{ garantie.label }}</td>
+                    <td class="text-center">
+                      {{ insuranceForm.get('coverageSliders.' + garantie.formControlName)?.value }}{{ garantie.unit }}
+                    </td>
+                    <td *ngFor="let result of comparisonResults" class="text-center" [ngClass]="getCoverageClass(result.garanties[garantie.formControlName])">
+                      <ng-container *ngIf="result.garanties[garantie.formControlName] > 0; else noValue">
+                        {{ result.garanties[garantie.formControlName] }}{{ garantie.unit }}
+                      </ng-container>
+                      <ng-template #noValue>-</ng-template>
+                    </td>
+                  </tr>
+
+                  <!-- Footer row for Correspondance -->
+                  <tr>
+                    <td class="font-bold">Correspondance</td>
+                    <td></td>
+                    <td *ngFor="let result of comparisonResults" class="text-center font-bold">
+                        {{ result.correspondencePercentage }}%
+                    </td>
+                  </tr>
+
+                  <!-- Footer row for Point Faible -->
+                  <tr>
+                    <td class="font-bold">Point Faible</td>
+                    <td></td>
+                    <td *ngFor="let result of comparisonResults" class="text-center">
+                        {{ result.weakPoint }}
+                    </td>
+                  </tr>
+
+                  <!-- Row for Automatic APRIL Pricing -->
+                  <tr class="border-b">
+                    <td class="font-bold">Prix</td>
+                    <td></td>
+                    <td *ngFor="let result of comparisonResults" class="text-center">
+                      <ng-container *ngIf="result.isAprilProduct">
+                        <p-progressSpinner *ngIf="result.isPricingLoading" [style]="{width: '25px', height: '25px'}"></p-progressSpinner>
+                        <div *ngIf="!result.isPricingLoading && isNumeric(result.tarifGlobal)">
+                          <span class="font-bold text-lg">{{ result.tarifGlobal | currency:'EUR':'symbol':'1.2-2' }}</span>
+                        </div>
+                        <span *ngIf="!result.isPricingLoading && !isNumeric(result.tarifGlobal)">-</span>
+                      </ng-container>
+                      <ng-container *ngIf="!result.isAprilProduct">
+                        <span *ngIf="isNumeric(result.prix)" class="font-bold text-lg">{{ result.prix | currency:'EUR':'symbol':'1.2-2' }}</span>
+                        <span *ngIf="!isNumeric(result.prix)">{{ result.prix }}</span>
+                      </ng-container>
+                    </td>
+                  </tr>
+
+                  <!-- Footer row for buttons -->
+                  <tr class="footer-row">
+                    <td></td>
+                    <td></td>
+                    <td *ngFor="let result of comparisonResults" class="text-center">
+                      <p-button label="Choisir" icon="pi pi-check" (click)="onFormuleSelect(result, result.formule)"></p-button>
+                      <p-button 
+                        *ngIf="isNumeric(result.prix) || isNumeric(result.tarifGlobal)"
+                        label="Générer un devis" 
+                        icon="pi pi-file-pdf" 
+                        styleClass="p-button-success mt-2"
+                        (click)="generateQuote(result)">
+                      </p-button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <ng-template #noResults>
+              <div class="text-center p-4">
+                <i class="pi pi-info-circle text-4xl text-primary mb-3"></i>
+                <p class="text-lg">
+                  Aucun résultat pour le moment. Veuillez remplir les étapes
+                  précédentes et cliquer sur "Comparer".
+                </p>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+
+        <!-- Navigation buttons -->
+        <div class="flex justify-content-between mt-4">
+          <p-button
+            label="Précédent"
+            icon="pi pi-chevron-left"
+            styleClass="p-button-secondary"
+            (click)="prevStep()"
+            [disabled]="activeIndex === 0"
+          ></p-button>
+
+          <div>
+            <p-button
+              *ngIf="activeIndex === 0"
+              label="Suivant"
+              icon="pi pi-chevron-right"
+              iconPos="right"
+              (click)="nextStep()"
+              [disabled]="!insuranceForm.get('personalInfo')?.valid"
+            ></p-button>
+
+            <p-button
+              *ngIf="activeIndex === 1"
+              label="Comparer"
+              icon="pi pi-calculator"
+              iconPos="right"
+              (click)="submitComparison()"
+              [loading]="submitting"
+              [disabled]="!insuranceForm.valid"
+            ></p-button>
+
+            <p-button
+              *ngIf="activeIndex === 2"
+              label="Nouvelle comparaison"
+              icon="pi pi-refresh"
+              (click)="resetForm()"
+            ></p-button>
+          </div>
+        </div>
+  </div>
+
+
+
+
+
+ 

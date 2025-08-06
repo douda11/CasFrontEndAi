@@ -587,13 +587,14 @@
                     <td></td>
                     <td *ngFor="let result of comparisonResults" class="text-center">
                       <p-button label="Choisir" icon="pi pi-check" (click)="onFormuleSelect(result, result.formule)"></p-button>
-                      <p-button 
-                        *ngIf="isNumeric(result.prix) || isNumeric(result.tarifGlobal)"
-                        label="Générer un devis" 
-                        icon="pi pi-file-pdf" 
-                        styleClass="p-button-success mt-2"
-                        (click)="generateQuote(result)">
-                      </p-button>
+                      <div *ngIf="isNumeric(result.prix) || isNumeric(result.tarifGlobal)" class="mt-2">
+                        <p-button 
+                          label="Générer un devis"
+                          icon="pi pi-file-pdf" 
+                          styleClass="p-button-success"
+                          (click)="generateQuote(result, 'telechargement')">
+                        </p-button>
+                      </div>
                     </td>
                   </tr>
                 </tbody>
@@ -651,9 +652,3 @@
           </div>
         </div>
   </div>
-
-
-
-
-
- 

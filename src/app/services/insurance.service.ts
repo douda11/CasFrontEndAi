@@ -46,6 +46,12 @@ export class InsuranceService {
     return this.http.post(this.aprilQuoteUrl, payload, { params });
   }
 
+  generateCommercialProposal(payload: any, action: 'envoiParEmail' | 'telechargement'): Observable<any> {
+    const endpoint = `${this.apiBasePath}/healthProtection/projects/commercial-proposal`;
+    const params = new HttpParams().set('action', action);
+    return this.http.post(endpoint, payload, { params });
+  }
+
   downloadApiviaQuotePdf(payload: any): Observable<Blob> {
     return this.http.post(this.apiviaPdfUrl, payload, {
       responseType: 'blob'
@@ -197,7 +203,6 @@ export class InsuranceService {
   getUtwinTarif(form: InsuranceQuoteForm, formule: string): Observable<any> {
     // Helper function to format date to ISO string format
     const formatDate = (date: Date): string => {
-      console.log(date);
       return date.toISOString();
     };
 

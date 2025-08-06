@@ -800,7 +800,7 @@ export class CompareComponent implements OnInit {
     return !isNaN(parseFloat(value)) && isFinite(value);
   }
 
-  generateQuote(result: ComparisonResult): void {
+  generateQuote(result: ComparisonResult, action: 'envoiParEmail' | 'telechargement'): void {
     const payload = this.getQuotePayload(result);
     if (!payload) {
       this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Impossible de générer le devis, données manquantes.' });
@@ -812,6 +812,23 @@ export class CompareComponent implements OnInit {
       this.insuranceService.sendAprilQuoteByEmail(payload).subscribe({
         next: () => this.messageService.add({ severity: 'success', summary: 'Email envoyé', detail: 'Le devis April a été envoyé par email.' }),
         error: () => this.messageService.add({ severity: 'error', summary: 'Erreur Email', detail: 'Impossible d\'envoyer le devis April.' })
+      });
+    } else if (result.assurance.toLowerCase().includes('utwin')) {
+      this.insuranceService.generateCommercialProposal(payload, action).subscribe({
+        next: (response) => {
+          if (action === 'telechargement' && response instanceof Blob) {
+            const url = window.URL.createObjectURL(response);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `devis-utwin.pdf`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+            this.messageService.add({ severity: 'success', summary: 'Téléchargement', detail: 'Le devis Utwin est en cours de téléchargement.' });
+          } else {
+            this.messageService.add({ severity: 'success', summary: 'Email envoyé', detail: 'Le devis Utwin a été envoyé par email.' });
+          }
+        },
+        error: () => this.messageService.add({ severity: 'error', summary: 'Erreur', detail: `Impossible de traiter la demande pour le devis Utwin.` })
       });
     } else if (result.assurance.toLowerCase().includes('apivia')) {
       this.insuranceService.downloadApiviaQuotePdf(payload).subscribe({
@@ -835,82 +852,85 @@ export class CompareComponent implements OnInit {
 
     const formatDate = (date: any): string => {
       if (!date) return '';
-      const d = new Date(date);
-      const day = (`0${d.getDate()}`).slice(-2);
-      const month = (`0${d.getMonth() + 1}`).slice(-2);
-      const year = d.getFullYear();
-      return `${day}/${month}/${year}`;
+      return new Date(date).toISOString();
     };
 
-    const beneficiaires: any[] = [];
+    const mapRegime = (regime: string): string => {
+      if (regime?.toUpperCase() === 'TNS') return 'SSI';
+      return 'RG'; // Default
+    };
 
-    beneficiaires.push({
-      typeBeneficiaire: 'PRINCIPAL',
-      dateDeNaissance: formatDate(personalInfo.dateNaissance),
-      typeRegime: 'GE',
-      regimeSocial: personalInfo.regime || 'TNS'
+    const mapCivilite = (civilite: string): string => {
+      if (civilite === 'M') return 'Monsieur';
+      if (civilite === 'F') return 'Madame';
+      return civilite;
+    }
+
+    const assures: any[] = [];
+
+    // Assuré principal
+    assures.push({
+      codeRegimeObligatoire: mapRegime(personalInfo.regime),
+      codeTypeRole: 'AssurePrincipal',
+      codeCivilite: mapCivilite(personalInfo.civilite),
+      nom: personalInfo.nom,
+      prenom: personalInfo.prenom,
+      dateDeNaissance: formatDate(personalInfo.dateNaissance)
     });
 
+    // Conjoint
     if (personalInfo.conjoint && (personalInfo.etatCivil === 'marie' || personalInfo.etatCivil === 'unionLibre')) {
-      beneficiaires.push({
-        typeBeneficiaire: 'CONJOINT',
-        dateDeNaissance: formatDate(personalInfo.conjoint.dateNaissance),
-        typeRegime: 'GE',
-        regimeSocial: personalInfo.conjoint.regime || 'TNS'
+      const conjointInfo = this.insuranceForm.get('personalInfo.conjoint')?.value;
+      assures.push({
+        codeRegimeObligatoire: mapRegime(conjointInfo.regime),
+        codeTypeRole: 'Conjoint',
+        codeCivilite: mapCivilite(conjointInfo.civilite),
+        nom: conjointInfo.nom,
+        prenom: conjointInfo.prenom,
+        dateDeNaissance: formatDate(conjointInfo.dateNaissance)
       });
     }
 
+    // Enfants
     personalInfo.enfants.forEach((enfant: any) => {
-      beneficiaires.push({
-        typeBeneficiaire: 'ENFANT',
-        dateDeNaissance: formatDate(enfant.dateNaissance),
-        typeRegime: 'GE',
-        regimeSocial: enfant.regime || 'TNS'
+      assures.push({
+        codeRegimeObligatoire: mapRegime(enfant.regime),
+        codeTypeRole: 'Enfant',
+        codeCivilite: mapCivilite(enfant.sexe === 'garcon' ? 'M' : 'F'),
+        nom: personalInfo.nom, // Assuming children have the same last name
+        prenom: enfant.prenom,
+        dateDeNaissance: formatDate(enfant.dateNaissance)
       });
     });
 
-    // Extraire dynamiquement le codeProduit et codeFormule
-    let codeProduit = 'UTWIN_MULTI'; // Valeur par défaut
-    let codeFormule = 'N1'; // Valeur par défaut
-
+    let codeProduit = 'UTWIN_MULTI'; // Default
+    let codeFormule = 'N1'; // Default
     if (result.formule) {
-        const parts = result.formule.split(/ FORMULE | NIVEAU /i);
-        if (parts.length === 2) {
-            codeProduit = parts[0].trim();
-            codeFormule = parts[1].trim();
+        const match = result.formule.match(/NIVEAU (\d+)/i);
+        if (match && match[1]) {
+            codeFormule = `N${match[1]}`;
         }
     }
 
     return {
       souscripteur: {
-        nom: personalInfo.nom,
-        prenom: personalInfo.prenom,
-        dateNaissance: formatDate(personalInfo.dateNaissance),
-        regimeSocial: personalInfo.regime || 'TNS',
+        telephonePortable: personalInfo.telephone1,
+        email: personalInfo.email,
         adresse: {
-          numero: '', // Not available in form
-          codeBtq: '', // Not available in form
-          natureVoie: '', // Not available in form
-          nomVoie: personalInfo.adresse,
-          complement: '', // Not available in form
-          codePostal: personalInfo.codePostal,
-          ville: personalInfo.ville,
-          isAdresseComplete: true
-        },
-        telephone: personalInfo.telephone1,
-        email: personalInfo.email
+          codePostal: personalInfo.codePostal
+        }
       },
+      besoin: {
+        dateEffet: formatDate(personalInfo.dateEffet)
+      },
+      assures: assures,
       contexteDeVente: {
-        produits: [
-          {
-            codeProduit: codeProduit,
-            codeFormule: codeFormule,
-            tauxCommission: '10/10', // Valeur par défaut
-          },
-        ],
-        venteAppelNonSollicite: 'false',
-        dateEffet: formatDate(personalInfo.dateEffet),
-        beneficiaires: beneficiaires
+        produits: [{
+          codeProduit: codeProduit,
+          codeFormule: codeFormule,
+          tauxCommission: '10/10'
+        }],
+        venteAppelNonSollicite: 'false'
       }
     };
   }

@@ -197,6 +197,7 @@ export class InsuranceService {
   getUtwinTarif(form: InsuranceQuoteForm, formule: string): Observable<any> {
     // Helper function to format date to ISO string format
     const formatDate = (date: Date): string => {
+      console.log(date);
       return date.toISOString();
     };
 

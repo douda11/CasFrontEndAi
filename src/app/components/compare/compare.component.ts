@@ -728,14 +728,19 @@ export class CompareComponent implements OnInit {
       return normalizedApiProduct === normalizedOfferProduct && p.codeFormule === codeFormuleToFind;
     });
 
-    if (proposition && proposition.cotisationMensuelleEuros) {
-      offer.prix = proposition.cotisationMensuelleEuros;
+    if (proposition) {
+      if (proposition.cotisationMensuelleEuros) {
+        offer.prix = proposition.cotisationMensuelleEuros;
+      }
+      // Stocker le codeTauxCommissionRetenu pour l'utiliser dans le payload
+      if (proposition.codeTauxCommissionRetenu) {
+        // @ts-ignore - Ajout de la propriété dynamique
+        offer.codeTauxCommissionRetenu = proposition.codeTauxCommissionRetenu;
+      }
     } else {
       console.warn(`No matching Utwin proposition found for: ${libelleProduit} - ${codeFormuleToFind}`);
     }
   }
-
-
 
   private fetchAprilPrices(): void {
     const quoteForm = this.transformFormToQuote();
@@ -912,6 +917,11 @@ export class CompareComponent implements OnInit {
         }
     }
 
+    // Récupérer le codeTauxCommissionRetenu s'il existe, sinon utiliser '10/10' comme valeur par défaut
+    const codeTauxCommission = 
+      // @ts-ignore - Vérification de la propriété dynamique
+      result.codeTauxCommissionRetenu || '10/10';
+
     return {
       souscripteur: {
         telephonePortable: personalInfo.telephone1,
@@ -928,7 +938,7 @@ export class CompareComponent implements OnInit {
         produits: [{
           codeProduit: codeProduit,
           codeFormule: codeFormule,
-          tauxCommission: '10/10'
+          tauxCommission: codeTauxCommission
         }],
         venteAppelNonSollicite: 'false'
       }

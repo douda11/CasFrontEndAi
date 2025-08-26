@@ -29,6 +29,7 @@ import { MarkdownModule } from 'ngx-markdown';
 // App services and models
 import { CompareService } from '../../services/compare.service';
 import { InsuranceService } from '../../services/insurance.service';
+import { AlptisService } from '../../services/alptis.service';
 import { BesoinClient } from '../../models/comparateur.model';
 import { InsuranceQuoteForm, InsuredPerson } from '../../models/project-model';
 import { MessageService } from 'primeng/api';
@@ -102,10 +103,24 @@ export class CompareComponent implements OnInit {
   ];
   sexeOptions = [{ label: 'Garçon', value: 'garcon' }, { label: 'Fille', value: 'fille' }];
 
+  // Options pour Alptis
+  categorieSocioProfessionnelleOptions = [
+    { label: 'Artisans', value: 'ARTISANS' },
+    { label: 'Commerçants et assimilés', value: 'COMMERCANTS_ET_ASSIMILES' },
+    { label: 'Professions libérales et assimilés', value: 'PROFESSIONS_LIBERALES_ET_ASSIMILES' },
+    { label: 'Chefs d\'entreprise', value: 'CHEFS_D_ENTREPRISE' }
+  ];
+
+  statutProfessionnelOptions = [
+    { label: 'Professions libérales', value: 'PROFESSIONS_LIBERALES' },
+    { label: 'Artisan commerçant', value: 'ARTISAN_COMMERCANT' }
+  ];
+
   constructor(
     private fb: FormBuilder,
     private compareService: CompareService,
     private insuranceService: InsuranceService,
+    private alptisService: AlptisService,
     private messageService: MessageService,
     private router: Router
   ) {
@@ -161,6 +176,8 @@ export class CompareComponent implements OnInit {
         telephone1: ['', Validators.required],
         etatCivil: [null, Validators.required],
         regime: [null, Validators.required],
+        categorieSocioProfessionnelle: [null, Validators.required],
+        statutProfessionnel: [null],
         conjoint: this.fb.group({
           civilite: [''], nom: [''], prenom: [''],
           email: ['', Validators.email], dateNaissance: [null], regime: ['']
@@ -273,11 +290,12 @@ export class CompareComponent implements OnInit {
               this.fetchAprilPrices();
               this.fetchAllUtwinPrices(); // Automatic fetch for Utwin
               this.fetchApiviaPrices(); // Automatic fetch for APIVIA
+              this.fetchAlptisPrices(); // Automatic fetch for Alptis
             });
 
             if (response.utwinResponse) {
               if (response.utwinResponse.messages) {
-}
+              }
             }
           }
           this.activeIndex = 2;
@@ -296,6 +314,7 @@ export class CompareComponent implements OnInit {
                   this.fetchAprilPrices();
                   this.fetchAllUtwinPrices(); // Automatic fetch for Utwin
                   this.fetchApiviaPrices(); // Automatic fetch for APIVIA
+                  this.fetchAlptisPrices(); // Automatic fetch for Alptis
                 });
             }
           } else {
@@ -406,6 +425,161 @@ export class CompareComponent implements OnInit {
     });
   }
 
+  private fetchAlptisPrices(): void {
+    const personalInfo = this.insuranceForm.get('personalInfo')?.value;
+
+    const formatDate = (date: any): string => {
+      if (!date) return '';
+      const d = new Date(date);
+      const year = d.getFullYear();
+      const month = (`0${d.getMonth() + 1}`).slice(-2);
+      const day = (`0${d.getDate()}`).slice(-2);
+      return `${year}-${month}-${day}`;
+    };
+
+    const alptisProducts = this.comparisonResults.filter(result => {
+      const assuranceName = result.assurance?.toLowerCase() || '';
+      return assuranceName.includes('alptis');
+    });
+
+    if (alptisProducts.length === 0) {
+      return; // No Alptis products, no need to proceed
+    }
+
+    // Déterminer le statut professionnel selon les règles métier
+    const getStatutProfessionnel = (categorie: string, statutChoisi?: string): string => {
+      switch (categorie) {
+        case 'ARTISANS':
+        case 'COMMERCANTS_ET_ASSIMILES':
+          return 'ARTISAN_COMMERCANT';
+        case 'PROFESSIONS_LIBERALES_ET_ASSIMILES':
+          return 'PROFESSIONS_LIBERALES';
+        case 'CHEFS_D_ENTREPRISE':
+          return statutChoisi || 'ARTISAN_COMMERCANT'; // Obligatoire de préciser
+        default:
+          return 'ARTISAN_COMMERCANT';
+      }
+    };
+
+    // Construire les assurés
+    const assures: any = {
+      adherent: {
+        cadre_exercice: 'INDEPENDANT',
+        categorie_socioprofessionnelle: personalInfo.categorieSocioProfessionnelle,
+        code_postal: personalInfo.codePostal,
+        date_naissance: formatDate(personalInfo.dateNaissance),
+        micro_entrepreneur: true,
+        regime_obligatoire: 'SECURITE_SOCIALE_INDEPENDANTS',
+        statut_professionnel: getStatutProfessionnel(
+          personalInfo.categorieSocioProfessionnelle,
+          personalInfo.statutProfessionnel
+        )
+      }
+    };
+
+    // Ajouter conjoint si présent
+    if (personalInfo.conjoint && (personalInfo.etatCivil === 'marie' || personalInfo.etatCivil === 'unionLibre') && personalInfo.conjoint.dateNaissance) {
+      assures.conjoint = {
+        categorie_socioprofessionnelle: personalInfo.categorieSocioProfessionnelle,
+        date_naissance: formatDate(personalInfo.conjoint.dateNaissance),
+        regime_obligatoire: 'SECURITE_SOCIALE_INDEPENDANTS'
+      };
+    }
+
+    // Ajouter enfants si présents
+    if (personalInfo.enfants && personalInfo.enfants.length > 0) {
+      assures.enfants = personalInfo.enfants.map((enfant: any) => ({
+        date_naissance: formatDate(enfant.dateNaissance),
+        regime_obligatoire: 'SECURITE_SOCIALE_INDEPENDANTS'
+      }));
+    }
+
+    alptisProducts.forEach(result => {
+      result.isPricingLoading = true;
+
+      // Extraire le niveau depuis la formule
+      const niveauMatch = result.formule.match(/Niveau (\d+)/i);
+      const niveau = niveauMatch ? `NIVEAU_${niveauMatch[1]}` : 'NIVEAU_1';
+
+      // Déterminer sur_complementaire selon les règles du contracts.json
+      const contractsData = [
+        { contract_name: 'Santé Pro+ Surco', contract_type: 'Surcomplémentaire santé', sur_complementaire: true },
+        { contract_name: 'Santé Pro+', contract_type: 'Complémentaire santé', sur_complementaire: false }
+      ];
+
+      const contractInfo = contractsData.find(c => 
+        result.formule.toLowerCase().includes(c.contract_name.toLowerCase())
+      );
+      const surComplementaire = contractInfo ? contractInfo.sur_complementaire : false;
+
+      // Calculer ayants_droit
+      const ayantsDroit: any = {};
+      if (assures.conjoint) {
+        ayantsDroit.conjoint = true;
+      }
+      if (assures.enfants && assures.enfants.length > 0) {
+        ayantsDroit.enfants = assures.enfants.length;
+      }
+
+      const alptisPayload = {
+        date_effet: formatDate(personalInfo.dateEffet),
+        assures: assures,
+        combinaisons: [{
+          numero: 1,
+          offre: {
+            niveau: niveau,
+            sur_complementaire: surComplementaire
+          },
+          ayants_droit: ayantsDroit,
+          commissionnement: 'PREC40_15'
+        }]
+      };
+
+      console.log('Sending Alptis Payload:', alptisPayload);
+
+      this.alptisService.getTarification(alptisPayload).pipe(
+        finalize(() => { result.isPricingLoading = false; })
+      ).subscribe({
+        next: (response: any) => {
+          console.log('Alptis Response:', response);
+          if (response && response.resultatsTarification && response.resultatsTarification.length > 0) {
+            const tarificationResult = response.resultatsTarification[0];
+            if (tarificationResult.tarifs && tarificationResult.tarifs.cotisationMensuelle) {
+              result.prix = parseFloat(tarificationResult.tarifs.cotisationMensuelle);
+              this.messageService.add({ 
+                severity: 'success', 
+                summary: 'Tarif Alptis Récupéré', 
+                detail: `Prix pour ${result.formule} mis à jour.` 
+              });
+            } else {
+              result.prix = 'N/A';
+              this.messageService.add({ 
+                severity: 'warn', 
+                summary: 'Tarif Alptis', 
+                detail: `Aucun prix trouvé pour ${result.formule}.` 
+              });
+            }
+          } else {
+            result.prix = 'Erreur';
+            this.messageService.add({ 
+              severity: 'error', 
+              summary: 'Erreur Alptis', 
+              detail: 'La tarification Alptis a échoué.' 
+            });
+          }
+        },
+        error: (err: any) => {
+          result.prix = 'Erreur';
+          this.messageService.add({ 
+            severity: 'error', 
+            summary: 'Erreur Alptis', 
+            detail: 'Une erreur est survenue lors de la récupération du tarif Alptis.' 
+          });
+          console.error('Alptis pricing error:', err);
+        }
+      });
+    });
+  }
 
   private transformFormToQuote(): InsuranceQuoteForm {
     const personalInfo = this.insuranceForm.get('personalInfo')?.value;
@@ -705,6 +879,116 @@ export class CompareComponent implements OnInit {
         }
       });
 
+    // ALPTIS LOGIC
+    } else if (assuranceName.includes('alptis')) {
+      console.log('ALPTIS product detected. Starting tarification process.');
+      const personalInfo = this.insuranceForm.get('personalInfo')?.value;
+      if (!personalInfo) {
+        result.isPricingLoading = false;
+        console.error('Personal info not available for Alptis tarification');
+        return;
+      }
+
+      const formatDate = (date: any): string => {
+        if (!date) return '';
+        const d = new Date(date);
+        const year = d.getFullYear();
+        const month = (`0${d.getMonth() + 1}`).slice(-2);
+        const day = (`0${d.getDate()}`).slice(-2);
+        return `${year}-${month}-${day}`;
+      };
+
+      const getStatutProfessionnel = (categorie: string, statutChoisi?: string): string => {
+        switch (categorie) {
+          case 'ARTISANS':
+          case 'COMMERCANTS_ET_ASSIMILES':
+            return 'ARTISAN_COMMERCANT';
+          case 'PROFESSIONS_LIBERALES_ET_ASSIMILES':
+            return 'PROFESSIONS_LIBERALES';
+          case 'CHEFS_D_ENTREPRISE':
+            return statutChoisi || 'ARTISAN_COMMERCANT';
+          default:
+            return 'ARTISAN_COMMERCANT';
+        }
+      };
+
+      const assures: any = {
+        adherent: {
+          cadre_exercice: 'INDEPENDANT',
+          categorie_socioprofessionnelle: personalInfo.categorieSocioProfessionnelle,
+          code_postal: personalInfo.codePostal,
+          date_naissance: formatDate(personalInfo.dateNaissance),
+          micro_entrepreneur: true,
+          regime_obligatoire: 'SECURITE_SOCIALE_INDEPENDANTS',
+          statut_professionnel: getStatutProfessionnel(
+            personalInfo.categorieSocioProfessionnelle,
+            personalInfo.statutProfessionnel
+          )
+        }
+      };
+
+      // N'ajouter conjoint et enfants que s'ils existent réellement
+      // L'API Alptis accepte un payload sans ces champs
+
+      const niveauMatch = result.formule.match(/Niveau (\d+)/i);
+      const niveau = niveauMatch ? `NIVEAU_${niveauMatch[1]}` : 'NIVEAU_1';
+
+      const contractsData = [
+        { contract_name: 'Santé Pro+ Surco', contract_type: 'Surcomplémentaire santé', sur_complementaire: true },
+        { contract_name: 'Santé Pro+', contract_type: 'Complémentaire santé', sur_complementaire: false }
+      ];
+
+      const contractInfo = contractsData.find(c => 
+        result.formule.toLowerCase().includes(c.contract_name.toLowerCase())
+      );
+      const surComplementaire = contractInfo ? contractInfo.sur_complementaire : false;
+
+      const ayantsDroit: any = {
+        conjoint: assures.conjoint ? true : false,
+        enfants: (assures.enfants && assures.enfants.length > 0) ? assures.enfants.length : 0
+      };
+
+      const alptisPayload = {
+        date_effet: formatDate(personalInfo.dateEffet),
+        assures: assures,
+        combinaisons: [{
+          numero: 1,
+          offre: {
+            niveau: niveau,
+            sur_complementaire: surComplementaire
+          },
+          ayants_droit: ayantsDroit,
+          commissionnement: 'PREC40_15'
+        }]
+      };
+
+      console.log('Alptis tarification payload:', alptisPayload);
+
+      this.alptisService.getTarification(alptisPayload).pipe(
+        finalize(() => { result.isPricingLoading = false; })
+      ).subscribe({
+        next: (response: any) => {
+          console.log('Alptis tarification response:', response);
+          if (response && response.resultatsTarification && response.resultatsTarification.length > 0) {
+            const tarificationResult = response.resultatsTarification[0];
+            if (tarificationResult.tarifs && tarificationResult.tarifs.total_mensuel) {
+              result.prix = parseFloat(tarificationResult.tarifs.total_mensuel);
+              console.log('Alptis price updated:', result.prix);
+            } else {
+              result.prix = 'N/A';
+              console.warn('No total_mensuel found in Alptis response');
+            }
+          } else {
+            result.prix = 'Erreur';
+            console.error('Invalid Alptis tarification response structure');
+          }
+        },
+        error: (err: any) => {
+          result.prix = 'Erreur';
+          console.error('Alptis tarification error:', err);
+        }
+      });
+
     } else {
       result.isPricingLoading = false;
       console.warn('No specific pricing logic for:', result.assurance);
@@ -848,7 +1132,139 @@ export class CompareComponent implements OnInit {
         },
         error: () => this.messageService.add({ severity: 'error', summary: 'Erreur PDF', detail: 'Impossible de télécharger le devis Apivia.' })
       });
+    } else if (result.assurance.toLowerCase().includes('alptis')) {
+      const alptisPayload = this.buildAlptisQuotePayload(result);
+      if (!alptisPayload) {
+        this.messageService.add({ severity: 'error', summary: 'Erreur', detail: 'Impossible de générer le devis Alptis, données manquantes.' });
+        return;
+      }
+      
+      this.alptisService.generateDevis(alptisPayload, action === 'telechargement').subscribe({
+        next: (response: any) => {
+          if (action === 'telechargement' && response.pdfBase64) {
+            const byteCharacters = atob(response.pdfBase64);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+              byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            const blob = new Blob([byteArray], { type: 'application/pdf' });
+            
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `devis-alptis.pdf`;
+            a.click();
+            window.URL.revokeObjectURL(url);
+            this.messageService.add({ severity: 'success', summary: 'Téléchargement', detail: 'Le devis Alptis est en cours de téléchargement.' });
+          } else {
+            this.messageService.add({ severity: 'success', summary: 'Email envoyé', detail: 'Le devis Alptis a été envoyé par email.' });
+          }
+        },
+        error: () => this.messageService.add({ severity: 'error', summary: 'Erreur Alptis', detail: 'Impossible de générer le devis Alptis.' })
+      });
     }
+  }
+
+  private buildAlptisQuotePayload(result: ComparisonResult): any {
+    const personalInfo = this.insuranceForm.get('personalInfo')?.value;
+    if (!personalInfo) return null;
+
+    const formatDate = (date: any): string => {
+      if (!date) return '';
+      const d = new Date(date);
+      const year = d.getFullYear();
+      const month = (`0${d.getMonth() + 1}`).slice(-2);
+      const day = (`0${d.getDate()}`).slice(-2);
+      return `${year}-${month}-${day}`;
+    };
+
+    const getStatutProfessionnel = (categorie: string, statutChoisi?: string): string => {
+      switch (categorie) {
+        case 'ARTISANS':
+        case 'COMMERCANTS_ET_ASSIMILES':
+          return 'ARTISAN_COMMERCANT';
+        case 'PROFESSIONS_LIBERALES_ET_ASSIMILES':
+          return 'PROFESSIONS_LIBERALES';
+        case 'CHEFS_D_ENTREPRISE':
+          return statutChoisi || 'ARTISAN_COMMERCANT';
+        default:
+          return 'ARTISAN_COMMERCANT';
+      }
+    };
+
+    const assures: any = {
+      adherent: {
+        cadre_exercice: 'INDEPENDANT',
+        categorie_socioprofessionnelle: personalInfo.categorieSocioProfessionnelle,
+        code_postal: personalInfo.codePostal,
+        date_naissance: formatDate(personalInfo.dateNaissance),
+        micro_entrepreneur: true,
+        regime_obligatoire: 'SECURITE_SOCIALE_INDEPENDANTS',
+        statut_professionnel: getStatutProfessionnel(
+          personalInfo.categorieSocioProfessionnelle,
+          personalInfo.statutProfessionnel
+        ),
+        nom: personalInfo.nom,
+        prenom: personalInfo.prenom,
+        email: personalInfo.email,
+        telephone: personalInfo.telephone1
+      }
+    };
+
+    if (personalInfo.conjoint && (personalInfo.etatCivil === 'marie' || personalInfo.etatCivil === 'unionLibre') && personalInfo.conjoint.dateNaissance) {
+      assures.conjoint = {
+        categorie_socioprofessionnelle: personalInfo.categorieSocioProfessionnelle,
+        date_naissance: formatDate(personalInfo.conjoint.dateNaissance),
+        regime_obligatoire: 'SECURITE_SOCIALE_INDEPENDANTS',
+        nom: personalInfo.conjoint.nom || personalInfo.nom,
+        prenom: personalInfo.conjoint.prenom
+      };
+    }
+
+    if (personalInfo.enfants && personalInfo.enfants.length > 0) {
+      assures.enfants = personalInfo.enfants.map((enfant: any) => ({
+        date_naissance: formatDate(enfant.dateNaissance),
+        regime_obligatoire: 'SECURITE_SOCIALE_INDEPENDANTS',
+        nom: personalInfo.nom,
+        prenom: enfant.prenom
+      }));
+    }
+
+    const niveauMatch = result.formule.match(/Niveau (\d+)/i);
+    const niveau = niveauMatch ? `NIVEAU_${niveauMatch[1]}` : 'NIVEAU_1';
+
+    const contractsData = [
+      { contract_name: 'Santé Pro+ Surco', contract_type: 'Surcomplémentaire santé', sur_complementaire: true },
+      { contract_name: 'Santé Pro+', contract_type: 'Complémentaire santé', sur_complementaire: false }
+    ];
+
+    const contractInfo = contractsData.find(c => 
+      result.formule.toLowerCase().includes(c.contract_name.toLowerCase())
+    );
+    const surComplementaire = contractInfo ? contractInfo.sur_complementaire : false;
+
+    const ayantsDroit: any = {};
+    if (assures.conjoint) {
+      ayantsDroit.conjoint = true;
+    }
+    if (assures.enfants && assures.enfants.length > 0) {
+      ayantsDroit.enfants = assures.enfants.length;
+    }
+
+    return {
+      date_effet: formatDate(personalInfo.dateEffet),
+      assures: assures,
+      combinaisons: [{
+        numero: 1,
+        offre: {
+          niveau: niveau,
+          sur_complementaire: surComplementaire
+        },
+        ayants_droit: ayantsDroit,
+        commissionnement: 'PREC40_15'
+      }]
+    };
   }
 
   private buildUtwinQuotePayload(result: ComparisonResult): any {
@@ -869,7 +1285,7 @@ export class CompareComponent implements OnInit {
       if (civilite === 'M') return 'Monsieur';
       if (civilite === 'F') return 'Madame';
       return civilite;
-    }
+    };
 
     const assures: any[] = [];
 
@@ -897,16 +1313,18 @@ export class CompareComponent implements OnInit {
     }
 
     // Enfants
-    personalInfo.enfants.forEach((enfant: any) => {
-      assures.push({
-        codeRegimeObligatoire: mapRegime(enfant.regime),
-        codeTypeRole: 'Enfant',
-        codeCivilite: mapCivilite(enfant.sexe === 'garcon' ? 'M' : 'F'),
-        nom: personalInfo.nom, // Assuming children have the same last name
-        prenom: enfant.prenom,
-        dateDeNaissance: formatDate(enfant.dateNaissance)
+    if (personalInfo.enfants && personalInfo.enfants.length > 0) {
+      personalInfo.enfants.forEach((enfant: any) => {
+        assures.push({
+          codeRegimeObligatoire: mapRegime(enfant.regime),
+          codeTypeRole: 'Enfant',
+          codeCivilite: mapCivilite(enfant.sexe === 'garcon' ? 'M' : 'F'),
+          nom: personalInfo.nom, // Assuming children have the same last name
+          prenom: enfant.prenom,
+          dateDeNaissance: formatDate(enfant.dateNaissance)
+        });
       });
-    });
+    }
 
     let codeProduit = 'UTWIN_MULTI'; // Default
     let codeFormule = 'N1'; // Default

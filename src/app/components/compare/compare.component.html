@@ -326,6 +326,53 @@
                   </div>
                 </div>
 
+                <div class="col-12 md:col-4">
+                  <div class="field">
+                    <label for="categorieSocioProfessionnelle" class="block mb-2">Catégorie socio-professionnelle *</label>
+                    <p-dropdown
+                      id="categorieSocioProfessionnelle"
+                      formControlName="categorieSocioProfessionnelle"
+                      [options]="categorieSocioProfessionnelleOptions"
+                      optionLabel="label"
+                      optionValue="value"
+                      placeholder="Sélectionner"
+                      [style]="{ width: '100%' }"
+                    ></p-dropdown>
+                    <small
+                      *ngIf="
+                        insuranceForm.get('personalInfo.categorieSocioProfessionnelle')?.invalid &&
+                        insuranceForm.get('personalInfo.categorieSocioProfessionnelle')?.touched
+                      "
+                      class="p-error"
+                      >La catégorie socio-professionnelle est requise</small
+                    >
+                  </div>
+                </div>
+
+                <!-- Statut professionnel conditionnel pour CHEFS_D_ENTREPRISE -->
+                <div *ngIf="insuranceForm.get('personalInfo.categorieSocioProfessionnelle')?.value === 'CHEFS_D_ENTREPRISE'" class="col-12 md:col-4">
+                  <div class="field">
+                    <label for="statutProfessionnel" class="block mb-2">Statut professionnel *</label>
+                    <p-dropdown
+                      id="statutProfessionnel"
+                      formControlName="statutProfessionnel"
+                      [options]="statutProfessionnelOptions"
+                      optionLabel="label"
+                      optionValue="value"
+                      placeholder="Sélectionner"
+                      [style]="{ width: '100%' }"
+                    ></p-dropdown>
+                    <small
+                      *ngIf="
+                        insuranceForm.get('personalInfo.statutProfessionnel')?.invalid &&
+                        insuranceForm.get('personalInfo.statutProfessionnel')?.touched
+                      "
+                      class="p-error"
+                      >Le statut professionnel est requis</small
+                    >
+                  </div>
+                </div>
+
                 <!-- Section Conjoint -->
                 <div *ngIf="insuranceForm.get('personalInfo.etatCivil')?.value === 'marie' || insuranceForm.get('personalInfo.etatCivil')?.value === 'unionLibre'" formGroupName="conjoint" class="col-12">
                   <div class="card p-4 mt-4 border-1 border-gray-200">

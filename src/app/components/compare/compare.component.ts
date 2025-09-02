@@ -798,7 +798,13 @@ minDate: Date | null = null;
 
         // Extract formula number from the result
         const formulaMatch = result.formule.match(/Formule (\d+)|Niveau (\d+)/i);
-        const formulaNumber = formulaMatch ? (formulaMatch[1] || formulaMatch[2]) : '*';
+        let formulaNumber = formulaMatch ? (formulaMatch[1] || formulaMatch[2]) : '*';
+        
+        // Vérifier que le numéro de formule est valide pour Apivia (1-6)
+        if (formulaNumber !== '*' && (parseInt(formulaNumber) < 1 || parseInt(formulaNumber) > 6)) {
+          console.warn(`Formule Apivia invalide: ${formulaNumber}. Utilisation de la formule 6 par défaut.`);
+          formulaNumber = '6';
+        }
 
         const apiviaPayload = {
           action: 'tarification',
@@ -972,17 +978,33 @@ minDate: Date | null = null;
       ).subscribe({
         next: (response: any) => {
           console.log('Alptis Response:', response);
-          if (response && response.resultatsTarification && response.resultatsTarification.length > 0) {
-            const tarificationResult = response.resultatsTarification[0];
-            if (tarificationResult.tarifs && tarificationResult.tarifs.cotisationMensuelle) {
-              result.prix = parseFloat(tarificationResult.tarifs.cotisationMensuelle);
+          
+          // Gérer les deux formats de réponse possibles (camelCase et snake_case)
+          const tarificationArray = response.resultatsTarification || response.resultats_tarification;
+          
+          if (response && tarificationArray && tarificationArray.length > 0) {
+            const tarificationResult = tarificationArray[0];
+            
+            // Chercher le prix dans total_mensuel en priorité
+            if (tarificationResult.tarifs && tarificationResult.tarifs.total_mensuel) {
+              result.prix = parseFloat(tarificationResult.tarifs.total_mensuel);
+              console.log('Prix Alptis extrait de total_mensuel:', result.prix);
               this.messageService.add({ 
                 severity: 'success', 
                 summary: 'Tarif Alptis Récupéré', 
-                detail: `Prix pour ${result.formule} mis à jour.` 
+                detail: `Prix pour ${result.formule}: ${result.prix}€/mois` 
+              });
+            } else if (tarificationResult.tarifs && tarificationResult.tarifs.cotisationMensuelle) {
+              result.prix = parseFloat(tarificationResult.tarifs.cotisationMensuelle);
+              console.log('Prix Alptis extrait de cotisationMensuelle:', result.prix);
+              this.messageService.add({ 
+                severity: 'success', 
+                summary: 'Tarif Alptis Récupéré', 
+                detail: `Prix pour ${result.formule}: ${result.prix}€/mois` 
               });
             } else {
               result.prix = 'N/A';
+              console.warn('Aucun prix trouvé dans la réponse Alptis:', tarificationResult.tarifs);
               this.messageService.add({ 
                 severity: 'warn', 
                 summary: 'Tarif Alptis', 
@@ -1257,10 +1279,10 @@ minDate: Date | null = null;
       const formulaMatch = formule.match(/Formule (\d+)|Niveau (\d+)/i);
       let formulaNumber = formulaMatch ? (formulaMatch[1] || formulaMatch[2]) : '*';
       
-      // Vérifier que le numéro de formule est valide pour Apivia (1-7)
-      if (formulaNumber !== '*' && (parseInt(formulaNumber) < 1 || parseInt(formulaNumber) > 7)) {
-        console.warn(`Formule Apivia invalide: ${formulaNumber}. Utilisation de la formule 1 par défaut.`);
-        formulaNumber = '1';
+      // Vérifier que le numéro de formule est valide pour Apivia (1-6)
+      if (formulaNumber !== '*' && (parseInt(formulaNumber) < 1 || parseInt(formulaNumber) > 6)) {
+        console.warn(`Formule Apivia invalide: ${formulaNumber}. Utilisation de la formule 6 par défaut.`);
+        formulaNumber = '6';
       }
 
       const apiviaPayload = {
@@ -1472,13 +1494,20 @@ minDate: Date | null = null;
           if (response) {
             console.log('Response keys:', Object.keys(response));
             console.log('Has resultatsTarification?', !!response.resultatsTarification);
+            console.log('Has resultats_tarification?', !!response.resultats_tarification);
             if (response.resultatsTarification) {
               console.log('resultatsTarification length:', response.resultatsTarification.length);
             }
+            if (response.resultats_tarification) {
+              console.log('resultats_tarification length:', response.resultats_tarification.length);
+            }
           }
           
-          if (response && response.resultatsTarification && response.resultatsTarification.length > 0) {
-            const tarificationResult = response.resultatsTarification[0];
+          // Gérer les deux formats de réponse possibles
+          const tarificationArray = response.resultatsTarification || response.resultats_tarification;
+          
+          if (response && tarificationArray && tarificationArray.length > 0) {
+            const tarificationResult = tarificationArray[0];
             console.log('Tarification result:', tarificationResult);
             
             // Vérifier plusieurs structures possibles

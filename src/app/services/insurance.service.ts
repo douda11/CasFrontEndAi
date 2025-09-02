@@ -23,7 +23,8 @@ export class InsuranceService {
   private apiviaPdfUrl = `${this.apiBasePath}/api/apivia/generate-devis`;
 
   private aprilProductCodeMap: { [key: string]: string } = {
-    'Santé PRO Start APRIL': 'SanteProStartV1', // Plus spécifique en premier
+    'Santé Pro Start': 'SanteProStart', // Plus spécifique en premier
+    'Santé PRO Start APRIL': 'SanteProStart', // Ancien format
     'Santé Mix': 'SanteMix',
     'Santé Pro': 'SantePro',
   };
@@ -66,6 +67,7 @@ export class InsuranceService {
 
     const guaranteeMap: { [key: string]: string[] } = {
       'SantePro': ['MaladieChirurgie', 'Surcomplementaire'],
+      'SanteProStart': ['MaladieChirurgie', 'Surcomplementaire'],
       'SanteSolution': ['MaladieChirurgie', 'Surcomplementaire'],
       'SanteMix': ['GarantieHospitalisation', 'GarantieFraisDeSante']
     };
@@ -80,7 +82,7 @@ export class InsuranceService {
       };
 
       // Appliquer le levelCode selon les règles
-      if (productCode === 'SantePro' || productCode === 'SanteSolution') {
+      if (productCode === 'SantePro' || productCode === 'SanteProStart' || productCode === 'SanteSolution') {
         if (guaranteeCode !== 'Surcomplementaire') {
           coverage.levelCode = levelCode;
         }
@@ -217,13 +219,14 @@ export class InsuranceService {
     const payload = {
       souscripteur: {
         adresse: {
-          codePostal: form.contact.address.postalCode
+          codePostal: form.contact?.address?.postalCode || '69000',
+          ville: form.contact?.address?.city || 'Lyon'
         }
       },
       besoin: {
-        dateEffet: formatDate(form.effectDate)
+        dateEffet: formatDate(form.effectDate || new Date())
       },
-      assures: form.insuredPersons.map((person, index) => {
+      assures: form.insuredPersons?.map((person, index) => {
         let codeTypeRole = 'Enfant';
         if (index === 0) {
           codeTypeRole = 'AssurePrincipal';
@@ -232,11 +235,11 @@ export class InsuranceService {
         }
 
         return {
-          codeRegimeObligatoire: mapRegime(person.regime),
+          codeRegimeObligatoire: mapRegime(person.regime || 'TNS'),
           codeTypeRole: codeTypeRole,
-          dateDeNaissance: formatDate(person.birthDate)
+          dateDeNaissance: formatDate(person.birthDate || new Date())
         };
-      })
+      }) || []
     };
 
     console.log('Sending Utwin Payload:', JSON.stringify(payload, null, 2));

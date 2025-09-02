@@ -232,3 +232,30 @@
   table-layout: fixed;
   width: 100%;
 }
+
+// Empêcher le scroll automatique global
+:host {
+  scroll-behavior: auto !important;
+}
+
+// Stabiliser les toasts PrimeNG
+::ng-deep .p-toast {
+  position: fixed !important;
+  z-index: 9999 !important;
+  pointer-events: none !important;
+  
+  .p-toast-message {
+    pointer-events: auto !important;
+  }
+}
+
+// Empêcher les animations qui peuvent causer des scrolls
+::ng-deep .p-toast-message-enter {
+  transform: none !important;
+  animation: none !important;
+}
+
+::ng-deep .p-toast-message-leave {
+  transform: none !important;
+  animation: none !important;
+}

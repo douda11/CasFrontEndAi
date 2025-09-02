@@ -33,7 +33,8 @@ import { AlptisService } from '../../services/alptis.service';
 import { BesoinClient } from '../../models/comparateur.model';
 import { InsuranceQuoteForm, InsuredPerson } from '../../models/project-model';
 import { MessageService } from 'primeng/api';
-import { startWith, finalize } from 'rxjs/operators';
+import { startWith, finalize, debounceTime } from 'rxjs/operators';
+import { Injectable } from '@angular/core';
 
 interface ApiviaBeneficiaire {
   typeBeneficiaire: string;
@@ -85,16 +86,21 @@ interface GarantieDefinition {
 })
 export class CompareComponent implements OnInit {
   insuranceForm!: FormGroup;
-  steps!: MenuItem[];
-  activeIndex = 0;
-  submitting = false;
-  minDate: Date;
-  comparisonResults: ComparisonResult[] = [];
+  activeIndex: number = 0;
+  submitting: boolean = false;
+  results: any[] = [];
+  comparisonResults: any[] = [];
+  an = false;
+  steps = [
+    { label: 'Informations personnelles' },
+    { label: 'Garanties' },
+    { label: 'Résultats' }
+  ];
   aprilPricingPayload: any = null;
   garanties: GarantieDefinition[] = [];
 
   civiliteOptions = [{ label: 'Monsieur', value: 'M' }, { label: 'Madame', value: 'F' }];
-  regimeOptions = [{ label: 'TNS', value: 'TNS' }];
+  regimeOptions = [{ label: 'Sécurité Sociale des Indépendants', value: 'TNS' }];
   EtatcivilOptions = [
     { label: 'Célibataire', value: 'celibataire' }, { label: 'Marié(e)', value: 'marie' },
     { label: 'Parent isolé', value: 'parentIsole' }, { label: 'Séparé(e)', value: 'separe' },
@@ -115,7 +121,8 @@ export class CompareComponent implements OnInit {
     { label: 'Professions libérales', value: 'PROFESSIONS_LIBERALES' },
     { label: 'Artisan commerçant', value: 'ARTISAN_COMMERCANT' }
   ];
-
+minDate: Date | null = null;
+  maxDate: Date | null = null;
   constructor(
     private fb: FormBuilder,
     private compareService: CompareService,
@@ -126,12 +133,14 @@ export class CompareComponent implements OnInit {
   ) {
     const today = new Date();
     this.minDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+    this.maxDate = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
   }
 
   ngOnInit(): void {
     this.initializeForm();
     this.initializeSteps();
     this.setupConjointListener();
+    this.setupPostalCodeListener();
     this.setupGaranties();
 
     const navigation = this.router.getCurrentNavigation();
@@ -161,17 +170,30 @@ export class CompareComponent implements OnInit {
   }
 
   initializeForm(): void {
+    // Calculer la date d'effet par défaut (Date du jour + 35 jours)
+    const today = new Date();
+    const defaultEffectDate = new Date(today);
+    defaultEffectDate.setDate(today.getDate() + 35);
+    
+    const formatDefaultDate = (date: Date): string => {
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}/${month}/${year}`;
+    };
+
     this.insuranceForm = this.fb.group({
       personalInfo: this.fb.group({
         civilite: ['Monsieur', Validators.required],
-        nom: ['', Validators.required],
-        prenom: ['', Validators.required],
-        dateNaissance: [null, Validators.required],
+        nom: ['', [Validators.required, this.noSpecialCharactersValidator]],
+        prenom: ['', [Validators.required, this.noSpecialCharactersValidator]],
+        dateNaissance: ['', [Validators.required, this.dateFormatValidator]],
         adresse: ['', Validators.required],
         complementAdresse: [''],
         codePostal: ['', [Validators.required, Validators.pattern(/^\d{5}$/)]],
         ville: ['', Validators.required],
-        dateEffet: [this.minDate, Validators.required],
+        pays: ['France', Validators.required],
+        dateEffet: [formatDefaultDate(defaultEffectDate), [Validators.required, this.dateFormatValidator]],
         email: ['', [Validators.required, Validators.email]],
         telephone1: ['', Validators.required],
         etatCivil: [null, Validators.required],
@@ -179,10 +201,19 @@ export class CompareComponent implements OnInit {
         categorieSocioProfessionnelle: [null, Validators.required],
         statutProfessionnel: [null],
         conjoint: this.fb.group({
-          civilite: [''], nom: [''], prenom: [''],
-          email: ['', Validators.email], dateNaissance: [null], regime: ['']
+          civilite: [''], 
+          nom: ['', this.noSpecialCharactersValidator], 
+          prenom: ['', this.noSpecialCharactersValidator],
+          email: ['', Validators.email], 
+          dateNaissance: ['', this.dateFormatValidator], 
+          regime: ['']
         }),
         enfants: this.fb.array([]),
+        termination: this.fb.group({
+          hasFormerContract: [false],
+          formerInsurer: [''],
+          formerContractReference: ['']
+        })
       }),
       coverageSliders: this.fb.group({
         hospitalisation: [0], chambreParticuliere: [50], honoraires: [0],
@@ -208,6 +239,334 @@ export class CompareComponent implements OnInit {
     }
   }
 
+  // Custom validators
+  noSpecialCharactersValidator(control: AbstractControl): {[key: string]: any} | null {
+    const value = control.value;
+    if (!value) return null;
+    
+    const specialCharsRegex = /[^a-zA-ZÀ-ÿ\s\-']/;
+    if (specialCharsRegex.test(value)) {
+      return { 'specialCharacters': { value: control.value } };
+    }
+    return null;
+  }
+
+  dateFormatValidator(control: AbstractControl): {[key: string]: any} | null {
+    const value = control.value;
+    if (!value) return null;
+    
+    // Vérifier le format JJ/MM/AAAA
+    const dateRegex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+    const match = value.match(dateRegex);
+    
+    if (!match) {
+      return { 'invalidDateFormat': { value: control.value } };
+    }
+    
+    const [, day, month, year] = match;
+    const dayNum = parseInt(day, 10);
+    const monthNum = parseInt(month, 10);
+    const yearNum = parseInt(year, 10);
+    
+    // Validation des valeurs
+    if (dayNum < 1 || dayNum > 31) {
+      return { 'invalidDay': { value: control.value } };
+    }
+    if (monthNum < 1 || monthNum > 12) {
+      return { 'invalidMonth': { value: control.value } };
+    }
+    if (yearNum < 1920 || yearNum > 2030) {
+      return { 'invalidYear': { value: control.value } };
+    }
+    
+    // Vérifier si la date est valide
+    const date = new Date(yearNum, monthNum - 1, dayNum);
+    if (date.getFullYear() !== yearNum || date.getMonth() !== monthNum - 1 || date.getDate() !== dayNum) {
+      return { 'invalidDate': { value: control.value } };
+    }
+    
+    return null;
+  }
+
+  formatDateInput(event: any, fieldName: string): void {
+    const input = event.target;
+    let value = input.value.replace(/\D/g, ''); // Supprimer tous les caractères non numériques
+    
+    // Limiter à 8 chiffres maximum (JJMMAAAA)
+    if (value.length > 8) {
+      value = value.substring(0, 8);
+    }
+    
+    // Ajouter les slashes automatiquement
+    if (value.length >= 3 && value.length <= 4) {
+      value = value.substring(0, 2) + '/' + value.substring(2);
+    } else if (value.length >= 5) {
+      value = value.substring(0, 2) + '/' + value.substring(2, 4) + '/' + value.substring(4);
+    }
+    
+    // Mettre à jour la valeur dans le champ
+    input.value = value;
+    
+    // Mettre à jour le FormControl
+    const control = this.insuranceForm.get(`personalInfo.${fieldName}`);
+    if (control) {
+      control.setValue(value);
+      control.markAsTouched();
+    }
+  }
+
+  setupPostalCodeListener(): void {
+    const codePostalControl = this.insuranceForm.get('personalInfo.codePostal');
+    const villeControl = this.insuranceForm.get('personalInfo.ville');
+    const paysControl = this.insuranceForm.get('personalInfo.pays');
+
+    if (codePostalControl && villeControl && paysControl) {
+      // Variables pour éviter les boucles infinies
+      let isUpdatingFromCode = false;
+      let isUpdatingFromCity = false;
+
+      // Listener pour code postal -> ville
+      codePostalControl.valueChanges.pipe(
+        debounceTime(300)
+      ).subscribe(codePostal => {
+        if (!isUpdatingFromCity && codePostal && /^\d{5}$/.test(codePostal)) {
+          console.log('Code postal détecté:', codePostal);
+          isUpdatingFromCode = true;
+          this.lookupCityFromPostalCode(codePostal, villeControl, paysControl);
+          setTimeout(() => { isUpdatingFromCode = false; }, 100);
+        }
+      });
+
+      // Listener pour ville -> code postal (seulement si l'utilisateur tape activement)
+      villeControl.valueChanges.pipe(
+        debounceTime(500)
+      ).subscribe(ville => {
+        if (!isUpdatingFromCode && ville && ville.length >= 3) {
+          console.log('Ville détectée:', ville);
+          isUpdatingFromCity = true;
+          this.lookupPostalCodeFromCity(ville, codePostalControl, paysControl);
+          setTimeout(() => { isUpdatingFromCity = false; }, 100);
+        }
+      });
+    }
+  }
+
+  private lookupCityFromPostalCode(codePostal: string, villeControl: AbstractControl, paysControl: AbstractControl): void {
+    // Base de données étendue des codes postaux français
+    const postalCodeCities: {[key: string]: string} = {
+      // Paris arrondissements
+      '75001': 'Paris', '75002': 'Paris', '75003': 'Paris', '75004': 'Paris', '75005': 'Paris',
+      '75006': 'Paris', '75007': 'Paris', '75008': 'Paris', '75009': 'Paris', '75010': 'Paris',
+      '75011': 'Paris', '75012': 'Paris', '75013': 'Paris', '75014': 'Paris', '75015': 'Paris',
+      '75016': 'Paris', '75017': 'Paris', '75018': 'Paris', '75019': 'Paris', '75020': 'Paris',
+      
+      // Lyon et région
+      '69001': 'Lyon', '69002': 'Lyon', '69003': 'Lyon', '69004': 'Lyon', '69005': 'Lyon',
+      '69006': 'Lyon', '69007': 'Lyon', '69008': 'Lyon', '69009': 'Lyon',
+      '69100': 'Villeurbanne', '69120': 'Vaulx-en-Velin', '69140': 'Rillieux-la-Pape',
+      '69200': 'Vénissieux', '69300': 'Caluire-et-Cuire', '69400': 'Arnas',
+      
+      // Marseille et région
+      '13001': 'Marseille', '13002': 'Marseille', '13003': 'Marseille', '13004': 'Marseille',
+      '13005': 'Marseille', '13006': 'Marseille', '13007': 'Marseille', '13008': 'Marseille',
+      '13009': 'Marseille', '13010': 'Marseille', '13011': 'Marseille', '13012': 'Marseille',
+      '13013': 'Marseille', '13014': 'Marseille', '13015': 'Marseille', '13016': 'Marseille',
+      '13100': 'Aix-en-Provence', '13200': 'Arles', '13300': 'Salon-de-Provence',
+      '13400': 'Aubagne', '13500': 'Martigues', '13600': 'La Ciotat',
+      
+      // Bordeaux et région
+      '33000': 'Bordeaux', '33100': 'Bordeaux', '33200': 'Bordeaux', '33300': 'Bordeaux',
+      '33400': 'Talence', '33500': 'Libourne', '33600': 'Pessac', '33700': 'Mérignac',
+      '33800': 'Bordeaux', '33900': 'Bordeaux',
+      
+      // Toulouse et région
+      '31000': 'Toulouse', '31100': 'Toulouse', '31200': 'Toulouse', '31300': 'Toulouse',
+      '31400': 'Toulouse', '31500': 'Toulouse', '31700': 'Blagnac', '31770': 'Colomiers',
+      
+      // Lille et région
+      '59000': 'Lille', '59100': 'Roubaix', '59200': 'Tourcoing', '59300': 'Valenciennes',
+      '59400': 'Cambrai', '59500': 'Douai', '59600': 'Maubeuge', '59700': 'Marcq-en-Barœul',
+      '59800': 'Lille', '59160': 'Lomme',
+      
+      // Nice et Côte d\'Azur
+      '06000': 'Nice', '06100': 'Nice', '06200': 'Nice', '06300': 'Nice',
+      '06400': 'Cannes', '06600': 'Antibes', '06800': 'Cagnes-sur-Mer',
+      
+      // Nantes et région
+      '44000': 'Nantes', '44100': 'Nantes', '44200': 'Nantes', '44300': 'Nantes',
+      '44400': 'Rezé', '44800': 'Saint-Herblain', '44900': 'Nantes',
+      
+      // Strasbourg et région
+      '67000': 'Strasbourg', '67100': 'Strasbourg', '67200': 'Strasbourg',
+      '67300': 'Schiltigheim', '67400': 'Illkirch-Graffenstaden',
+      
+      // Montpellier et région
+      '34000': 'Montpellier', '34070': 'Montpellier', '34080': 'Montpellier',
+      '34090': 'Montpellier', '34170': 'Castelnau-le-Lez', '34200': 'Sète',
+      
+      // Rennes et région
+      '35000': 'Rennes', '35100': 'Rennes', '35200': 'Rennes', '35700': 'Rennes',
+      
+      // Grenoble et région
+      '38000': 'Grenoble', '38100': 'Grenoble', '38700': 'La Tronche',
+      '38400': 'Saint-Martin-d\'Hères', '38600': 'Fontaine',
+      
+      // Autres grandes villes
+      '21000': 'Dijon', '25000': 'Besançon', '30000': 'Nîmes', '37000': 'Tours',
+      '42000': 'Saint-Étienne', '45000': 'Orléans', '49000': 'Angers',
+      '51100': 'Reims', '54000': 'Nancy', '57000': 'Metz', '63000': 'Clermont-Ferrand',
+      '68000': 'Colmar', '76000': 'Rouen', '80000': 'Amiens', '87000': 'Limoges',
+      
+      // Villes moyennes importantes
+      '14000': 'Caen', '29000': 'Quimper', '29200': 'Brest', '35400': 'Saint-Malo',
+      '56000': 'Vannes', '64000': 'Pau', '65000': 'Tarbes', '66000': 'Perpignan',
+      '71000': 'Mâcon', '72000': 'Le Mans', '73000': 'Chambéry', '74000': 'Annecy',
+      '83000': 'Toulon', '84000': 'Avignon', '86000': 'Poitiers', '88000': 'Épinal',
+      '90000': 'Belfort', '17000': 'La Rochelle', '79000': 'Niort'
+    };
+
+    const city = postalCodeCities[codePostal];
+    if (city) {
+      console.log('Ville trouvée pour', codePostal, ':', city);
+      villeControl.setValue(city);
+      paysControl.setValue('France');
+    } else {
+      console.log('Aucune ville trouvée pour', codePostal, ', recherche par département');
+      // Enhanced department-based city lookup
+      const department = codePostal.substring(0, 2);
+      const departmentCities: {[key: string]: string} = {
+        '01': 'Bourg-en-Bresse', '02': 'Laon', '03': 'Moulins', '04': 'Digne-les-Bains',
+        '05': 'Gap', '06': 'Nice', '07': 'Privas', '08': 'Charleville-Mézières',
+        '09': 'Foix', '10': 'Troyes', '11': 'Carcassonne', '12': 'Rodez',
+        '13': 'Marseille', '14': 'Caen', '15': 'Aurillac', '16': 'Angoulême',
+        '17': 'La Rochelle', '18': 'Bourges', '19': 'Tulle', '20': 'Ajaccio',
+        '21': 'Dijon', '22': 'Saint-Brieuc', '23': 'Guéret', '24': 'Périgueux',
+        '25': 'Besançon', '26': 'Valence', '27': 'Évreux', '28': 'Chartres',
+        '29': 'Quimper', '30': 'Nîmes', '31': 'Toulouse', '32': 'Auch',
+        '33': 'Bordeaux', '34': 'Montpellier', '35': 'Rennes', '36': 'Châteauroux',
+        '37': 'Tours', '38': 'Grenoble', '39': 'Lons-le-Saunier', '40': 'Mont-de-Marsan',
+        '41': 'Blois', '42': 'Saint-Étienne', '43': 'Le Puy-en-Velay', '44': 'Nantes',
+        '45': 'Orléans', '46': 'Cahors', '47': 'Agen', '48': 'Mende',
+        '49': 'Angers', '50': 'Saint-Lô', '51': 'Châlons-en-Champagne', '52': 'Chaumont',
+        '53': 'Laval', '54': 'Nancy', '55': 'Bar-le-Duc', '56': 'Vannes',
+        '57': 'Metz', '58': 'Nevers', '59': 'Lille', '60': 'Beauvais',
+        '61': 'Alençon', '62': 'Arras', '63': 'Clermont-Ferrand', '64': 'Pau',
+        '65': 'Tarbes', '66': 'Perpignan', '67': 'Strasbourg', '68': 'Colmar',
+        '69': 'Lyon', '70': 'Vesoul', '71': 'Mâcon', '72': 'Le Mans',
+        '73': 'Chambéry', '74': 'Annecy', '75': 'Paris', '76': 'Rouen',
+        '77': 'Melun', '78': 'Versailles', '79': 'Niort', '80': 'Amiens',
+        '81': 'Albi', '82': 'Montauban', '83': 'Toulon', '84': 'Avignon',
+        '85': 'La Roche-sur-Yon', '86': 'Poitiers', '87': 'Limoges', '88': 'Épinal',
+        '89': 'Auxerre', '90': 'Belfort', '91': 'Évry', '92': 'Nanterre',
+        '93': 'Bobigny', '94': 'Créteil', '95': 'Pontoise'
+      };
+      
+      const defaultCity = departmentCities[department];
+      if (defaultCity) {
+        console.log('Ville trouvée par département', department, ':', defaultCity);
+        villeControl.setValue(defaultCity);
+      } else {
+        console.log('Aucune ville trouvée pour le département', department);
+      }
+      paysControl.setValue('France');
+    }
+  }
+
+  private lookupPostalCodeFromCity(ville: string, codePostalControl: AbstractControl, paysControl: AbstractControl): void {
+    // Normaliser la ville (supprimer accents, espaces, casse)
+    const normalizedVille = ville.toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .trim();
+
+    // Mapping ville -> code postal principal
+    const cityToPostalCode: {[key: string]: string} = {
+      // Grandes villes avec codes postaux principaux
+      'paris': '75001',
+      'lyon': '69001',
+      'marseille': '13001',
+      'toulouse': '31000',
+      'nice': '06000',
+      'nantes': '44000',
+      'montpellier': '34000',
+      'strasbourg': '67000',
+      'bordeaux': '33000',
+      'lille': '59000',
+      'rennes': '35000',
+      'reims': '51100',
+      'saint-etienne': '42000',
+      'toulon': '83000',
+      'grenoble': '38000',
+      'dijon': '21000',
+      'angers': '49000',
+      'nimes': '30000',
+      'villeurbanne': '69100',
+      'clermont-ferrand': '63000',
+      'le havre': '76600',
+      'aix-en-provence': '13100',
+      'brest': '29200',
+      'tours': '37000',
+      'amiens': '80000',
+      'limoges': '87000',
+      'annecy': '74000',
+      'perpignan': '66000',
+      'besancon': '25000',
+      'metz': '57000',
+      'orleans': '45000',
+      'rouen': '76000',
+      'mulhouse': '68100',
+      'caen': '14000',
+      'nancy': '54000',
+      'argenteuil': '95100',
+      'montreuil': '93100',
+      'roubaix': '59100',
+      'tourcoing': '59200',
+      'dunkerque': '59140',
+      'avignon': '84000',
+      'poitiers': '86000',
+      'fort-de-france': '97200',
+      'courbevoie': '92400',
+      'versailles': '78000',
+      'colombes': '92700',
+      'aulnay-sous-bois': '93600',
+      'pau': '64000',
+      'la rochelle': '17000',
+      'calais': '62100',
+      'cannes': '06400',
+      'antibes': '06600',
+      'boulogne-billancourt': '92100',
+      'meudon': '92190',
+      'beziers': '34500',
+      'bourges': '18000',
+      'quimper': '29000',
+      'valence': '26000',
+      'merignac': '33700',
+      'troyes': '10000'
+    };
+
+    // Chercher correspondance exacte
+    let foundPostalCode = cityToPostalCode[normalizedVille];
+    
+    // Si pas de correspondance exacte, chercher par similarité
+    if (!foundPostalCode) {
+      for (const [cityKey, postalCode] of Object.entries(cityToPostalCode)) {
+        if (cityKey.includes(normalizedVille) || normalizedVille.includes(cityKey)) {
+          foundPostalCode = postalCode;
+          break;
+        }
+      }
+    }
+
+    if (foundPostalCode) {
+      console.log('Code postal trouvé pour', ville, ':', foundPostalCode);
+      // Toujours mettre à jour le code postal, même s'il y en a déjà un
+      codePostalControl.setValue(foundPostalCode);
+      paysControl.setValue('France');
+    } else {
+      console.log('Aucun code postal trouvé pour', ville);
+    }
+  }
+
   setupGaranties(): void {
     this.garanties = [
       { label: 'Hospitalisation', formControlName: 'hospitalisation', unit: '%' },
@@ -222,9 +581,9 @@ export class CompareComponent implements OnInit {
 
   initializeSteps(): void {
     this.steps = [
-      { label: 'Informations personnelles', command: () => this.goToStep(0) },
-      { label: 'Comparer', command: () => this.goToStep(1) },
-      { label: 'Résultat', command: () => this.goToStep(2) },
+      { label: 'Informations personnelles' },
+      { label: 'Comparer' },
+      { label: 'Résultat' }
     ];
   }
 
@@ -235,10 +594,10 @@ export class CompareComponent implements OnInit {
   addEnfant(): void {
     this.enfants.push(this.fb.group({
       civilite: ['Monsieur', Validators.required],
-      nom: ['', Validators.required],
-      prenom: ['', Validators.required],
-      dateNaissance: [null, Validators.required],
-      regime: ['GENERAL', Validators.required],
+      nom: ['', [Validators.required, this.noSpecialCharactersValidator]],
+      prenom: ['', [Validators.required, this.noSpecialCharactersValidator]],
+      dateNaissance: ['', [Validators.required, this.dateFormatValidator]],
+      regime: ['TNS', Validators.required],
     }));
   }
 
@@ -251,13 +610,50 @@ export class CompareComponent implements OnInit {
     return stepGroups[stepIndex] ? this.insuranceForm.get(stepGroups[stepIndex]) as FormGroup : null;
   }
 
-  nextStep(): void {
-    if (this.activeIndex < this.steps.length - 1) {
-      if (this.activeIndex === 1) {
-        this.submitComparison();
-      } else {
+  nextStep(event?: Event): void {
+    // Empêcher le comportement par défaut du scroll
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    
+    // Marquer tous les champs comme touchés pour afficher les erreurs
+    const personalInfoGroup = this.insuranceForm.get('personalInfo') as FormGroup;
+    if (personalInfoGroup) {
+      Object.keys(personalInfoGroup.controls).forEach(key => {
+        const control = personalInfoGroup.get(key);
+        if (control) {
+          control.markAsTouched();
+          if (control instanceof FormGroup) {
+            Object.keys(control.controls).forEach(subKey => {
+              control.get(subKey)?.markAsTouched();
+            });
+          }
+        }
+      });
+    }
+    
+    // Vérifier si le formulaire est valide
+    if (this.insuranceForm.get('personalInfo')?.valid) {
+      if (this.activeIndex < 2) {
         this.activeIndex++;
       }
+    } else {
+      // Sauvegarder la position actuelle du scroll
+      const currentScrollPosition = window.pageYOffset || document.documentElement.scrollTop;
+      
+      // Afficher une notification toast au lieu du message sous le bouton
+      this.messageService.add({ 
+        severity: 'warn', 
+        summary: 'Champs manquants', 
+        detail: 'Veuillez remplir tous les champs obligatoires avant de continuer.',
+        life: 4000
+      });
+      
+      // Forcer le maintien de la position de scroll après l'affichage du toast
+      setTimeout(() => {
+        window.scrollTo(0, currentScrollPosition);
+      }, 0);
     }
   }
 
@@ -285,7 +681,8 @@ export class CompareComponent implements OnInit {
       .subscribe({
         next: (response: any) => {
           if (response && response.table) {
-            this.comparisonResults = this.parseMarkdownTable(response.table);
+            this.results = this.parseMarkdownTable(response.table);
+            this.comparisonResults = this.results;
             setTimeout(() => {
               this.fetchAprilPrices();
               this.fetchAllUtwinPrices(); // Automatic fetch for Utwin
@@ -309,7 +706,8 @@ export class CompareComponent implements OnInit {
 }
           
             if (err.error.table) { // Handle markdown table even in case of 400 error
-                this.comparisonResults = this.parseMarkdownTable(err.error.table);
+                this.results = this.parseMarkdownTable(err.error.table);
+                this.comparisonResults = this.results;
                 setTimeout(() => {
                   this.fetchAprilPrices();
                   this.fetchAllUtwinPrices(); // Automatic fetch for Utwin
@@ -329,11 +727,31 @@ export class CompareComponent implements OnInit {
 
     const formatDate = (date: any): string => {
       if (!date) return '';
-      const d = new Date(date);
-      const day = (`0${d.getDate()}`).slice(-2);
-      const month = (`0${d.getMonth() + 1}`).slice(-2);
-      const year = d.getFullYear();
-      return `${day}/${month}/${year}`;
+      
+      // Si c'est déjà une chaîne au format DD/MM/YYYY, la retourner directement
+      if (typeof date === 'string' && /^\d{2}\/\d{2}\/\d{4}$/.test(date)) {
+        return date;
+      }
+      
+      // Si c'est un objet Date
+      if (date instanceof Date && !isNaN(date.getTime())) {
+        const day = (`0${date.getDate()}`).slice(-2);
+        const month = (`0${date.getMonth() + 1}`).slice(-2);
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+      }
+      
+      // Si c'est une chaîne au format DD/MM/YYYY, convertir en Date puis reformater
+      if (typeof date === 'string' && /^\d{2}\/\d{2}\/\d{4}$/.test(date)) {
+        const [day, month, year] = date.split('/');
+        const d = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+        if (!isNaN(d.getTime())) {
+          return date; // La date est déjà au bon format
+        }
+      }
+      
+      console.warn('Invalid date format:', date);
+      return '';
     };
 
     const apiviaProducts = this.comparisonResults.filter(result => {
@@ -430,11 +848,23 @@ export class CompareComponent implements OnInit {
 
     const formatDate = (date: any): string => {
       if (!date) return '';
-      const d = new Date(date);
-      const year = d.getFullYear();
-      const month = (`0${d.getMonth() + 1}`).slice(-2);
-      const day = (`0${d.getDate()}`).slice(-2);
-      return `${year}-${month}-${day}`;
+      
+      // Si c'est déjà une chaîne au format DD/MM/YYYY, convertir en YYYY-MM-DD
+      if (typeof date === 'string' && /^\d{2}\/\d{2}\/\d{4}$/.test(date)) {
+        const [day, month, year] = date.split('/');
+        return `${year}-${month}-${day}`;
+      }
+      
+      // Si c'est un objet Date
+      if (date instanceof Date && !isNaN(date.getTime())) {
+        const year = date.getFullYear();
+        const month = (`0${date.getMonth() + 1}`).slice(-2);
+        const day = (`0${date.getDate()}`).slice(-2);
+        return `${year}-${month}-${day}`;
+      }
+      
+      console.warn('Invalid date format for Alptis:', date);
+      return '';
     };
 
     const alptisProducts = this.comparisonResults.filter(result => {
@@ -585,11 +1015,23 @@ export class CompareComponent implements OnInit {
     const personalInfo = this.insuranceForm.get('personalInfo')?.value;
     const insuredPersons: InsuredPerson[] = [];
 
+    // Helper pour convertir DD/MM/YYYY en Date
+    const parseFormDate = (dateStr: string): Date => {
+      if (!dateStr || typeof dateStr !== 'string') return new Date();
+      
+      if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateStr)) {
+        const [day, month, year] = dateStr.split('/');
+        return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+      }
+      
+      return new Date(dateStr);
+    };
+
     // Main person
     insuredPersons.push({
       lastName: personalInfo.nom,
       firstName: personalInfo.prenom,
-      birthDate: personalInfo.dateNaissance,
+      birthDate: parseFormDate(personalInfo.dateNaissance),
       gender: personalInfo.civilite,
       address: {
         street: personalInfo.adresse,
@@ -604,11 +1046,11 @@ export class CompareComponent implements OnInit {
     });
 
     // Conjoint
-    if (personalInfo.conjoint && (personalInfo.etatCivil === 'marie' || personalInfo.etatCivil === 'unionLibre')) {
+    if (personalInfo.conjoint && (personalInfo.etatCivil === 'marie' || personalInfo.etatCivil === 'unionLibre') && personalInfo.conjoint.dateNaissance) {
       insuredPersons.push({
         lastName: personalInfo.conjoint.nom,
         firstName: personalInfo.conjoint.prenom,
-        birthDate: personalInfo.conjoint.dateNaissance,
+        birthDate: parseFormDate(personalInfo.conjoint.dateNaissance),
         gender: personalInfo.conjoint.civilite,
         address: insuredPersons[0].address,
         email: personalInfo.conjoint.email,
@@ -621,18 +1063,20 @@ export class CompareComponent implements OnInit {
 
     // Enfants
     personalInfo.enfants.forEach((enfant: any) => {
-      insuredPersons.push({
-        lastName: enfant.nom,
-        firstName: enfant.prenom,
-        birthDate: enfant.dateNaissance,
-        gender: enfant.sexe === 'garcon' ? 'M' : 'F',
-        address: insuredPersons[0].address,
-        email: '',
-        phoneNumber: '',
-        regime: enfant.regime,
-        situation: 'celibataire',
-        addressType: 'Actuelle'
-      });
+      if (enfant.dateNaissance) {
+        insuredPersons.push({
+          lastName: enfant.nom,
+          firstName: enfant.prenom,
+          birthDate: parseFormDate(enfant.dateNaissance),
+          gender: enfant.sexe === 'garcon' ? 'M' : 'F',
+          address: insuredPersons[0].address,
+          email: '',
+          phoneNumber: '',
+          regime: enfant.regime,
+          situation: 'celibataire',
+          addressType: 'Actuelle'
+        });
+      }
     });
 
     return {
@@ -643,7 +1087,7 @@ export class CompareComponent implements OnInit {
         phoneNumber: personalInfo.telephone1,
         address: insuredPersons[0].address
       },
-      effectDate: personalInfo.dateEffet,
+      effectDate: parseFormDate(personalInfo.dateEffet),
       garanties: []
     };
   }
@@ -766,11 +1210,22 @@ export class CompareComponent implements OnInit {
       const personalInfo = this.insuranceForm.get('personalInfo')?.value;
       const formatDate = (date: any): string => {
         if (!date) return '';
-        const d = new Date(date);
-        const day = (`0${d.getDate()}`).slice(-2);
-        const month = (`0${d.getMonth() + 1}`).slice(-2);
-        const year = d.getFullYear();
-        return `${day}/${month}/${year}`;
+        
+        // Si c'est déjà une chaîne au format DD/MM/YYYY, la retourner directement
+        if (typeof date === 'string' && /^\d{2}\/\d{2}\/\d{4}$/.test(date)) {
+          return date;
+        }
+        
+        // Si c'est un objet Date
+        if (date instanceof Date && !isNaN(date.getTime())) {
+          const day = (`0${date.getDate()}`).slice(-2);
+          const month = (`0${date.getMonth() + 1}`).slice(-2);
+          const year = date.getFullYear();
+          return `${day}/${month}/${year}`;
+        }
+        
+        console.warn('Invalid date format for Apivia:', date);
+        return '';
       };
 
       const beneficiaires: ApiviaBeneficiaire[] = [];
@@ -800,7 +1255,13 @@ export class CompareComponent implements OnInit {
       });
 
       const formulaMatch = formule.match(/Formule (\d+)|Niveau (\d+)/i);
-      const formulaNumber = formulaMatch ? (formulaMatch[1] || formulaMatch[2]) : '*';
+      let formulaNumber = formulaMatch ? (formulaMatch[1] || formulaMatch[2]) : '*';
+      
+      // Vérifier que le numéro de formule est valide pour Apivia (1-7)
+      if (formulaNumber !== '*' && (parseInt(formulaNumber) < 1 || parseInt(formulaNumber) > 7)) {
+        console.warn(`Formule Apivia invalide: ${formulaNumber}. Utilisation de la formule 1 par défaut.`);
+        formulaNumber = '1';
+      }
 
       const apiviaPayload = {
         action: 'tarification',
@@ -842,6 +1303,8 @@ export class CompareComponent implements OnInit {
     // APRIL LOGIC
     } else if (assuranceName.includes('april')) {
       const quoteForm = this.transformFormToQuote();
+      // Modifier le productCode selon le type d'assurance April
+      quoteForm.productReference = this.getAprilProductCode(result.assurance);
       this.insuranceService.getAprilHealthTarif(quoteForm, result.assurance, formule).pipe(
         finalize(() => { result.isPricingLoading = false; })
       ).subscribe({
@@ -856,26 +1319,48 @@ export class CompareComponent implements OnInit {
 
     // UTWIN LOGIC
     } else if (assuranceName.includes('utwin')) {
-      const quoteForm = this.transformFormToQuote();
-      this.insuranceService.getUtwinTarif(quoteForm, formule).pipe(
-        finalize(() => { result.isPricingLoading = false; })
-      ).subscribe({
+      const quote = this.transformFormToQuote();
+      this.insuranceService.getUtwinTarif(quote, result.formule).subscribe({
         next: (response: any) => {
-          const matchingProposition = response.propositions.find((p: any) => {
-            const normalizedApiName = this.normalizeUtwinProductName(p.libelle);
-            const normalizedOfferName = this.normalizeUtwinProductName(result.assurance);
-            return normalizedApiName === normalizedOfferName;
-          });
+          console.log('Réponse Utwin complète:', response);
+          
+          if (response && response.propositions && response.propositions.length > 0) {
+            // Extraire le code formule depuis result.formule
+            let codeFormuleToFind = '';
+            if (result.formule) {
+              const formuleMatch = result.formule.match(/(?:Niveau|Formule)\s*(\d+)/i);
+              if (formuleMatch) {
+                codeFormuleToFind = 'N' + formuleMatch[1];
+              }
+            }
+            
+            console.log('Code formule recherché:', codeFormuleToFind);
+            
+            // Chercher la proposition avec commission 30/10 et le bon code formule
+            const matchingProposition = response.propositions.find((p: any) => 
+              p.codeFormule === codeFormuleToFind && 
+              p.codeTauxCommissionRetenu === '30/10' &&
+              p.libelleProduit?.includes("MULTI' Santé")
+            );
 
-          if (matchingProposition) {
-            result.prix = matchingProposition.cotisationTTC;
+            if (matchingProposition?.cotisationMensuelleEuros) {
+              result.prix = matchingProposition.cotisationMensuelleEuros;
+              console.log('Prix Utwin trouvé:', matchingProposition.cotisationMensuelleEuros);
+            } else {
+              console.log('Aucune proposition Utwin correspondante trouvée pour:', codeFormuleToFind);
+              result.prix = 'N/A';
+            }
           } else {
+            console.log('Aucune proposition dans la réponse Utwin');
             result.prix = 'N/A';
           }
+          
+          result.isPricingLoading = false;
         },
-        error: (err: any) => {
-          console.error('Erreur API pour', result.assurance, err);
+        error: (error: any) => {
+          console.error('Erreur lors de la récupération du prix Utwin:', error);
           result.prix = 'Erreur';
+          result.isPricingLoading = false;
         }
       });
 
@@ -891,11 +1376,23 @@ export class CompareComponent implements OnInit {
 
       const formatDate = (date: any): string => {
         if (!date) return '';
-        const d = new Date(date);
-        const year = d.getFullYear();
-        const month = (`0${d.getMonth() + 1}`).slice(-2);
-        const day = (`0${d.getDate()}`).slice(-2);
-        return `${year}-${month}-${day}`;
+        
+        // Si c'est déjà une chaîne au format DD/MM/YYYY, convertir en YYYY-MM-DD
+        if (typeof date === 'string' && /^\d{2}\/\d{2}\/\d{4}$/.test(date)) {
+          const [day, month, year] = date.split('/');
+          return `${year}-${month}-${day}`;
+        }
+        
+        // Si c'est un objet Date
+        if (date instanceof Date && !isNaN(date.getTime())) {
+          const year = date.getFullYear();
+          const month = (`0${date.getMonth() + 1}`).slice(-2);
+          const day = (`0${date.getDate()}`).slice(-2);
+          return `${year}-${month}-${day}`;
+        }
+        
+        console.warn('Invalid date format:', date);
+        return '';
       };
 
       const getStatutProfessionnel = (categorie: string, statutChoisi?: string): string => {
@@ -969,18 +1466,85 @@ export class CompareComponent implements OnInit {
       ).subscribe({
         next: (response: any) => {
           console.log('Alptis tarification response:', response);
+          console.log('Full response structure:', JSON.stringify(response, null, 2));
+          
+          // Debug response structure
+          if (response) {
+            console.log('Response keys:', Object.keys(response));
+            console.log('Has resultatsTarification?', !!response.resultatsTarification);
+            if (response.resultatsTarification) {
+              console.log('resultatsTarification length:', response.resultatsTarification.length);
+            }
+          }
+          
           if (response && response.resultatsTarification && response.resultatsTarification.length > 0) {
             const tarificationResult = response.resultatsTarification[0];
-            if (tarificationResult.tarifs && tarificationResult.tarifs.total_mensuel) {
-              result.prix = parseFloat(tarificationResult.tarifs.total_mensuel);
+            console.log('Tarification result:', tarificationResult);
+            
+            // Vérifier plusieurs structures possibles
+            let prix = null;
+            
+            if (tarificationResult.tarifs) {
+              console.log('Tarifs object:', tarificationResult.tarifs);
+              
+              // Essayer différents champs de prix (camelCase et snake_case)
+              if (tarificationResult.tarifs.totalMensuel) {
+                prix = parseFloat(tarificationResult.tarifs.totalMensuel);
+                console.log('Prix trouvé dans totalMensuel:', prix);
+              } else if (tarificationResult.tarifs.total_mensuel) {
+                prix = parseFloat(tarificationResult.tarifs.total_mensuel);
+                console.log('Prix trouvé dans total_mensuel:', prix);
+              } else if (tarificationResult.tarifs.cotisationMensuelleBase) {
+                prix = parseFloat(tarificationResult.tarifs.cotisationMensuelleBase);
+                console.log('Prix trouvé dans cotisationMensuelleBase:', prix);
+              } else if (tarificationResult.tarifs.cotisation_mensuelle) {
+                prix = parseFloat(tarificationResult.tarifs.cotisation_mensuelle);
+                console.log('Prix trouvé dans cotisation_mensuelle:', prix);
+              } else if (tarificationResult.tarifs.montant_total) {
+                prix = parseFloat(tarificationResult.tarifs.montant_total);
+                console.log('Prix trouvé dans montant_total:', prix);
+              } else if (typeof tarificationResult.tarifs === 'number') {
+                prix = tarificationResult.tarifs;
+                console.log('Prix trouvé directement dans tarifs:', prix);
+              }
+            }
+            
+            // Essayer aussi au niveau racine
+            if (!prix && tarificationResult.prix) {
+              prix = parseFloat(tarificationResult.prix);
+              console.log('Prix trouvé dans prix:', prix);
+            }
+            
+            if (!prix && tarificationResult.cotisation) {
+              prix = parseFloat(tarificationResult.cotisation);
+              console.log('Prix trouvé dans cotisation:', prix);
+            }
+            
+            if (prix && prix > 0) {
+              result.prix = prix;
               console.log('Alptis price updated:', result.prix);
+              this.messageService.add({ 
+                severity: 'success', 
+                summary: 'Tarif Alptis Récupéré', 
+                detail: `Prix pour ${result.formule} mis à jour.` 
+              });
             } else {
               result.prix = 'N/A';
-              console.warn('No total_mensuel found in Alptis response');
+              console.warn('No valid price found in Alptis response');
+              this.messageService.add({ 
+                severity: 'warn', 
+                summary: 'Tarif Alptis', 
+                detail: `Aucun prix trouvé pour ${result.formule}.` 
+              });
             }
           } else {
             result.prix = 'Erreur';
             console.error('Invalid Alptis tarification response structure');
+            this.messageService.add({ 
+              severity: 'error', 
+              summary: 'Erreur Alptis', 
+              detail: `Réponse API invalide pour ${result.formule}.` 
+            });
           }
         },
         error: (err: any) => {
@@ -995,34 +1559,110 @@ export class CompareComponent implements OnInit {
     }
   }
 
+  private getAprilProductCode(assuranceName: string): string {
+    console.log('getAprilProductCode called with:', assuranceName);
+    
+    if (!assuranceName) {
+      console.log('No assurance name provided, returning SantePro');
+      return 'SantePro';    console.log('getAprilProductCode called with:', assuranceName);
+
+    }
+    
+    const normalizedName = assuranceName.toLowerCase();
+    console.log('Normalized name:', normalizedName);
+    
+    if (normalizedName.includes('santé pro start') || normalizedName.includes('sante pro start')) {
+      console.log('Detected Santé Pro Start, returning SanteProStart');
+      return 'SanteProStart';
+    } else if (normalizedName.includes('santé pro') || normalizedName.includes('sante pro')) {
+      console.log('Detected Santé Pro, returning SantePro');
+      return 'SantePro';
+    }
+    
+    console.log('No match found, returning default SantePro');
+    return 'SantePro';
+  }
+
   private updateUtwinPrice(offer: ComparisonResult, propositions: any[]): void {
-    const formulaParts = offer.formule.match(/(.+) Niveau (\d+)/);
-    if (!formulaParts || formulaParts.length !== 3) {
-      console.warn(`Formule format not recognized for automatic pricing: ${offer.formule}`);
-      return;
+    console.log('Updating Utwin price for offer:', offer.formule);
+    console.log('Available propositions:', propositions.length);
+    
+    // Essayer différents formats : "Niveau X", "Formule X", ou juste un numéro
+    let libelleProduit: string;
+    let niveau: string;
+    
+    // Format "Produit Niveau X"
+    let formulaParts = offer.formule.match(/(.+) Niveau (\d+)/i);
+    if (formulaParts && formulaParts.length === 3) {
+      libelleProduit = formulaParts[1].trim();
+      niveau = formulaParts[2];
+    } else {
+      // Format "Produit Formule X"
+      formulaParts = offer.formule.match(/(.+) Formule (\d+)/i);
+      if (formulaParts && formulaParts.length === 3) {
+        libelleProduit = formulaParts[1].trim();
+        niveau = formulaParts[2];
+      } else {
+        // Extraire juste le numéro et déterminer le produit
+        const numeroMatch = offer.formule.match(/(\d+)/);
+        if (numeroMatch) {
+          niveau = numeroMatch[1];
+          // Déterminer le produit basé sur le nom de l'offre
+          if (offer.formule.toLowerCase().includes('basic')) {
+            libelleProduit = "BASIC' Santé";
+          } else if (offer.formule.toLowerCase().includes('multi')) {
+            libelleProduit = "MULTI' Santé";
+          } else {
+            // Par défaut, essayer MULTI' Santé
+            libelleProduit = "MULTI' Santé";
+          }
+        } else {
+          console.warn(`Formule format not recognized for automatic pricing: ${offer.formule}`);
+          return;
+        }
+      }
     }
 
-    const libelleProduit = formulaParts[1].trim();
-    const niveau = formulaParts[2];
     const codeFormuleToFind = `N${niveau}`; // e.g., "N3"
+    console.log(`Looking for: ${libelleProduit} with code ${codeFormuleToFind}`);
 
     const proposition = propositions.find((p: any) => {
-      const normalizedApiProduct = this.normalizeUtwinProductName(p.libelleProduit);
+      // Support both camelCase and underscore formats
+      const apiProduct = p.libelle_produit || p.libelleProduit;
+      const apiCodeFormule = p.code_formule || p.codeFormule;
+      
+      const normalizedApiProduct = this.normalizeUtwinProductName(apiProduct);
       const normalizedOfferProduct = this.normalizeUtwinProductName(libelleProduit);
-      return normalizedApiProduct === normalizedOfferProduct && p.codeFormule === codeFormuleToFind;
+      const matches = normalizedApiProduct === normalizedOfferProduct && apiCodeFormule === codeFormuleToFind;
+      
+      if (matches) {
+        console.log(`Found matching proposition:`, p);
+      }
+      
+      return matches;
     });
 
     if (proposition) {
-      if (proposition.cotisationMensuelleEuros) {
-        offer.prix = proposition.cotisationMensuelleEuros;
+      // Support both camelCase and underscore formats for price
+      const price = proposition.cotisation_mensuelle_euros || proposition.cotisationMensuelleEuros;
+      if (price) {
+        offer.prix = price;
+        console.log(`Price updated to: ${price}`);
       }
       // Stocker le codeTauxCommissionRetenu pour l'utiliser dans le payload
-      if (proposition.codeTauxCommissionRetenu) {
+      const commissionCode = proposition.code_taux_commission_retenu || proposition.codeTauxCommissionRetenu;
+      if (commissionCode) {
         // @ts-ignore - Ajout de la propriété dynamique
-        offer.codeTauxCommissionRetenu = proposition.codeTauxCommissionRetenu;
+        offer.codeTauxCommissionRetenu = commissionCode;
       }
     } else {
       console.warn(`No matching Utwin proposition found for: ${libelleProduit} - ${codeFormuleToFind}`);
+      // Afficher les propositions disponibles pour debug
+      console.log('Available propositions:', propositions.map(p => ({
+        libelle: p.libelle_produit || p.libelleProduit,
+        code: p.code_formule || p.codeFormule,
+        prix: p.cotisation_mensuelle_euros || p.cotisationMensuelleEuros
+      })));
     }
   }
 
@@ -1050,13 +1690,44 @@ export class CompareComponent implements OnInit {
 
   loadExampleData(): void {
     this.insuranceForm.get('personalInfo')?.patchValue({
-      civilite: 'M', nom: 'Dupont', prenom: 'Jean', dateNaissance: new Date('1980-05-15'),
-      regime: 'TNS', etatCivil: 'celibataire', adresse: '123 Rue de Paris', codePostal: '75001', ville: 'Paris',
-      complementAdresse: 'Apt 101', dateEffet: new Date(), email: 'jean.dupont@example.com', telephone1: '0612345678'
+      civilite: 'M', 
+      nom: 'Dupont', 
+      prenom: 'Jean', 
+      dateNaissance: '16/04/1999',
+      regime: 'TNS', 
+      etatCivil: 'celibataire', 
+      adresse: '123 Rue de la République', 
+      codePostal: '69001', 
+      ville: 'Lyon',
+      complementAdresse: 'Appartement 15', 
+      dateEffet: (() => {
+        const today = new Date();
+        today.setDate(today.getDate() + 35);
+        const day = today.getDate().toString().padStart(2, '0');
+        const month = (today.getMonth() + 1).toString().padStart(2, '0');
+        const year = today.getFullYear();
+        return `${day}/${month}/${year}`;
+      })(), 
+      email: 'jean.dupont@example.com', 
+      telephone1: '0612345678',
+      telephone2: '0478901234',
+      conjoint: {
+        civilite: 'F',
+        nom: 'Dupont',
+        prenom: 'Marie',
+        dateNaissance: '22/08/2001'
+      }
     });
+    
+    // Supprimer tous les enfants - pas d'enfant dans l'exemple
     const enfantsArray = this.insuranceForm.get('personalInfo.enfants') as FormArray;
     while (enfantsArray.length) { enfantsArray.removeAt(0); }
-    this.messageService.add({ severity: 'success', summary: 'Données chargées', detail: 'Les données d\'exemple ont été chargées.' });
+    
+    this.messageService.add({ 
+      severity: 'success', 
+      summary: 'Données chargées', 
+      detail: 'Tous les champs ont été pré-remplis avec des données d\'exemple (sans enfant).' 
+    });
   }
 
   resetForm(): void {
@@ -1065,6 +1736,7 @@ export class CompareComponent implements OnInit {
     this.initializeForm();
     this.setupConjointListener();
     this.activeIndex = 0;
+    this.results = [];
     this.comparisonResults = [];
     this.messageService.add({ severity: 'info', summary: 'Formulaire réinitialisé', detail: 'Le formulaire a été vidé.' });
   }
@@ -1172,11 +1844,23 @@ export class CompareComponent implements OnInit {
 
     const formatDate = (date: any): string => {
       if (!date) return '';
-      const d = new Date(date);
-      const year = d.getFullYear();
-      const month = (`0${d.getMonth() + 1}`).slice(-2);
-      const day = (`0${d.getDate()}`).slice(-2);
-      return `${year}-${month}-${day}`;
+      
+      // Si c'est déjà une chaîne au format DD/MM/YYYY, convertir en YYYY-MM-DD
+      if (typeof date === 'string' && /^\d{2}\/\d{2}\/\d{4}$/.test(date)) {
+        const [day, month, year] = date.split('/');
+        return `${year}-${month}-${day}`;
+      }
+      
+      // Si c'est un objet Date
+      if (date instanceof Date && !isNaN(date.getTime())) {
+        const year = date.getFullYear();
+        const month = (`0${date.getMonth() + 1}`).slice(-2);
+        const day = (`0${date.getDate()}`).slice(-2);
+        return `${year}-${month}-${day}`;
+      }
+      
+      console.warn('Invalid date format:', date);
+      return '';
     };
 
     const getStatutProfessionnel = (categorie: string, statutChoisi?: string): string => {
@@ -1273,7 +1957,21 @@ export class CompareComponent implements OnInit {
 
     const formatDate = (date: any): string => {
       if (!date) return '';
-      return new Date(date).toISOString();
+      
+      // Si c'est déjà une chaîne au format DD/MM/YYYY, convertir en ISO
+      if (typeof date === 'string' && /^\d{2}\/\d{2}\/\d{4}$/.test(date)) {
+        const [day, month, year] = date.split('/');
+        const d = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+        return d.toISOString();
+      }
+      
+      // Si c'est un objet Date
+      if (date instanceof Date && !isNaN(date.getTime())) {
+        return date.toISOString();
+      }
+      
+      console.warn('Invalid date format for ISO:', date);
+      return '';
     };
 
     const mapRegime = (regime: string): string => {
@@ -1369,8 +2067,20 @@ export class CompareComponent implements OnInit {
 
     const formatDate = (date: any): string => {
       if (!date) return '';
-      const d = new Date(date);
-      return d.toISOString().split('T')[0];
+      
+      // Si c'est déjà une chaîne au format DD/MM/YYYY, convertir en YYYY-MM-DD
+      if (typeof date === 'string' && /^\d{2}\/\d{2}\/\d{4}$/.test(date)) {
+        const [day, month, year] = date.split('/');
+        return `${year}-${month}-${day}`;
+      }
+      
+      // Si c'est un objet Date
+      if (date instanceof Date && !isNaN(date.getTime())) {
+        return date.toISOString().split('T')[0];
+      }
+      
+      console.warn('Invalid date format for ISO date:', date);
+      return '';
     };
 
     const formula = result.formule || '';
@@ -1412,8 +2122,14 @@ export class CompareComponent implements OnInit {
       persons: persons,
       products: [{
         '$id': 'p-1',
-        productCode: 'SantePro',
+        productCode: this.getAprilProductCode(result.assurance),
         effectiveDate: formatDate(personalInfo.dateEffet),
+        ...(personalInfo.termination?.hasFormerContract && personalInfo.termination?.formerInsurer && personalInfo.termination?.formerContractReference ? {
+          termination: {
+            insurer: personalInfo.termination.formerInsurer,
+            formerContractReference: personalInfo.termination.formerContractReference
+          }
+        } : {}),
         insureds: insureds,
         coverages: [{
           insured: { '$ref': mainApplicantId },
@@ -1470,17 +2186,129 @@ export class CompareComponent implements OnInit {
     return `<strong style="color: #A102F2; font-weight: bold;">${cleanedFormula}</strong>`;
   }
 
+  private buildUtwinRequest(): any {
+    const personalInfo = this.insuranceForm.get('personalInfo')?.value;
+    if (!personalInfo) {
+      console.error('Personal info not available for Utwin request');
+      return null;
+    }
+
+    console.log('Building Utwin request with personalInfo:', personalInfo);
+
+    const formatDateISO = (date: any): string => {
+      if (!date) {
+        console.warn('Date is null/undefined, using current date');
+        return new Date().toISOString();
+      }
+      
+      let dateObj: Date;
+      if (typeof date === 'string' && /^\d{2}\/\d{2}\/\d{4}$/.test(date)) {
+        const [day, month, year] = date.split('/');
+        dateObj = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+      } else if (date instanceof Date) {
+        dateObj = date;
+      } else {
+        dateObj = new Date(date);
+      }
+      
+      if (isNaN(dateObj.getTime())) {
+        console.warn('Invalid date, using current date:', date);
+        return new Date().toISOString();
+      }
+      
+      return dateObj.toISOString();
+    };
+
+    const assures: any[] = [];
+
+    // Assuré principal - validation des données
+    const principalData = {
+      codeRegimeObligatoire: this.mapRegimeToUtwin(personalInfo.regime) || 'SSI',
+      codeTypeRole: 'AssurePrincipal',
+      dateDeNaissance: formatDateISO(personalInfo.dateNaissance)
+    };
+    console.log('Principal assuré data:', principalData);
+    assures.push(principalData);
+
+    // Conjoint
+    if (personalInfo.conjoint && personalInfo.conjoint.dateNaissance && 
+        (personalInfo.etatCivil === 'marie' || personalInfo.etatCivil === 'unionLibre')) {
+      const conjointData = {
+        codeRegimeObligatoire: this.mapRegimeToUtwin(personalInfo.conjoint.regime) || 'SSI',
+        codeTypeRole: 'Conjoint',
+        dateDeNaissance: formatDateISO(personalInfo.conjoint.dateNaissance)
+      };
+      console.log('Conjoint data:', conjointData);
+      assures.push(conjointData);
+    }
+
+    // Enfants
+    if (personalInfo.enfants && Array.isArray(personalInfo.enfants)) {
+      personalInfo.enfants.forEach((enfant: any, index: number) => {
+        if (enfant && enfant.dateNaissance) {
+          const enfantData = {
+            codeRegimeObligatoire: this.mapRegimeToUtwin(enfant.regime) || 'SSI',
+            codeTypeRole: 'Enfant',
+            dateDeNaissance: formatDateISO(enfant.dateNaissance)
+          };
+          console.log(`Enfant ${index} data:`, enfantData);
+          assures.push(enfantData);
+        }
+      });
+    }
+
+    const utwinRequest = {
+      souscripteur: {
+        adresse: {
+          codePostal: personalInfo.codePostal || '69000',
+          ville: personalInfo.ville || 'Lyon'
+        }
+      },
+      besoin: {
+        dateEffet: formatDateISO(personalInfo.dateEffet)
+      },
+      assures: assures
+    };
+
+    console.log('Final Utwin request:', utwinRequest);
+    return utwinRequest;
+  }
+
+  private mapRegimeToUtwin(regime: string): string {
+    if (!regime) return 'SSI';
+    
+    const regimeMap: { [key: string]: string } = {
+      'TNS': 'SSI',
+      'SALARIE': 'SALARIE', 
+      'FONCTIONNAIRE': 'FONCTIONNAIRE',
+      'PROFESSIONS_LIBERALES': 'SSI',
+      'ARTISAN_COMMERCANT': 'SSI'
+    };
+    return regimeMap[regime] || 'SSI';
+  }
+
   private buildApiviaQuotePayload(result: ComparisonResult): any {
     const personalInfo = this.insuranceForm.get('personalInfo')?.value;
     if (!personalInfo) return null;
 
     const formatDate = (date: any): string => {
       if (!date) return '';
-      const d = new Date(date);
-      const day = ('0' + d.getDate()).slice(-2);
-      const month = ('0' + (d.getMonth() + 1)).slice(-2);
-      const year = d.getFullYear();
-      return `${day}/${month}/${year}`;
+      
+      // Si c'est déjà une chaîne au format DD/MM/YYYY, la retourner directement
+      if (typeof date === 'string' && /^\d{2}\/\d{2}\/\d{4}$/.test(date)) {
+        return date;
+      }
+      
+      // Si c'est un objet Date
+      if (date instanceof Date && !isNaN(date.getTime())) {
+        const day = ('0' + date.getDate()).slice(-2);
+        const month = ('0' + (date.getMonth() + 1)).slice(-2);
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+      }
+      
+      console.warn('Invalid date format:', date);
+      return '';
     };
 
     const getProductCode = (productName: string): string => {
@@ -1550,7 +2378,7 @@ export class CompareComponent implements OnInit {
         adresse: {
           numero: '', // Not available in form
           codeBtq: '', // Not available in form
-          natureVoie: '', // Not available in form
+          natureVoie: 'RUE', // Default value required by Apivia API
           nomVoie: personalInfo.adresse,
           complement: '', // Not available in form
           codePostal: personalInfo.codePostal,

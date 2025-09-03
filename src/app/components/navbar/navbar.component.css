@@ -1,0 +1,319 @@
+/* CASHedi Professional Navbar Styles */
+.cashedi-navbar {
+  background: linear-gradient(135deg, var(--cashedi-primary) 0%, var(--cashedi-primary-dark) 100%);
+  box-shadow: var(--shadow-lg);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.cashedi-navbar-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  gap: 2rem;
+}
+
+/* Logo Section */
+.cashedi-logo-section {
+  flex-shrink: 0;
+}
+
+.cashedi-logo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.cashedi-logo:hover {
+  transform: scale(1.02);
+}
+
+.cashedi-logo-brokins {
+  width: auto;
+  height: 3rem;
+  background: white;
+  border-radius: var(--border-radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 0.5rem 0.75rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.cashedi-logo-brokins svg {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  display: block;
+}
+
+.cashedi-logo-brokins svg text {
+  dominant-baseline: central;
+  text-anchor: start;
+}
+
+.cashedi-logo-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.cashedi-brand-name {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--cashedi-white);
+  margin: 0;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.cashedi-brand-tagline {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* Navigation Menu */
+.cashedi-nav-menu {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.cashedi-nav-items {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cashedi-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  border-radius: var(--border-radius-md);
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+  position: relative;
+  background: none;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.cashedi-nav-link:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--cashedi-white);
+  transform: translateY(-1px);
+}
+
+.cashedi-nav-link.active {
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--cashedi-white);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.cashedi-nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  height: 2px;
+  background: var(--cashedi-white);
+  border-radius: 1px;
+}
+
+/* Dropdown */
+.cashedi-nav-dropdown {
+  position: relative;
+}
+
+.dropdown-toggle {
+  position: relative;
+}
+
+.dropdown-toggle .pi-chevron-down {
+  font-size: 0.75rem;
+  transition: transform 0.3s ease;
+}
+
+.cashedi-nav-dropdown:hover .dropdown-toggle .pi-chevron-down {
+  transform: rotate(180deg);
+}
+
+.cashedi-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: var(--cashedi-white);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-xl);
+  padding: 0.5rem 0;
+  min-width: 200px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+  border: 1px solid var(--cashedi-gray-200);
+  z-index: 1001;
+}
+
+.cashedi-nav-dropdown:hover .cashedi-dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.cashedi-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  color: var(--cashedi-gray-700);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.cashedi-dropdown-item:hover {
+  background: var(--cashedi-primary-lightest);
+  color: var(--cashedi-primary);
+  transform: translateX(4px);
+}
+
+.cashedi-dropdown-item i {
+  font-size: 1rem;
+  color: var(--cashedi-primary);
+}
+
+/* Action Section */
+.cashedi-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-shrink: 0;
+}
+
+.cashedi-nav-btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--cashedi-white);
+  backdrop-filter: blur(10px);
+}
+
+.cashedi-nav-btn:hover {
+  background: var(--cashedi-white);
+  color: var(--cashedi-primary);
+  border-color: var(--cashedi-white);
+}
+
+/* Mobile Responsive */
+@media (max-width: 1024px) {
+  .cashedi-navbar-container {
+    padding: 0.75rem 1rem;
+    gap: 1rem;
+  }
+  
+  .cashedi-brand-name {
+    font-size: 1.5rem;
+  }
+  
+  .cashedi-brand-tagline {
+    display: none;
+  }
+  
+  .cashedi-nav-items {
+    gap: 0.25rem;
+  }
+  
+  .cashedi-nav-link span {
+    display: none;
+  }
+  
+  .cashedi-nav-link {
+    padding: 0.75rem;
+    min-width: 2.5rem;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .cashedi-navbar-container {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .cashedi-logo {
+    gap: 0.5rem;
+  }
+  
+  .cashedi-logo-icon {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+  
+  .cashedi-logo-icon i {
+    font-size: 1.25rem !important;
+  }
+  
+  .cashedi-brand-name {
+    font-size: 1.25rem;
+  }
+  
+  .cashedi-nav-menu {
+    order: 3;
+    flex-basis: 100%;
+    justify-content: center;
+    margin-top: 0.5rem;
+  }
+  
+  .cashedi-nav-actions {
+    gap: 0.5rem;
+  }
+  
+  .cashedi-nav-btn span {
+    display: none;
+  }
+  
+  .cashedi-nav-btn {
+    padding: 0.5rem;
+    min-width: 2.5rem;
+  }
+}
+
+/* Loading Animation */
+.cashedi-navbar.loading {
+  animation: cashedi-pulse 2s infinite;
+}
+
+/* Scroll Effect */
+.cashedi-navbar.scrolled {
+  background: rgba(161, 2, 242, 0.95);
+  backdrop-filter: blur(20px);
+}
+
+/* Focus States for Accessibility */
+.cashedi-nav-link:focus,
+.cashedi-nav-btn:focus {
+  outline: 2px solid var(--cashedi-white);
+  outline-offset: 2px;
+}

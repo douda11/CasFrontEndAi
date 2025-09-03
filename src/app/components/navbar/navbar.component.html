@@ -1,16 +1,42 @@
-<div class="wizard-nav-container">
-  <p-menubar [model]="items">
-    <ng-template pTemplate="start">
-      <div class="logo mr-3">
-        <img src="https://github.com/seifeddinerezgui/CAC/blob/master/cac-frontend/src/assets/logo.png" alt="Logo" height="40" class="mr-2">
-        <span class="font-bold text-lg">CAS Brokins</span>
+<div class="cashedi-navbar">
+  <div class="cashedi-navbar-container">
+    <!-- Logo Section -->
+    <div class="cashedi-logo-section">
+      <div class="cashedi-logo">
+        <div class="cashedi-logo-brokins">
+          <svg width="120" height="40" viewBox="0 0 120 40" xmlns="http://www.w3.org/2000/svg">
+            <text x="5" y="28" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="bold" fill="white" stroke="#A102F2" stroke-width="1">b</text>
+            <text x="20" y="28" font-family="Inter, Arial, sans-serif" font-size="20" font-weight="bold" fill="#A102F2">rokins</text>
+          </svg>
+        </div>
+        <div class="cashedi-logo-text">
+          <h1 class="cashedi-brand-name">CAS</h1>
+          <p class="cashedi-brand-tagline">Comparateur d'Assurance Santé</p>
+        </div>
       </div>
-    </ng-template>
-    <ng-template pTemplate="end">
-      <div class="flex align-items-center">
-        <button pButton label="Accueil" icon="pi pi-home" class="p-button-text mr-2" routerLink="/home"></button>
-        <app-theme-switcher></app-theme-switcher>
+    </div>
+
+    <!-- Navigation Menu -->
+    <nav class="cashedi-nav-menu">
+      <div class="cashedi-nav-items">
+        <a routerLink="/home" routerLinkActive="active" class="cashedi-nav-link">
+          <i class="pi pi-home"></i>
+          <span>Accueil</span>
+        </a>
+        <a routerLink="/compare" routerLinkActive="active" class="cashedi-nav-link">
+          <i class="pi pi-chart-bar"></i>
+          <span>Comparateur</span>
+        </a>
       </div>
-    </ng-template>
-  </p-menubar>
+    </nav>
+
+    <!-- Action Section -->
+    <div class="cashedi-nav-actions">
+      <button class="cashedi-btn-secondary cashedi-nav-btn">
+        <i class="pi pi-user"></i>
+        <span>Connexion</span>
+      </button>
+      <app-theme-switcher></app-theme-switcher>
+    </div>
+  </div>
 </div>

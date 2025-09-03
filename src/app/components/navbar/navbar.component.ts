@@ -1,11 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
-
-// PrimeNG imports
-import { MenubarModule } from 'primeng/menubar';
-import { ButtonModule } from 'primeng/button';
-import { MenuItem } from 'primeng/api';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 
 // Theme switcher
 import { ThemeSwitcherComponent } from '../theme-switcher/theme-switcher.component';
@@ -13,31 +8,10 @@ import { ThemeSwitcherComponent } from '../theme-switcher/theme-switcher.compone
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, RouterLink, MenubarModule, ButtonModule, ThemeSwitcherComponent],
+  imports: [CommonModule, RouterLink, RouterLinkActive, ThemeSwitcherComponent],
   templateUrl: './navbar.component.html',
-  styleUrl: './navbar.component.scss'
+  styleUrl: './navbar.component.css'
 })
 export class NavbarComponent {
-  items: MenuItem[];
-
-  constructor(private router: Router) {
-    this.items = [
-      {
-        label: 'UTWIN',
-        icon: 'pi pi-calculator',
-        command: () => this.router.navigate(['/tarif-utwin'])
-      },
-      {
-        label: 'APRIL',
-        icon: 'pi pi-calculator',
-        command: () => this.router.navigate(['/tarif-april'])
-      },
-      {
-        label: 'Comparateur',
-        icon: 'pi pi-sync',
-        command: () => this.router.navigate(['/compare'])
-      }
-    ];
-  }
-
+  constructor(private router: Router) {}
 }

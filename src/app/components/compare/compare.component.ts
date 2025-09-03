@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormArray, AbstractControl, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Router } from '@angular/router';
 
 // PrimeNG imports
@@ -24,7 +24,9 @@ import { CardModule } from 'primeng/card';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { AccordionModule } from 'primeng/accordion';
 import { TabViewModule } from 'primeng/tabview';
+import { MessageModule } from 'primeng/message';
 import { MarkdownModule } from 'ngx-markdown';
+import { FormsModule } from '@angular/forms';
 
 // App services and models
 import { CompareService } from '../../services/compare.service';
@@ -78,19 +80,31 @@ interface GarantieDefinition {
   styleUrls: ['./compare.component.scss'],
   standalone: true,
   imports: [
-    CommonModule, HttpClientModule, ReactiveFormsModule, StepsModule, ToastModule, SliderModule, PanelModule,
+    CommonModule, HttpClientModule, ReactiveFormsModule, FormsModule, StepsModule, ToastModule, SliderModule, PanelModule,
     DropdownModule, RadioButtonModule, CalendarModule, InputTextModule, InputMaskModule, ButtonModule, DividerModule,
     TooltipModule, InputNumberModule, CheckboxModule, CardModule, ProgressSpinnerModule, AccordionModule, TabViewModule,
-    MarkdownModule
+    MessageModule, MarkdownModule
   ]
 })
 export class CompareComponent implements OnInit {
   insuranceForm!: FormGroup;
   activeIndex: number = 0;
   submitting: boolean = false;
+  isComparing: boolean = false;
   results: any[] = [];
   comparisonResults: any[] = [];
   an = false;
+  private comparisonSubscription: any = null;
+  
+  // PDF extraction properties
+  selectedPdfFile: File | null = null;
+  selectedInsurer: string = '';
+  selectedLevelName: string = '';
+  isExtractingPdf: boolean = false;
+  pdfExtractionMessage: { type: 'success' | 'error' | 'info' | 'warn', text: string } | null = null;
+  availableInsurers: { label: string, value: string }[] = [];
+  availableLevels: { label: string, value: string }[] = [];
+  contractsData: any[] = [];
   steps = [
     { label: 'Informations personnelles' },
     { label: 'Garanties' },
@@ -129,7 +143,9 @@ minDate: Date | null = null;
     private insuranceService: InsuranceService,
     private alptisService: AlptisService,
     private messageService: MessageService,
-    private router: Router
+    private router: Router,
+    private http: HttpClient,
+    private cdr: ChangeDetectorRef
   ) {
     const today = new Date();
     this.minDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
@@ -142,6 +158,7 @@ minDate: Date | null = null;
     this.setupConjointListener();
     this.setupPostalCodeListener();
     this.setupGaranties();
+    this.initializeAvailableInsurers();
 
     const navigation = this.router.getCurrentNavigation();
     const state = navigation?.extras.state as { insuranceData: InsuranceQuoteForm };
@@ -579,6 +596,21 @@ minDate: Date | null = null;
     ];
   }
 
+  initializeAvailableInsurers(): void {
+    this.availableInsurers = [
+      { label: 'ALPTIS', value: 'ALPTIS' },
+      { label: 'APIVIA', value: 'APIVIA' },
+      { label: 'UTWIN', value: 'UTWIN' },
+      { label: 'APRIL', value: 'APRIL' },
+      { label: 'ACHEEL', value: 'ACHEEL' },
+      { label: 'AXA', value: 'AXA' },
+      { label: 'MAAF', value: 'MAAF' },
+      { label: 'MATMUT', value: 'MATMUT' },
+      { label: 'HARMONIE MUTUELLE', value: 'HARMONIE_MUTUELLE' },
+      { label: 'MGEN', value: 'MGEN' }
+    ];
+  }
+
   initializeSteps(): void {
     this.steps = [
       { label: 'Informations personnelles' },
@@ -674,10 +706,20 @@ minDate: Date | null = null;
       return;
     }
     this.submitting = true;
+    this.isComparing = true;
+    
+    // Bloquer instantanément les sliders
+    this.disableSliders();
+    
     const needs: BesoinClient = this.insuranceForm.get('coverageSliders')?.value;
 
-    this.compareService.getComparisonResults(needs)
-      .pipe(finalize(() => { this.submitting = false; }))
+    this.comparisonSubscription = this.compareService.getComparisonResults(needs)
+      .pipe(finalize(() => { 
+        this.submitting = false;
+        this.isComparing = false;
+        this.enableSliders();
+        this.comparisonSubscription = null;
+      }))
       .subscribe({
         next: (response: any) => {
           if (response && response.table) {
@@ -700,6 +742,9 @@ minDate: Date | null = null;
         },
         error: (err) => {
           this.submitting = false;
+          this.isComparing = false;
+          this.enableSliders();
+          this.comparisonSubscription = null;
           this.activeIndex = 2;
           if (err.status === 400 && err.error) {
             if (err.error.messages) {
@@ -2289,8 +2334,8 @@ minDate: Date | null = null;
     const utwinRequest = {
       souscripteur: {
         adresse: {
-          codePostal: personalInfo.codePostal || '69000',
-          ville: personalInfo.ville || 'Lyon'
+          codePostal: personalInfo.codePostal || '69000'
+          // ville supprimée - non requise par Utwin
         }
       },
       besoin: {
@@ -2417,5 +2462,205 @@ minDate: Date | null = null;
       },
       tarif: result.tarifGlobal || 0
     };
+  }
+
+  // Méthodes pour contrôler les sliders
+  disableSliders(): void {
+    const slidersGroup = this.insuranceForm.get('coverageSliders');
+    if (slidersGroup) {
+      slidersGroup.disable();
+    }
+  }
+
+  enableSliders(): void {
+    const slidersGroup = this.insuranceForm.get('coverageSliders');
+    if (slidersGroup) {
+      slidersGroup.enable();
+    }
+  }
+
+  // Méthode pour annuler la comparaison
+  cancelComparison(): void {
+    if (this.comparisonSubscription) {
+      this.comparisonSubscription.unsubscribe();
+      this.comparisonSubscription = null;
+    }
+    
+    this.submitting = false;
+    this.isComparing = false;
+    this.enableSliders();
+    
+    this.messageService.add({ 
+      severity: 'info', 
+      summary: 'Comparaison Annulée', 
+      detail: 'Le processus de comparaison a été interrompu.' 
+    });
+  }
+
+  // Méthodes pour l'extraction PDF
+  onPdfFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file && file.type === 'application/pdf') {
+      this.selectedPdfFile = file;
+      this.pdfExtractionMessage = null;
+    } else {
+      this.selectedPdfFile = null;
+      this.pdfExtractionMessage = {
+        type: 'error',
+        text: 'Veuillez sélectionner un fichier PDF valide.'
+      };
+    }
+  }
+
+  extractPdfData(): void {
+    if (!this.selectedPdfFile || !this.selectedInsurer || !this.selectedLevelName) {
+      this.pdfExtractionMessage = {
+        type: 'error',
+        text: 'Veuillez sélectionner un fichier PDF, un assureur et indiquer le niveau/formule.'
+      };
+      return;
+    }
+
+    this.isExtractingPdf = true;
+    this.pdfExtractionMessage = {
+      type: 'info',
+      text: 'Extraction en cours... Cela peut prendre quelques instants.'
+    };
+
+    const formData = new FormData();
+    formData.append('pdf_file', this.selectedPdfFile);
+    formData.append('level_name', this.selectedLevelName);
+
+    // URL du service d'extraction PDF (comparateur_brokins-master)
+    const extractionUrl = 'http://localhost:5000/extract';
+
+    this.http.post(extractionUrl, formData).pipe(
+      finalize(() => {
+        this.isExtractingPdf = false;
+      })
+    ).subscribe({
+      next: (response: any) => {
+        console.log('PDF extraction response:', response);
+        this.handlePdfExtractionSuccess(response);
+      },
+      error: (error) => {
+        console.error('PDF extraction error:', error);
+        this.handlePdfExtractionError(error);
+      }
+    });
+  }
+
+  private handlePdfExtractionSuccess(extractedData: any): void {
+    try {
+      // Mapping des garanties PDF vers les sliders
+      const guaranteeMapping = this.mapPdfToSliders(extractedData);
+      
+      if (guaranteeMapping) {
+        // Remplir automatiquement les sliders
+        this.populateSliders(guaranteeMapping);
+        
+        this.pdfExtractionMessage = {
+          type: 'success',
+          text: 'Extraction réussie ! Les sliders ont été remplis automatiquement.'
+        };
+      } else {
+        this.pdfExtractionMessage = {
+          type: 'warn',
+          text: 'Extraction réussie mais aucune garantie compatible trouvée.'
+        };
+      }
+    } catch (error) {
+      console.error('Error processing extracted data:', error);
+      this.pdfExtractionMessage = {
+        type: 'error',
+        text: 'Erreur lors du traitement des données extraites.'
+      };
+    }
+  }
+
+  private handlePdfExtractionError(error: any): void {
+    let errorMessage = 'Erreur lors de l\'extraction du PDF.';
+    
+    if (error.status === 0) {
+      errorMessage = 'Impossible de se connecter au service d\'extraction. Vérifiez que le serveur est démarré.';
+    } else if (error.error?.error) {
+      errorMessage = error.error.error;
+    }
+
+    this.pdfExtractionMessage = {
+      type: 'error',
+      text: errorMessage
+    };
+  }
+
+  private mapPdfToSliders(extractedData: any): any {
+    if (!extractedData?.benefits) {
+      return null;
+    }
+
+    const benefits = extractedData.benefits;
+    const mapping: any = {};
+
+    // Mapping selon les correspondances spécifiées
+    // "honoraires_chirurgien_optam" -> Hospitalisation
+    if (benefits.HOSPITALISATION?.honoraires_chirurgien_optam) {
+      mapping.hospitalisation = this.extractNumericValue(benefits.HOSPITALISATION.honoraires_chirurgien_optam);
+    }
+
+    // "chambre_particuliere" -> Chambre particulière
+    if (benefits.HOSPITALISATION?.chambre_particuliere) {
+      mapping.chambreParticuliere = this.extractNumericValue(benefits.HOSPITALISATION.chambre_particuliere);
+    }
+
+    // "consultation_generaliste_optam" -> Honoraires
+    if (benefits.SOINS_COURANTS?.consultation_generaliste_optam) {
+      mapping.honoraires = this.extractNumericValue(benefits.SOINS_COURANTS.consultation_generaliste_optam);
+    }
+
+    // "soins_dentaires" -> Dentaire
+    if (benefits.DENTAIRE?.soins_dentaires) {
+      mapping.dentaire = this.extractNumericValue(benefits.DENTAIRE.soins_dentaires);
+    }
+
+    // "implantologie" -> Forfait dentaire
+    if (benefits.DENTAIRE?.implantologie) {
+      mapping.forfaitDentaire = this.extractNumericValue(benefits.DENTAIRE.implantologie);
+    }
+
+    // "orthodontie" -> Orthodontie
+    if (benefits.DENTAIRE?.orthodontie) {
+      mapping.orthodontie = this.extractNumericValue(benefits.DENTAIRE.orthodontie);
+    }
+
+    // "verres_complexes" -> Forfait optique
+    if (benefits.OPTIQUE?.verres_complexes) {
+      mapping.forfaitOptique = this.extractNumericValue(benefits.OPTIQUE.verres_complexes);
+    }
+
+    return Object.keys(mapping).length > 0 ? mapping : null;
+  }
+
+  private extractNumericValue(value: string): number {
+    if (!value) return 0;
+    
+    // Extraire les nombres de la chaîne (ex: "250 % BRSS" -> 250, "60 €" -> 60)
+    const match = value.match(/(\d+)/);
+    return match ? parseInt(match[1], 10) : 0;
+  }
+
+  private populateSliders(mapping: any): void {
+    const slidersGroup = this.insuranceForm.get('coverageSliders');
+    if (!slidersGroup) return;
+
+    // Remplir chaque slider avec les valeurs extraites
+    Object.keys(mapping).forEach(key => {
+      const control = slidersGroup.get(key);
+      if (control && mapping[key] !== undefined) {
+        control.setValue(mapping[key]);
+      }
+    });
+
+    // Marquer les contrôles comme touchés pour déclencher la validation
+    slidersGroup.markAsTouched();
   }
 }

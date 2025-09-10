@@ -16,7 +16,7 @@ export class InsuranceService {
   private apiUrl = '/api/v1/tarification';
   private aprilUrl = `${this.apiBasePath}/api/v1/comparisons/april/projects/prices`;
   private healthProtectionUrl = `${this.apiBasePath}/healthProtection/projects/prices`; // New endpoint
-  private utwinUrl = `${this.apiBasePath}/api/Sante/v1/Tarifs`;
+  private utwinUrl = `${this.apiBasePath}/api/utwin/tarification`;
   private compareUrl = `${this.apiBasePath}/api/v1/comparisons/compare`;
   private apiviaDevisUrl = `${this.apiBasePath}/api/apivia/generate-devis`;
   private aprilQuoteUrl = `${this.apiBasePath}/healthProtection/projects`;

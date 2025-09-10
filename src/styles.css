@@ -409,6 +409,207 @@ h6 { font-size: var(--font-size-base); }
   outline-offset: 2px;
 }
 
+/* CASHedi PrimeNG Component Overrides */
+/* Buttons */
+::ng-deep .p-button {
+  background: linear-gradient(135deg, var(--cashedi-primary) 0%, var(--cashedi-primary-light) 100%);
+  border: none;
+  color: var(--cashedi-white);
+  font-weight: 500;
+  border-radius: var(--border-radius-md);
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+::ng-deep .p-button:hover {
+  background: linear-gradient(135deg, var(--cashedi-primary-dark) 0%, var(--cashedi-primary) 100%);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+::ng-deep .p-button:focus {
+  box-shadow: 0 0 0 3px rgba(161, 2, 242, 0.3);
+}
+
+::ng-deep .p-button.p-button-outlined {
+  background: transparent;
+  border: 2px solid var(--cashedi-primary);
+  color: var(--cashedi-primary);
+}
+
+::ng-deep .p-button.p-button-outlined:hover {
+  background: var(--cashedi-primary);
+  color: var(--cashedi-white);
+}
+
+::ng-deep .p-button.p-button-secondary {
+  background: linear-gradient(135deg, var(--cashedi-secondary) 0%, #7C3AED 100%);
+}
+
+::ng-deep .p-button.p-button-secondary:hover {
+  background: linear-gradient(135deg, #5B21B6 0%, var(--cashedi-secondary) 100%);
+}
+
+::ng-deep .p-button.p-button-success {
+  background: linear-gradient(135deg, var(--cashedi-success) 0%, #34D399 100%);
+}
+
+::ng-deep .p-button.p-button-warning {
+  background: linear-gradient(135deg, var(--cashedi-warning) 0%, #FBBF24 100%);
+}
+
+::ng-deep .p-button.p-button-danger {
+  background: linear-gradient(135deg, var(--cashedi-error) 0%, #F87171 100%);
+}
+
+/* Toast Notifications */
+::ng-deep .p-toast {
+  z-index: 9999;
+}
+
+::ng-deep .p-toast .p-toast-message {
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-xl);
+  border: none;
+  backdrop-filter: blur(10px);
+}
+
+::ng-deep .p-toast .p-toast-message.p-toast-message-success {
+  background: linear-gradient(135deg, var(--cashedi-success) 0%, #34D399 100%);
+  color: var(--cashedi-white);
+}
+
+::ng-deep .p-toast .p-toast-message.p-toast-message-info {
+  background: linear-gradient(135deg, var(--cashedi-info) 0%, #60A5FA 100%);
+  color: var(--cashedi-white);
+}
+
+::ng-deep .p-toast .p-toast-message.p-toast-message-warn {
+  background: linear-gradient(135deg, var(--cashedi-warning) 0%, #FBBF24 100%);
+  color: var(--cashedi-white);
+}
+
+::ng-deep .p-toast .p-toast-message.p-toast-message-error {
+  background: linear-gradient(135deg, var(--cashedi-error) 0%, #F87171 100%);
+  color: var(--cashedi-white);
+}
+
+::ng-deep .p-toast .p-toast-message .p-toast-message-icon {
+  color: var(--cashedi-white);
+  font-size: 1.25rem;
+}
+
+::ng-deep .p-toast .p-toast-message .p-toast-message-text {
+  color: var(--cashedi-white);
+}
+
+::ng-deep .p-toast .p-toast-message .p-toast-icon-close {
+  color: var(--cashedi-white);
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: var(--border-radius-sm);
+  transition: all 0.3s ease;
+}
+
+::ng-deep .p-toast .p-toast-message .p-toast-icon-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Dropdown */
+::ng-deep .p-dropdown {
+  border: 2px solid var(--cashedi-gray-300);
+  border-radius: var(--border-radius-md);
+  transition: all 0.3s ease;
+}
+
+::ng-deep .p-dropdown:focus {
+  border-color: var(--cashedi-primary);
+  box-shadow: 0 0 0 3px rgba(161, 2, 242, 0.1);
+}
+
+::ng-deep .p-dropdown-panel {
+  border: 1px solid var(--cashedi-gray-200);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-lg);
+}
+
+::ng-deep .p-dropdown-item:hover {
+  background: var(--cashedi-primary-lightest);
+  color: var(--cashedi-primary);
+}
+
+::ng-deep .p-dropdown-item.p-highlight {
+  background: var(--cashedi-primary);
+  color: var(--cashedi-white);
+}
+
+/* Input Text */
+::ng-deep .p-inputtext {
+  border: 2px solid var(--cashedi-gray-300);
+  border-radius: var(--border-radius-md);
+  padding: 0.75rem 1rem;
+  transition: all 0.3s ease;
+}
+
+::ng-deep .p-inputtext:focus {
+  border-color: var(--cashedi-primary);
+  box-shadow: 0 0 0 3px rgba(161, 2, 242, 0.1);
+}
+
+/* Steps Component */
+::ng-deep .p-steps .p-steps-item.p-highlight .p-steps-number {
+  background: var(--cashedi-primary);
+  color: var(--cashedi-white);
+}
+
+::ng-deep .p-steps .p-steps-item.p-highlight .p-steps-title {
+  color: var(--cashedi-primary);
+  font-weight: 600;
+}
+
+/* Dialog */
+::ng-deep .p-dialog {
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-xl);
+}
+
+::ng-deep .p-dialog .p-dialog-header {
+  background: linear-gradient(135deg, var(--cashedi-primary) 0%, var(--cashedi-primary-light) 100%);
+  color: var(--cashedi-white);
+  border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+}
+
+::ng-deep .p-dialog .p-dialog-title {
+  color: var(--cashedi-white);
+  font-weight: 600;
+}
+
+::ng-deep .p-dialog .p-dialog-header-icon {
+  color: var(--cashedi-white);
+}
+
+::ng-deep .p-dialog .p-dialog-header-icon:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Cards */
+::ng-deep .p-card {
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--cashedi-gray-200);
+  transition: all 0.3s ease;
+}
+
+::ng-deep .p-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+::ng-deep .p-card .p-card-header {
+  background: linear-gradient(135deg, var(--cashedi-primary) 0%, var(--cashedi-primary-light) 100%);
+  color: var(--cashedi-white);
+  border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+}
+
 /* Print Styles */
 @media print {
   .cashedi-card {

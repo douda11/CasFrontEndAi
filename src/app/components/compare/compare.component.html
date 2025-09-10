@@ -316,6 +316,29 @@
 
                       <div *ngIf="insuranceForm.get('personalInfo.termination.hasFormerContract')?.value" class="col-12">
                         <div class="grid">
+                          <div class="col-12">
+                            <div class="field">
+                              <label class="block mb-2">Est-il assuré depuis 12 mois ?</label>
+                              <div class="flex gap-4">
+                                <div class="flex align-items-center">
+                                  <p-radioButton 
+                                    inputId="isInsuredFor12MonthsOui" 
+                                    formControlName="isInsuredFor12Months" 
+                                    [value]="true">
+                                  </p-radioButton>
+                                  <label for="isInsuredFor12MonthsOui" class="ml-2">Oui</label>
+                                </div>
+                                <div class="flex align-items-center">
+                                  <p-radioButton 
+                                    inputId="isInsuredFor12MonthsNon" 
+                                    formControlName="isInsuredFor12Months" 
+                                    [value]="false">
+                                  </p-radioButton>
+                                  <label for="isInsuredFor12MonthsNon" class="ml-2">Non</label>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
                           <div class="col-12 md:col-6">
                             <div class="field">
                               <label for="formerInsurer" class="block mb-2">Assureur précédent</label>
@@ -887,8 +910,13 @@
                   <tr>
                     <td class="font-bold">Point Faible</td>
                     <td></td>
-                    <td *ngFor="let result of results" class="text-center">
-                        {{ result.weakPoint }}
+                    <td *ngFor="let result of results; let i = index" class="text-center">
+                      <p-button 
+                        label="Détail" 
+                        icon="pi pi-info-circle" 
+                        styleClass="p-button-outlined p-button-sm"
+                        (click)="showWeakPointDetails(result, i)">
+                      </p-button>
                     </td>
                   </tr>
 
@@ -980,16 +1008,45 @@
             ></p-button>
           </div>
 
-            <p-button
-              *ngIf="activeIndex === 2"
-              label="Nouvelle comparaison"
-              icon="pi pi-refresh"
-              styleClass="p-button-secondary"
-              (click)="resetForm()"
-            ></p-button>
+          <p-button
+            *ngIf="activeIndex === 2"
+            label="Nouvelle comparaison"
+            icon="pi pi-refresh"
+            styleClass="p-button-secondary"
+            (click)="resetForm()"
+          ></p-button>
         </div>
       </div>
+    </form>
+  </div>
 
-      <!-- Toast pour les notifications -->
-      <p-toast></p-toast>
-    
+  <!-- Dialog pour afficher les détails des points faibles -->
+  <p-dialog 
+    header="Détails des Points Faibles" 
+    [(visible)]="showWeakPointDialog" 
+    [modal]="true" 
+    [style]="{width: '50vw'}"
+    [closable]="true">
+    <div *ngIf="selectedWeakPointDetails">
+          <h4 class="font-bold mb-3">{{ getInsurerName(selectedWeakPointDetails.assurance) }}</h4>
+          <p class="mb-2"><strong>Point faible principal :</strong></p>
+          <p class="text-gray-700 mb-4">{{ selectedWeakPointDetails.weakPoint }}</p>
+          
+          <div *ngIf="selectedWeakPointDetails.detailedWeakPoints && selectedWeakPointDetails.detailedWeakPoints.length > 0">
+            <p class="mb-2"><strong>Détails supplémentaires :</strong></p>
+            <ul class="list-disc pl-5">
+              <li *ngFor="let detail of selectedWeakPointDetails.detailedWeakPoints" class="mb-1">
+                {{ detail }}
+              </li>
+            </ul>
+          </div>
+          
+          <div *ngIf="!selectedWeakPointDetails.detailedWeakPoints || selectedWeakPointDetails.detailedWeakPoints.length === 0">
+            <p class="text-gray-500 italic">Aucun détail supplémentaire disponible.</p>
+          </div>
+    </div>
+  </p-dialog>
+
+  <!-- Toast pour les notifications -->
+  <p-toast></p-toast>
+</div>

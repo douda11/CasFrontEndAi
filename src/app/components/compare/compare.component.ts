@@ -25,6 +25,7 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { AccordionModule } from 'primeng/accordion';
 import { TabViewModule } from 'primeng/tabview';
 import { MessageModule } from 'primeng/message';
+import { DialogModule } from 'primeng/dialog';
 import { MarkdownModule } from 'ngx-markdown';
 import { FormsModule } from '@angular/forms';
 
@@ -83,7 +84,7 @@ interface GarantieDefinition {
     CommonModule, HttpClientModule, ReactiveFormsModule, FormsModule, StepsModule, ToastModule, SliderModule, PanelModule,
     DropdownModule, RadioButtonModule, CalendarModule, InputTextModule, InputMaskModule, ButtonModule, DividerModule,
     TooltipModule, InputNumberModule, CheckboxModule, CardModule, ProgressSpinnerModule, AccordionModule, TabViewModule,
-    MessageModule, MarkdownModule
+    MessageModule, DialogModule, MarkdownModule
   ]
 })
 export class CompareComponent implements OnInit {
@@ -135,8 +136,13 @@ export class CompareComponent implements OnInit {
     { label: 'Professions libérales', value: 'PROFESSIONS_LIBERALES' },
     { label: 'Artisan commerçant', value: 'ARTISAN_COMMERCANT' }
   ];
-minDate: Date | null = null;
+  minDate: Date | null = null;
   maxDate: Date | null = null;
+
+  // Variables pour le dialog des points faibles
+  showWeakPointDialog: boolean = false;
+  selectedWeakPointDetails: any = null;
+
   constructor(
     private fb: FormBuilder,
     private compareService: CompareService,
@@ -229,7 +235,8 @@ minDate: Date | null = null;
         termination: this.fb.group({
           hasFormerContract: [false],
           formerInsurer: [''],
-          formerContractReference: ['']
+          formerContractReference: [''],
+          isInsuredFor12Months: [true] // Par défaut "oui"
         })
       }),
       coverageSliders: this.fb.group({
@@ -1819,16 +1826,31 @@ minDate: Date | null = null;
     return this.comparisonResults && this.comparisonResults.length > 0;
   }
 
-  public getInsurerName(assurance: string): string {
-    if (!assurance) return '';
-    return assurance.split(' ')[0];
-  }
 
   public getCoverageClass(value: number): string {
     if (value >= 300) return 'coverage-high';
     if (value >= 150) return 'coverage-medium';
-    if (value > 0) return 'coverage-low';
-    return '';
+    return 'coverage-low';
+  }
+
+  // Nouvelle méthode pour les classes CASHedi
+  getCashediCoverageClass(actualValue: number, neededValue: number): string {
+    if (!actualValue || actualValue === 0) return 'cashedi-coverage-none';
+    
+    const ratio = actualValue / neededValue;
+    
+    if (ratio >= 1.2) return 'cashedi-coverage-excellent';
+    if (ratio >= 1.0) return 'cashedi-coverage-good';
+    if (ratio >= 0.7) return 'cashedi-coverage-average';
+    return 'cashedi-coverage-poor';
+  }
+
+  // Méthode pour les classes de correspondance
+  getCorrespondenceClass(percentage: number): string {
+    if (percentage >= 90) return 'cashedi-correspondence-excellent';
+    if (percentage >= 75) return 'cashedi-correspondence-good';
+    if (percentage >= 60) return 'cashedi-correspondence-average';
+    return 'cashedi-correspondence-poor';
   }
 
   public isNumeric(value: any): boolean {
@@ -1885,29 +1907,11 @@ minDate: Date | null = null;
         return;
       }
       
-      this.alptisService.generateDevis(alptisPayload, action === 'telechargement').subscribe({
-        next: (response: any) => {
-          if (action === 'telechargement' && response.pdfBase64) {
-            const byteCharacters = atob(response.pdfBase64);
-            const byteNumbers = new Array(byteCharacters.length);
-            for (let i = 0; i < byteCharacters.length; i++) {
-              byteNumbers[i] = byteCharacters.charCodeAt(i);
-            }
-            const byteArray = new Uint8Array(byteNumbers);
-            const blob = new Blob([byteArray], { type: 'application/pdf' });
-            
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `devis-alptis.pdf`;
-            a.click();
-            window.URL.revokeObjectURL(url);
-            this.messageService.add({ severity: 'success', summary: 'Téléchargement', detail: 'Le devis Alptis est en cours de téléchargement.' });
-          } else {
-            this.messageService.add({ severity: 'success', summary: 'Email envoyé', detail: 'Le devis Alptis a été envoyé par email.' });
-          }
-        },
-        error: () => this.messageService.add({ severity: 'error', summary: 'Erreur Alptis', detail: 'Impossible de générer le devis Alptis.' })
+      // Placeholder pour la génération de devis Alptis
+      this.messageService.add({ 
+        severity: 'info', 
+        summary: 'Devis Alptis', 
+        detail: 'La génération de devis Alptis sera disponible prochainement.' 
       });
     }
   }
@@ -2662,5 +2666,60 @@ minDate: Date | null = null;
 
     // Marquer les contrôles comme touchés pour déclencher la validation
     slidersGroup.markAsTouched();
+  }
+
+  // Méthode pour afficher les détails des points faibles
+  showWeakPointDetails(result: any, index: number) {
+    this.selectedWeakPointDetails = {
+      ...result,
+      detailedWeakPoints: this.getDetailedWeakPoints(result)
+    };
+    this.showWeakPointDialog = true;
+  }
+
+  // Méthode pour obtenir les détails des points faibles
+  getDetailedWeakPoints(result: any): string[] {
+    const details: string[] = [];
+    
+    // Analyser les garanties pour identifier les points faibles
+    if (result.garanties) {
+      Object.keys(result.garanties).forEach(key => {
+        const value = result.garanties[key];
+        const garantie = this.garanties.find(g => g.formControlName === key);
+        const userValue = this.insuranceForm.get('coverageSliders.' + key)?.value;
+        
+        if (garantie && userValue && value < userValue) {
+          details.push(`${garantie.label}: Couverture insuffisante (${value}${garantie.unit} vs ${userValue}${garantie.unit} demandé)`);
+        } else if (garantie && value === 0) {
+          details.push(`${garantie.label}: Non couvert par cette formule`);
+        }
+      });
+    }
+    
+    // Ajouter des points faibles spécifiques par assureur
+    if (result.assurance.toLowerCase().includes('alptis')) {
+      details.push('Réseau de soins limité dans certaines régions');
+      details.push('Délais de remboursement parfois plus longs');
+    } else if (result.assurance.toLowerCase().includes('apivia')) {
+      details.push('Franchise élevée sur certaines prestations');
+      details.push('Plafonds annuels restrictifs');
+    } else if (result.assurance.toLowerCase().includes('utwin')) {
+      details.push('Conditions d\'âge restrictives');
+      details.push('Exclusions nombreuses la première année');
+    }
+    
+    return details;
+  }
+
+  // Méthode pour obtenir le nom de l'assureur
+  getInsurerName(assurance: string): string {
+    if (assurance.toLowerCase().includes('alptis')) {
+      return 'Alptis';
+    } else if (assurance.toLowerCase().includes('apivia')) {
+      return 'Apivia';
+    } else if (assurance.toLowerCase().includes('utwin')) {
+      return 'Utwin';
+    }
+    return assurance;
   }
 }

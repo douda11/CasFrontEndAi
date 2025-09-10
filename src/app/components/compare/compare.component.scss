@@ -1,225 +1,418 @@
-/* General styles for the comparison table */
-.comparison-table {
+/* CASHedi Professional Comparison Container */
+.cashedi-comparison-container {
+  background: linear-gradient(135deg, var(--cashedi-gray-50) 0%, var(--cashedi-primary-lightest) 100%);
+  border-radius: var(--border-radius-xl);
+  padding: 2rem;
+  box-shadow: var(--shadow-xl);
+  margin: 2rem 0;
+}
+
+.cashedi-comparison-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.cashedi-comparison-title {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--cashedi-primary);
+  margin-bottom: 0.5rem;
+}
+
+.cashedi-comparison-subtitle {
+  font-size: 1rem;
+  color: var(--cashedi-gray-600);
+  font-weight: 400;
+}
+
+.cashedi-table-wrapper {
+  background: var(--cashedi-white);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  margin-bottom: 2rem;
+}
+
+.cashedi-professional-table {
+  width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  width: 100%;
+  font-size: 0.875rem;
 
-  th, td {
-    padding: 0.75rem;
-    text-align: center;
-    border-bottom: 1px solid #dee2e6;
+  thead .cashedi-header-row {
+    background: linear-gradient(135deg, var(--cashedi-primary) 0%, var(--cashedi-primary-light) 100%);
+    
+    th {
+      padding: 1.5rem 1rem;
+      color: var(--cashedi-white);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border: none;
+      position: relative;
+    }
   }
 
-  th {
-    background-color: #f8f9fa;
+  .cashedi-criteria-header {
+    width: 200px;
+    text-align: left;
+  }
+
+  .cashedi-needs-header {
+    width: 150px;
+    text-align: center;
+  }
+
+  .cashedi-insurer-header {
+    text-align: center;
+    min-width: 180px;
+  }
+
+  .cashedi-insurer-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .cashedi-insurer-name {
+    font-size: 1.125rem;
+    font-weight: 700;
+  }
+
+  tbody tr {
+    transition: all 0.3s ease;
+    
+    &:nth-child(even) {
+      background: var(--cashedi-gray-50);
+    }
+    
+    &:hover {
+      background: var(--cashedi-primary-lightest);
+      transform: scale(1.01);
+    }
+  }
+
+  td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--cashedi-gray-200);
+    vertical-align: middle;
+  }
+
+  .cashedi-criteria-cell {
+    background: linear-gradient(135deg, var(--cashedi-gray-100) 0%, var(--cashedi-gray-50) 100%);
+    border-right: 3px solid var(--cashedi-primary);
     font-weight: 600;
   }
 
-  .assurance-header {
-    font-size: 1.1rem;
-    color: var(--primary-color);
+  .cashedi-criteria-content {
+    display: flex;
+    align-items: center;
+    color: var(--cashedi-gray-800);
+  }
+
+  .cashedi-criteria-label {
+    font-weight: 600;
+  }
+
+  .cashedi-needs-cell {
+    text-align: center;
+    background: var(--cashedi-white);
+  }
+
+  .cashedi-needs-value {
+    display: flex;
+    justify-content: center;
+  }
+
+  .cashedi-value-badge {
+    background: linear-gradient(135deg, var(--cashedi-info) 0%, #60A5FA 100%);
+    color: var(--cashedi-white);
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius-sm);
+    font-weight: 600;
+    font-size: 0.875rem;
   }
 }
 
-/* Coverage level styling */
+/* CASHedi Coverage Level Styling */
 .coverage-high {
-  background-color: #d4edda; /* Light green */
-  color: #155724; /* Dark green */
-  font-weight: bold;
+  background: linear-gradient(135deg, var(--cashedi-success) 0%, #34D399 100%);
+  color: var(--cashedi-white);
+  font-weight: 600;
+  border-radius: var(--border-radius-sm);
+  padding: 0.5rem;
+  box-shadow: var(--shadow-sm);
 }
 
 .coverage-medium {
-  background-color: #fff3cd; /* Light yellow */
-  color: #856404; /* Dark yellow */
+  background: linear-gradient(135deg, var(--cashedi-warning) 0%, #FBBF24 100%);
+  color: var(--cashedi-white);
+  font-weight: 600;
+  border-radius: var(--border-radius-sm);
+  padding: 0.5rem;
+  box-shadow: var(--shadow-sm);
 }
 
 .coverage-low {
-  background-color: #f8d7da; /* Light red */
-  color: #721c24; /* Dark red */
+  background: linear-gradient(135deg, var(--cashedi-error) 0%, #F87171 100%);
+  color: var(--cashedi-white);
+  font-weight: 600;
+  border-radius: var(--border-radius-sm);
+  padding: 0.5rem;
+  box-shadow: var(--shadow-sm);
 }
 
+/* CASHedi Professional Comparison Container */
 .comparison-container {
   width: 100%;
-  overflow-x: auto; // Enable horizontal scrolling to handle wide content
-  -webkit-overflow-scrolling: touch; // Smooth scrolling on iOS
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   padding: 2rem 0;
+  background: linear-gradient(135deg, var(--cashedi-gray-50) 0%, var(--cashedi-primary-lightest) 100%);
+  border-radius: var(--border-radius-xl);
 }
 
-// The flexbox grid for the table
+/* CASHedi Professional Grid Layout */
 .comparison-grid {
   display: flex;
-  min-width: 1000px; // A sensible minimum width
-  border: 1px solid #dee2e6;
-  border-radius: 8px;
+  min-width: 1000px;
+  border: 1px solid var(--cashedi-gray-200);
+  border-radius: var(--border-radius-lg);
   overflow: hidden;
   font-size: 0.9rem;
+  box-shadow: var(--shadow-xl);
+  background: var(--cashedi-white);
 }
 
-// First column (Garanties)
+/* CASHedi Garanties Column */
 .garanties-column {
   flex: 0 0 200px;
   display: flex;
   flex-direction: column;
-  background-color: #f8f9fa;
-  border-right: 1px solid #dee2e6;
+  background: linear-gradient(135deg, var(--cashedi-gray-50) 0%, var(--cashedi-gray-100) 100%);
+  border-right: 2px solid var(--cashedi-primary);
 }
 
-// Offer columns
+/* CASHedi Offer Cards */
 .offer-card {
-  flex: 1 1 auto; // Allow cards to grow but not shrink below content size
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  background-color: #ffffff;
-  border-left: 1px solid #dee2e6;
+  background: var(--cashedi-white);
+  border-left: 1px solid var(--cashedi-gray-200);
   text-align: center;
+  transition: all 0.3s ease;
 }
 
-// General cell styling
+.offer-card:hover {
+  background: var(--cashedi-primary-lightest);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* CASHedi Professional Cell Styling */
 .grid-cell {
-  padding: 0.5rem 0.75rem;
-  min-height: 45px;
+  padding: 0.75rem;
+  min-height: 50px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-bottom: 1px solid #dee2e6;
+  border-bottom: 1px solid var(--cashedi-gray-200);
+  transition: all 0.3s ease;
+  font-weight: 500;
+  
   &:last-of-type {
     border-bottom: none;
   }
+  
+  &:hover {
+    background: var(--cashedi-gray-50);
+  }
 }
 
-// Specific styling for the first column's cells
+/* CASHedi Garanties Column Cells */
 .garanties-column .grid-cell {
   justify-content: flex-start;
   text-align: left;
-  color: #343a40;
+  color: var(--cashedi-gray-800);
+  font-weight: 600;
+  background: linear-gradient(135deg, var(--cashedi-gray-50) 0%, var(--cashedi-gray-100) 100%);
 }
 
-// Header and Footer styling
+/* CASHedi Professional Headers and Footers */
 .grid-header, .card-header, .grid-footer, .card-footer {
-  padding: 0.75rem;
-  background-color: #f8f9fa;
+  padding: 1rem 0.75rem;
+  background: linear-gradient(135deg, var(--cashedi-primary) 0%, var(--cashedi-primary-light) 100%);
+  color: var(--cashedi-white);
 }
 
 .grid-header, .card-header {
-  font-weight: bold;
-  border-bottom: 1px solid #dee2e6;
-  min-height: 60px;
+  font-weight: 700;
+  border-bottom: 2px solid var(--cashedi-primary-dark);
+  min-height: 70px;
   display: flex;
   align-items: center;
   justify-content: center;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .grid-footer, .card-footer {
   margin-top: auto;
-  border-top: 1px solid #dee2e6;
+  border-top: 2px solid var(--cashedi-primary-dark);
+  background: linear-gradient(135deg, var(--cashedi-primary-dark) 0%, var(--cashedi-primary) 100%);
 }
 
 .card-header {
-  font-size: 1.1rem;
+  font-size: 1.125rem;
 }
 
-// Row-specific styling
+/* CASHedi Professional Row Styling */
 .assureur-row, .produit-row {
   text-align: left;
   justify-content: flex-start;
-  font-weight: bold;
-  white-space: nowrap; // Keep content on a single line
+  font-weight: 700;
+  white-space: nowrap;
+  padding: 1rem 0.75rem;
 }
 
 .assureur-row {
-  color: #eb29d4 !important; // Baby pink
+  color: var(--cashedi-primary) !important;
+  background: linear-gradient(135deg, var(--cashedi-primary-lightest) 0%, rgba(161, 2, 242, 0.1) 100%);
+  border-left: 4px solid var(--cashedi-primary);
 }
 
 .produit-row {
-  color: rgb(66, 154, 242) !important; // Blue
+  color: var(--cashedi-secondary) !important;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(99, 102, 241, 0.05) 100%);
+  border-left: 4px solid var(--cashedi-secondary);
 }
 
 .formule-row {
-  color: #495057; // Light black
-  font-weight: bold !important; // Ensure this is always bold
+  color: var(--cashedi-gray-800) !important;
+  font-weight: 600 !important;
+  background: var(--cashedi-gray-50);
+  border-left: 4px solid var(--cashedi-gray-400);
 }
 
-// Cell highlighting
+/* CASHedi Professional Cell States */
 .cell-good {
-  background-color: #d4edda !important;
-  color: #0cc838 !important;
+  background: linear-gradient(135deg, var(--cashedi-success) 0%, #34D399 100%) !important;
+  color: var(--cashedi-white) !important;
+  font-weight: 600;
+  border-radius: var(--border-radius-sm);
+  box-shadow: var(--shadow-sm);
 }
 
 .cell-bad {
-  background-color: #f8d7da !important;
-  color: #df1227 !important;
+  background: linear-gradient(135deg, var(--cashedi-error) 0%, #F87171 100%) !important;
+  color: var(--cashedi-white) !important;
+  font-weight: 600;
+  border-radius: var(--border-radius-sm);
+  box-shadow: var(--shadow-sm);
 }
 
-// New styles for comparison table
+/* CASHedi Professional Comparison Table Container */
 .comparison-table-container {
   width: 100%;
-  /* overflow-x: auto; // Supprimé pour empêcher le défilement */
+  background: linear-gradient(135deg, var(--cashedi-gray-50) 0%, var(--cashedi-primary-lightest) 100%);
+  border-radius: var(--border-radius-xl);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-lg);
 }
 
+/* CASHedi Enhanced Comparison Table */
 .comparison-table {
-  width: 100%; /* Le tableau prend toute la largeur */
-  table-layout: fixed; /* Les colonnes se partagent la largeur équitablement */
-  border-collapse: collapse;
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0;
   margin: 1rem 0;
-  font-size: 0.85rem; /* Police légèrement réduite */
+  font-size: 0.875rem;
+  background: var(--cashedi-white);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
 
   th, td {
-    padding: 0.6rem; /* Espacement réduit */
-    border: 1px solid #dee2e6;
+    padding: 1rem 0.75rem;
+    border-bottom: 1px solid var(--cashedi-gray-200);
     vertical-align: middle;
-    word-wrap: break-word; /* Le texte long va à la ligne */
-    hyphens: auto; /* Aide à couper les mots si nécessaire */
+    word-wrap: break-word;
+    hyphens: auto;
+    transition: all 0.3s ease;
   }
 
   thead th {
-    background-color: #f8f9fa;
-    font-weight: 600;
+    background: linear-gradient(135deg, var(--cashedi-primary) 0%, var(--cashedi-primary-light) 100%);
+    color: var(--cashedi-white);
+    font-weight: 700;
     position: sticky;
     top: 0;
-    z-index: 1;
+    z-index: 10;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 0.875rem;
   }
 
   .assurance-header {
-    color: var(--primary-color);
-    font-size: 1.1rem;
+    color: var(--cashedi-white);
+    font-size: 1.125rem;
+    font-weight: 700;
   }
 
   tbody tr:nth-child(even) {
-    background-color: #f8f9fa;
+    background: var(--cashedi-gray-50);
+  }
+
+  tbody tr:hover {
+    background: var(--cashedi-primary-lightest);
+    transform: scale(1.01);
   }
 
   .font-bold {
-    font-weight: 600;
+    font-weight: 700;
+    color: var(--cashedi-gray-900);
   }
 
   .coverage-good {
-    background-color: #d4edda; // Green
-    color: #155724;
-    font-weight: bold;
+    background: linear-gradient(135deg, var(--cashedi-success) 0%, #34D399 100%);
+    color: var(--cashedi-white);
+    font-weight: 600;
+    border-radius: var(--border-radius-sm);
+    padding: 0.5rem;
+    box-shadow: var(--shadow-sm);
   }
 
   .coverage-bad {
-    background-color: #f8d7da; // Red
-    color: #721c24;
-    font-weight: bold;
+    background: linear-gradient(135deg, var(--cashedi-error) 0%, #F87171 100%);
+    color: var(--cashedi-white);
+    font-weight: 600;
+    border-radius: var(--border-radius-sm);
+    padding: 0.5rem;
+    box-shadow: var(--shadow-sm);
   }
 
   .footer-row td {
     border: none;
-    padding-top: 1rem;
-    background-color: transparent;
+    padding-top: 1.5rem;
+    background: transparent;
+    font-weight: 600;
+    color: var(--cashedi-primary);
   }
 }
 
-// Animation for content fade-in
+/* CASHedi Professional Animations */
 .fadeIn {
-  animation: fadeIn 0.5s ease-in-out;
+  animation: cashedi-fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@keyframes fadeIn {
+@keyframes cashedi-fadeIn {
   from {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
@@ -227,10 +420,17 @@
   }
 }
 
+/* Import Extended Styles */
+
+/* CASHedi Custom Table */
 .custom-table {
   min-width: 1200px; 
   table-layout: fixed;
   width: 100%;
+  background: var(--cashedi-white);
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-xl);
 }
 
 // Empêcher le scroll automatique global

@@ -1,0 +1,270 @@
+<div class="user-management">
+  <div class="flex justify-content-between align-items-center mb-4">
+    <h1 class="text-3xl font-bold text-primary">Gestion des Utilisateurs</h1>
+    <p-button 
+      label="Nouvel Utilisateur" 
+      icon="pi pi-plus" 
+      (onClick)="openCreateDialog()">
+    </p-button>
+  </div>
+
+  <!-- Filters -->
+  <div class="card filters-card">
+    <div class="filters-grid">
+      <div class="search-container">
+        <label class="filter-label">Rechercher</label>
+        <span class="p-input-icon-left w-full">
+          <i class="pi pi-search"></i>
+          <input 
+            pInputText 
+            type="text" 
+            [(ngModel)]="searchTerm"
+            (input)="onSearch()"
+            placeholder="Nom, prénom ou email..."
+            class="w-full">
+        </span>
+      </div>
+      
+      <div>
+        <label class="filter-label">Rôle</label>
+        <p-dropdown 
+          [(ngModel)]="selectedRole"
+          [options]="roleOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Tous les rôles"
+          [showClear]="true"
+          (onChange)="onFilterChange()"
+          class="w-full">
+        </p-dropdown>
+      </div>
+      
+      <div>
+        <label class="filter-label">Statut</label>
+        <p-dropdown 
+          [(ngModel)]="selectedStatus"
+          [options]="statusOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Tous les statuts"
+          [showClear]="true"
+          (onChange)="onFilterChange()"
+          class="w-full">
+        </p-dropdown>
+      </div>
+      
+      <div>
+        <label class="filter-label">&nbsp;</label>
+        <p-button 
+          label="Actualiser" 
+          icon="pi pi-refresh" 
+          styleClass="refresh-btn"
+          (onClick)="loadUsers()"
+          class="w-full">
+        </p-button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Users Table -->
+  <div class="card">
+    <p-table 
+      [value]="users" 
+      [paginator]="true" 
+      [rows]="perPage"
+      [totalRecords]="totalUsers"
+      [lazy]="true"
+      (onLazyLoad)="loadUsersLazy($event)"
+      [loading]="loading"
+      responsiveLayout="scroll">
+      
+      <ng-template pTemplate="header">
+        <tr>
+          <th>Nom</th>
+          <th>Email</th>
+          <th>Rôle</th>
+          <th>Statut</th>
+          <th>Date création</th>
+          <th>Dernière connexion</th>
+          <th>Actions</th>
+        </tr>
+      </ng-template>
+      
+      <ng-template pTemplate="body" let-user>
+        <tr>
+          <td>{{ user.prenom }} {{ user.nom }}</td>
+          <td>{{ user.email }}</td>
+          <td>
+            <p-tag 
+              [value]="getRoleLabel(user.role)"
+              [severity]="getRoleSeverity(user.role)">
+            </p-tag>
+          </td>
+          <td>
+            <p-tag 
+              [value]="getStatusLabel(user.status)"
+              [severity]="getStatusSeverity(user.status)">
+            </p-tag>
+          </td>
+          <td>{{ user.created_at | date:'short' }}</td>
+          <td>{{ user.last_login ? (user.last_login | date:'short') : 'Jamais' }}</td>
+          <td>
+            <div class="flex gap-2">
+              <p-button 
+                icon="pi pi-pencil" 
+                [text]="true" 
+                [rounded]="true"
+                severity="info"
+                (onClick)="editUser(user)"
+                pTooltip="Modifier">
+              </p-button>
+              
+              <p-button 
+                *ngIf="user.status === 'ACTIVE'"
+                icon="pi pi-ban" 
+                [text]="true" 
+                [rounded]="true"
+                severity="warn"
+                (onClick)="deactivateUser(user)"
+                pTooltip="Désactiver">
+              </p-button>
+              
+              <p-button 
+                *ngIf="user.status === 'INACTIVE'"
+                icon="pi pi-check" 
+                [text]="true" 
+                [rounded]="true"
+                severity="success"
+                (onClick)="activateUser(user)"
+                pTooltip="Activer">
+              </p-button>
+              
+              <p-button 
+                icon="pi pi-trash" 
+                [text]="true" 
+                [rounded]="true"
+                severity="danger"
+                (onClick)="deleteUser(user)"
+                pTooltip="Supprimer">
+              </p-button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+
+  <!-- Create/Edit User Dialog -->
+  <p-dialog 
+    [(visible)]="showUserDialog" 
+    [header]="dialogMode === 'create' ? 'Créer un utilisateur' : 'Modifier l\'utilisateur'"
+    [modal]="true" 
+    [closable]="true"
+    [style]="{width: '600px'}"
+    styleClass="user-dialog">
+    
+    <div class="user-form">
+      <div class="form-row">
+        <div class="form-field">
+          <label for="prenom" class="field-label">Prénom *</label>
+          <input 
+            pInputText 
+            id="prenom" 
+            [(ngModel)]="currentUser.prenom"
+            class="form-input" 
+            placeholder="Entrez le prénom"
+            required>
+        </div>
+        <div class="form-field">
+          <label for="nom" class="field-label">Nom *</label>
+          <input 
+            pInputText 
+            id="nom" 
+            [(ngModel)]="currentUser.nom"
+            class="form-input" 
+            placeholder="Entrez le nom"
+            required>
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-field full-width">
+          <label for="email" class="field-label">Email *</label>
+          <input 
+            pInputText 
+            id="email" 
+            [(ngModel)]="currentUser.email"
+            type="email"
+            class="form-input" 
+            placeholder="exemple@email.com"
+            required>
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-field">
+          <label for="role" class="field-label">Rôle *</label>
+          <p-dropdown 
+            [(ngModel)]="currentUser.role"
+            [options]="roleOptions"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Sélectionnez un rôle"
+            class="form-dropdown"
+            [showClear]="false"
+            required>
+          </p-dropdown>
+        </div>
+        <div class="form-field" *ngIf="dialogMode === 'create'">
+          <label for="password" class="field-label">Mot de passe *</label>
+          <input 
+            pInputText 
+            id="password" 
+            [(ngModel)]="currentUser.password"
+            type="password"
+            class="form-input" 
+            placeholder="Mot de passe sécurisé"
+            required>
+        </div>
+      </div>
+      
+      <div class="form-row" *ngIf="dialogMode === 'edit'">
+        <div class="form-field">
+          <label for="telephone" class="field-label">Téléphone</label>
+          <input 
+            pInputText 
+            id="telephone" 
+            [(ngModel)]="currentUser.telephone"
+            class="form-input" 
+            placeholder="Numéro de téléphone">
+        </div>
+        <div class="form-field">
+          <label for="departement" class="field-label">Département</label>
+          <input 
+            pInputText 
+            id="departement" 
+            [(ngModel)]="currentUser.departement"
+            class="form-input" 
+            placeholder="Département">
+        </div>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <p-button 
+        label="Annuler" 
+        icon="pi pi-times" 
+        [text]="true"
+        (onClick)="hideUserDialog()">
+      </p-button>
+      <p-button 
+        [label]="dialogMode === 'create' ? 'Créer' : 'Modifier'" 
+        icon="pi pi-check"
+        (onClick)="saveUser()">
+      </p-button>
+    </ng-template>
+  </p-dialog>
+
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+</div>

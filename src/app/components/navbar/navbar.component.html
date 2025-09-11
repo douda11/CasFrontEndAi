@@ -27,15 +27,51 @@
           <i class="pi pi-chart-bar"></i>
           <span>Comparateur</span>
         </a>
+        <a *ngIf="isAdmin()" routerLink="/admin/users" routerLinkActive="active" class="cashedi-nav-link">
+          <i class="pi pi-users"></i>
+          <span>Utilisateurs</span>
+        </a>
       </div>
     </nav>
 
     <!-- Action Section -->
     <div class="cashedi-nav-actions">
-      <button class="cashedi-btn-secondary cashedi-nav-btn">
+      <!-- Login Button (when not authenticated) -->
+      <button *ngIf="!isAuthenticated" (click)="navigateToLogin()" class="cashedi-btn-secondary cashedi-nav-btn">
         <i class="pi pi-user"></i>
         <span>Connexion</span>
       </button>
+      
+      <!-- User Profile Menu (when authenticated) -->
+      <div *ngIf="isAuthenticated && currentUser" class="user-profile-menu">
+        <div class="user-profile-dropdown">
+          <button 
+            class="user-profile-btn p-button p-component p-button-text"
+            (click)="showUserMenu = !showUserMenu"
+            type="button">
+            <i class="pi pi-user p-button-icon p-button-icon-left"></i>
+            <span class="p-button-label">{{ getUserDisplayName() }}</span>
+            <p-tag 
+              [value]="getRoleBadge()" 
+              [severity]="getRoleSeverity()" 
+              styleClass="ml-2">
+            </p-tag>
+          </button>
+          
+          <div *ngIf="showUserMenu" class="user-dropdown-menu">
+            <div class="dropdown-item" (click)="viewProfile()">
+              <i class="pi pi-user"></i>
+              <span>Profil</span>
+            </div>
+            <div class="dropdown-separator"></div>
+            <div class="dropdown-item" (click)="logout()">
+              <i class="pi pi-sign-out"></i>
+              <span>Déconnexion</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
       <app-theme-switcher></app-theme-switcher>
     </div>
   </div>

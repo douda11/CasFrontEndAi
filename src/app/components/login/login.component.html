@@ -1,72 +1,104 @@
-<div class="mx-auto w-full max-w-sm space-y-6">
-  <div class="flex flex-col space-y-2 text-center">
-    <div class="mx-auto bg-insurance-blue p-2 rounded-full">
-      <!-- Vous pouvez ajouter ici une icône Angular adaptée -->
-      <i class="pi pi-chart-bar text-white text-2xl"></i>
-    </div>
-    <h1 class="text-2xl font-semibold tracking-tight">Brokins CAC</h1>
-    <p class="text-sm text-muted-foreground">
-      Connectez-vous à votre compte pour continuer
-    </p>
-  </div>
+<div class="login-container">
+  <p-toast></p-toast>
   
-  <div class="space-y-4">
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-      <div class="space-y-4">
-        <!-- Champ Email -->
-        <div class="space-y-2">
-          <label for="email" class="block text-sm font-medium">Email</label>
-          <input pInputText id="email" type="email" placeholder="votre@email.com"
-                 formControlName="email" 
-                 class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary" />
-          <div *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched" class="text-xs text-red-500">
-            <small *ngIf="loginForm.get('email')?.errors?.['required']">Email est requis.</small>
-            <small *ngIf="loginForm.get('email')?.errors?.['email']">Veuillez saisir un email valide.</small>
-          </div>
+  <p-card class="login-card">
+    <ng-template pTemplate="header">
+      <div class="login-header">
+        <div class="logo-container">
+          <i class="pi pi-chart-bar"></i>
         </div>
-        
-        <!-- Champ Mot de passe -->
-        <div class="space-y-2">
-          <div class="flex items-center justify-between">
-            <label for="password" class="block text-sm font-medium">Mot de passe</label>
-            <a href="#" class="text-xs text-primary underline">Mot de passe oublié?</a>
-          </div>
-          <input pPassword id="password" type="password" formControlName="password" required
-                 class="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary" 
-                 feedback="false" />
-          <div *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched" class="text-xs text-red-500">
-            <small *ngIf="loginForm.get('password')?.errors?.['required']">Mot de passe est requis.</small>
-          </div>
+        <h1>CASHedi</h1>
+        <p>Connectez-vous à votre compte pour continuer</p>
+      </div>
+    </ng-template>
+
+    <ng-template pTemplate="content">
+      <!-- Error Message -->
+      <div *ngIf="errorMessage" class="error-banner">
+        <i class="pi pi-exclamation-triangle"></i>
+        <span>{{ errorMessage }}</span>
+      </div>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+        <!-- Email Field -->
+        <div class="field">
+          <label for="email">Email *</label>
+          <input 
+            pInputText 
+            id="email" 
+            type="email" 
+            placeholder="votre@email.com"
+            formControlName="email"
+            [class.ng-invalid]="isFieldInvalid('email')"
+            autocomplete="email" />
+          <small *ngIf="isFieldInvalid('email')" class="p-error">
+            {{ getFieldError('email') }}
+          </small>
         </div>
-        
-        <!-- Checkbox Se souvenir de moi -->
-        <div class="flex items-center space-x-2">
-          <p-checkbox id="remember" formControlName="rememberMe" binary="true"></p-checkbox>
-          <label for="remember" class="text-sm">Se souvenir de moi</label>
+
+        <!-- Password Field -->
+        <div class="field">
+          <div class="password-header">
+            <label for="password">Mot de passe *</label>
+            <a href="#" class="forgot-password">Mot de passe oublié?</a>
+          </div>
+          <p-password 
+            id="password" 
+            formControlName="password"
+            [class.ng-invalid]="isFieldInvalid('password')"
+            [feedback]="false"
+            [toggleMask]="true"
+            placeholder="Votre mot de passe"
+            autocomplete="current-password">
+          </p-password>
+          <small *ngIf="isFieldInvalid('password')" class="p-error">
+            {{ getFieldError('password') }}
+          </small>
         </div>
-        
-        <!-- Bouton Login -->
-        <p-button label="{{ isLoading ? 'Connexion...' : 'Se connecter' }}" type="submit" class="w-full" 
-                  [disabled]="isLoading || loginForm.invalid"></p-button>
+
+        <!-- Remember Me -->
+        <div class="field-checkbox">
+          <p-checkbox 
+            id="rememberMe" 
+            formControlName="rememberMe" 
+            binary="true">
+          </p-checkbox>
+          <label for="rememberMe">Se souvenir de moi</label>
+        </div>
+
+        <!-- Login Button -->
+        <p-button 
+          type="submit"
+          [label]="isLoading ? 'Connexion...' : 'Se connecter'"
+          [loading]="isLoading"
+          [disabled]="loginForm.invalid"
+          styleClass="w-full">
+        </p-button>
+      </form>
+
+      <!-- Divider -->
+      <p-divider align="center">
+        <span class="divider-text">Ou continuer avec</span>
+      </p-divider>
+
+      <!-- HubSpot Login Button -->
+      <p-button 
+        type="button"
+        label="Se connecter avec HubSpot"
+        severity="secondary"
+        styleClass="w-full hubspot-button"
+        [loading]="isLoading"
+        (click)="onHubSpotLogin()">
+        <ng-template pTemplate="icon">
+          <i class="pi pi-external-link"></i>
+        </ng-template>
+      </p-button>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+      <div class="login-footer">
+        <p>Pas encore de compte? Contactez votre administrateur</p>
       </div>
-    </form>
-    
-    <!-- Séparateur -->
-    <div class="relative">
-      <div class="absolute inset-0 flex items-center">
-        <div class="w-full border-t"></div>
-      </div>
-      <div class="relative flex justify-center text-xs uppercase">
-        <span class="bg-background px-2 text-muted-foreground">Ou continuer avec</span>
-      </div>
-    </div>
-    
-    <!-- Bouton Connexion via HubSpot -->
-    <p-button variant="outlined" type="button" label="Connexion via HubSpot" class="w-full" (click)="onHubspotLogin()">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#ff7a59"
-           class="mr-2 h-4 w-4" viewBox="0 0 512 512">
-        <path d="M488.4 336.5c-27.4 0-49.6 22.5-49.6 49.9 ..."></path>
-      </svg>
-    </p-button>
-  </div>
+    </ng-template>
+  </p-card>
 </div>

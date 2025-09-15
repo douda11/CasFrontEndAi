@@ -1,10 +1,10 @@
 // src/app/services/insurance.service.ts
 
-import { HttpClient, HttpHeaders, HttpParams, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { BorrowerForm } from '../models/borrower-form.model';
+import { HttpClient, HttpHeaders, HttpParams, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError, EMPTY, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { retry, catchError } from 'rxjs/operators';
+import { API_CONFIG } from '../config/api.config';
 import { QuoteResponse, ComparisonResult, InsuranceQuoteForm, AprilPayload, AprilPerson, AprilAddress, AprilMobilePhone, AprilProduct, AprilInsured, AprilCoverage } from '../models/project-model';
 import { formatDate } from '@angular/common';
 
@@ -12,11 +12,11 @@ import { AprilGetTarifResponse } from '../models/april-models';
 
 @Injectable({ providedIn: 'root' })
 export class InsuranceService {
-  private apiBasePath = '';
+  private apiBasePath = 'http://localhost:8081';
   private apiUrl = '/api/v1/tarification';
   private aprilUrl = `${this.apiBasePath}/api/v1/comparisons/april/projects/prices`;
   private healthProtectionUrl = `${this.apiBasePath}/healthProtection/projects/prices`; // New endpoint
-  private utwinUrl = `${this.apiBasePath}/api/utwin/tarification`;
+  private utwinUrl = `${API_CONFIG.utwin.baseUrl}${API_CONFIG.utwin.endpoints.tarification}`;
   private compareUrl = `${this.apiBasePath}/api/v1/comparisons/compare`;
   private apiviaDevisUrl = `${this.apiBasePath}/api/apivia/generate-devis`;
   private aprilQuoteUrl = `${this.apiBasePath}/healthProtection/projects`;
@@ -34,29 +34,83 @@ export class InsuranceService {
   ) {}
 
   getApiviaTarif(data: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/apivia`, data);
+    // Construction du payload JSON pour le backend selon ApiviaTarificationRequest
+    const payload = {
+      action: data.action || 'tarification',
+      format: data.format || 'json',
+      produits: data.produits || '',
+      formules: data.formules || '',
+      renforts: data.renforts || '',
+      options: data.options || '',
+      codePostal: data.codePostal,
+      dateEffet: data.dateEffet,
+      dejaAssurance: data.dejaAssurance || false,
+      isResiliationPourCompte: data.isResiliationPourCompte || false,
+      typeAffaire: data.typeAffaire || '',
+      typeObjectSortie: data.typeObjectSortie || 'v2',
+      beneficiaires: data.beneficiaires || []
+    };
+
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Accept': 'application/json'
+    });
+
+    const apiUrl = `${API_CONFIG.apivia.baseUrl}${API_CONFIG.apivia.endpoints.tarification}`;
+    
+    return this.http.post<any>(apiUrl, payload, { headers }).pipe(
+      retry(2),
+      catchError(error => {
+        console.error('Erreur lors de la tarification Apivia:', error);
+        throw error;
+      })
+    );
   }
 
   generateApiviaDevisPdf(devisRequest: any, test: boolean = false): Observable<any> {
     const params = new HttpParams().set('test', test.toString());
-    return this.http.post(this.apiviaDevisUrl, devisRequest, { params });
+    return this.http.post(this.apiviaDevisUrl, devisRequest, { params }).pipe(
+      retry(2),
+      catchError(error => {
+        console.error('Erreur lors de la génération du devis Apivia:', error);
+        throw error;
+      })
+    );
   }
 
   sendAprilQuoteByEmail(payload: any): Observable<any> {
     const params = new HttpParams().set('marketingParameters.requestType', 'Quotation');
-    return this.http.post(this.aprilQuoteUrl, payload, { params });
+    return this.http.post(this.aprilQuoteUrl, payload, { params }).pipe(
+      retry(2),
+      catchError(error => {
+        console.error('Erreur lors de l\'envoi du devis April par email:', error);
+        throw error;
+      })
+    );
   }
 
   generateCommercialProposal(payload: any, action: 'envoiParEmail' | 'telechargement'): Observable<any> {
     const endpoint = `${this.apiBasePath}/healthProtection/projects/commercial-proposal`;
     const params = new HttpParams().set('action', action);
-    return this.http.post(endpoint, payload, { params });
+    return this.http.post(endpoint, payload, { params }).pipe(
+      retry(2),
+      catchError(error => {
+        console.error('Erreur lors de la génération de la proposition commerciale:', error);
+        throw error;
+      })
+    );
   }
 
   downloadApiviaQuotePdf(payload: any): Observable<Blob> {
     return this.http.post(this.apiviaPdfUrl, payload, {
       responseType: 'blob'
-    });
+    }).pipe(
+      retry(2),
+      catchError(error => {
+        console.error('Erreur lors du téléchargement du PDF Apivia:', error);
+        throw error;
+      })
+    );
   }
 
   // New method for Health Protection API
@@ -198,8 +252,32 @@ export class InsuranceService {
       .set('pricingType', 'Simple') // Valeur par défaut
       .set('withSchedule', 'true');   // Valeur par défaut
 
-    // Exécution de l'appel POST avec le payload et les paramètres
-    return this.http.post(url, payload, { params });
+    // Headers selon l'ancienne version qui fonctionne
+    const projectUuid = this.generateRandomUuid();
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Cache-Control': 'no-cache',
+      'x-projectUuid': projectUuid,
+      'x-api-version': '1.0',
+      'Authorization': 'Bearer YOUR_APRIL_OAUTH_TOKEN' // À remplacer par le vrai token OAuth
+    });
+    
+    return this.http.post(url, payload, { headers, params }).pipe(
+      retry(2),
+      catchError(error => {
+        console.error('Erreur lors de la tarification April Health:', error);
+        throw error;
+      })
+    );
+  }
+
+  private generateRandomUuid(): string {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      const r = Math.random() * 16 | 0;
+      const v = c == 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
   }
 
   getUtwinTarif(form: InsuranceQuoteForm, formule: string): Observable<any> {
@@ -244,7 +322,16 @@ export class InsuranceService {
 
     console.log('Sending Utwin Payload:', JSON.stringify(payload, null, 2));
 
-    return this.http.post(this.utwinUrl, payload).pipe(
+    // Correction: Utiliser les headers Utwin corrects selon l'ancienne version
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'X-U-Licence': API_CONFIG.utwin.licence,
+      'X-Utwin-Contexte-Vendeur': API_CONFIG.utwin.contexteVendeur
+    });
+    
+    return this.http.post(this.utwinUrl, payload, { headers }).pipe(
+      retry(2),
       catchError((error: HttpErrorResponse) => {
         // Check if the error is a 400 Bad Request and has a response body
         if (error.status === 400 && error.error) {
@@ -253,6 +340,7 @@ export class InsuranceService {
           return of(error.error);
         }
         // For all other errors, propagate the error
+        console.error('Erreur lors de la tarification Utwin:', error);
         return throwError(() => error);
       })
     );

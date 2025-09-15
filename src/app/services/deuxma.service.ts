@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AcheelTarificationRequest, AcheelTarificationResponse } from '../models/deuxma.model';
 
@@ -8,11 +8,14 @@ import { AcheelTarificationRequest, AcheelTarificationResponse } from '../models
 })
 export class DeuxMaService {
 
-  private apiUrl = '/api/deuxma/v1/tarifs'; // L'URL de base de votre API backend
+  private apiUrl = 'http://localhost:8081/api/deuxma/v1/tarifs'; // L'URL de base de votre API backend
 
   constructor(private http: HttpClient) { }
 
   getAcheelTarif(request: AcheelTarificationRequest): Observable<AcheelTarificationResponse> {
-    return this.http.post<AcheelTarificationResponse>(`${this.apiUrl}/acheel`, request);
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+    return this.http.post<AcheelTarificationResponse>(`${this.apiUrl}/acheel`, request, { headers });
   }
 }

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, BehaviorSubject, of, throwError } from 'rxjs';
-import { tap, catchError, map, finalize } from 'rxjs/operators';
+import { tap, catchError, map, finalize, retry } from 'rxjs/operators';
 
 export interface AuthResponse {
   access_token: string;
@@ -41,7 +41,7 @@ export interface HubSpotAuthResponse {
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly apiUrl = 'http://localhost:8081/api/v1';
+  private readonly apiUrl = 'http://localhost:8081';
   private readonly tokenKey = 'access_token';
   private readonly userKey = 'current_user';
   
@@ -116,8 +116,9 @@ export class AuthService {
   login(loginRequest: LoginRequest): Observable<AuthResponse> {
     this.isLoadingSubject.next(true);
 
-    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/login`, loginRequest)
+    return this.http.post<AuthResponse>(`${this.apiUrl}/api/v1/auth/login`, loginRequest)
       .pipe(
+        retry(2),
         tap(response => {
           if (response.access_token) {
             // Store token first
@@ -144,8 +145,9 @@ export class AuthService {
     
     const headers = this.getAuthHeaders();
     
-    return this.http.post(`${this.apiUrl}/auth/logout`, {}, { headers })
+    return this.http.post(`${this.apiUrl}/api/v1/auth/logout`, {}, { headers })
       .pipe(
+        retry(2),
         tap(() => {
           console.log('✅ Logout successful');
         }),
@@ -168,7 +170,7 @@ export class AuthService {
   refreshToken(): Observable<AuthResponse> {
     const headers = this.getAuthHeaders();
     
-    return this.http.post<AuthResponse>(`${this.apiUrl}/auth/refresh`, {}, { headers })
+    return this.http.post<AuthResponse>(`${this.apiUrl}/api/v1/auth/refresh`, {}, { headers })
       .pipe(
         tap(response => {
           if (response.access_token) {
@@ -190,7 +192,7 @@ export class AuthService {
   getCurrentUserProfile(): Observable<UserInfo> {
     const headers = this.getAuthHeaders();
     
-    return this.http.get<UserInfo>(`${this.apiUrl}/auth/me`, { headers })
+    return this.http.get<UserInfo>(`${this.apiUrl}/api/v1/auth/me`, { headers })
       .pipe(
         tap(user => {
           this.currentUserSubject.next(user);
@@ -251,7 +253,7 @@ export class AuthService {
     this.isLoadingSubject.next(true);
     
     // Get HubSpot authorization URL
-    this.http.post<HubSpotAuthResponse>(`${this.apiUrl}/hubspot-auth/authorize`, {})
+    this.http.post<HubSpotAuthResponse>(`${this.apiUrl}/api/v1/hubspot_auth/authorize`, {})
       .pipe(
         finalize(() => this.isLoadingSubject.next(false))
       )

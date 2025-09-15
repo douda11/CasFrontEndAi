@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators, FormArray, AbstractControl, Reactiv
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { environment } from '../../environments/environment';
 
 // PrimeNG imports
 import { StepsModule } from 'primeng/steps';
@@ -2536,7 +2537,7 @@ export class CompareComponent implements OnInit {
     formData.append('level_name', this.selectedLevelName);
 
     // URL du service d'extraction PDF (comparateur_brokins-master)
-    const extractionUrl = 'http://localhost:5000/extract';
+    const extractionUrl = 'http://127.0.0.1:5000/extract';
 
     this.http.post(extractionUrl, formData).pipe(
       finalize(() => {

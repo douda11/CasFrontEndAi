@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../environments/environment';
-import { AuthService } from './auth.service';
 
 export interface User {
   id: string;
@@ -49,16 +47,13 @@ export interface UserList {
   providedIn: 'root'
 })
 export class AdminService {
-  private baseUrl = `${environment.apiUrl}/api/v1`;
+  private baseUrl = 'http://localhost:8000/api/v1';
   private usersUrl = `${this.baseUrl}/admin/users`;
 
-  constructor(
-    private http: HttpClient,
-    private authService: AuthService
-  ) {}
+  constructor(private http: HttpClient) {}
 
   private getAuthHeaders(): HttpHeaders {
-    const token = this.authService.getToken();
+    const token = localStorage.getItem('access_token');
     return new HttpHeaders({
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'

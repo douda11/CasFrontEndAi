@@ -84,7 +84,7 @@ import { ToastModule } from 'primeng/toast';
 })
 export class HubspotCallbackComponent implements OnInit {
   errorMessage = '';
-  private readonly apiUrl = 'http://localhost:8081/api/v1';
+  private readonly apiUrl = 'http://localhost:809/api/v1/auth';
 
   constructor(
     private route: ActivatedRoute,
@@ -120,7 +120,8 @@ export class HubspotCallbackComponent implements OnInit {
   private exchangeCodeForToken(code: string, state?: string): void {
     const body = { code, state };
     
-    this.http.post<any>(`${this.apiUrl}/hubspot-auth/callback`, body)
+    // Note: HubSpot callback doesn't need auth headers as it's part of the auth flow
+    this.http.post<any>('http://localhost:8081/api/v1/hubspot-auth/callback', body)
       .subscribe({
         next: (response) => {
           if (response.accessToken && response.user) {

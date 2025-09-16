@@ -5,6 +5,7 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { routes } from './app.routes';
 import { withFetch } from '@angular/common/http';
 import { errorInterceptor } from './interceptors/error.interceptor';
+import { jwtInterceptor } from './interceptors/jwt.interceptor';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { MessageService } from 'primeng/api';
 import { providePrimeNG } from 'primeng/config';
@@ -17,7 +18,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideHttpClient(
       withFetch(), 
-      withInterceptors([errorInterceptor])
+      withInterceptors([jwtInterceptor, errorInterceptor])
     ),
     {
       provide: HTTP_INTERCEPTORS,

@@ -47,7 +47,7 @@ export interface UserList {
   providedIn: 'root'
 })
 export class AdminService {
-  private baseUrl = 'http://localhost:8000/api/v1';
+  private baseUrl = 'http://localhost:8081/api/v1';
   private usersUrl = `${this.baseUrl}/admin/users`;
 
   constructor(private http: HttpClient) {}

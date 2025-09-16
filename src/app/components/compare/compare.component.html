@@ -933,8 +933,11 @@
                         <span *ngIf="!result.isPricingLoading && !isNumeric(result.tarifGlobal)">-</span>
                       </ng-container>
                       <ng-container *ngIf="!result.isAprilProduct">
-                        <span *ngIf="isNumeric(result.prix)" class="font-bold text-lg">{{ result.prix | currency:'EUR':'symbol':'1.2-2' }}</span>
-                        <span *ngIf="!isNumeric(result.prix)">{{ result.prix }}</span>
+                        <p-progressSpinner *ngIf="result.isPricingLoading" [style]="{width: '25px', height: '25px'}"></p-progressSpinner>
+                        <div *ngIf="!result.isPricingLoading">
+                          <span *ngIf="isNumeric(result.prix)" class="font-bold text-lg">{{ result.prix | currency:'EUR':'symbol':'1.2-2' }}</span>
+                          <span *ngIf="!isNumeric(result.prix)">{{ result.prix }}</span>
+                        </div>
                       </ng-container>
                     </td>
                   </tr>

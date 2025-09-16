@@ -34,6 +34,7 @@ import { FormsModule } from '@angular/forms';
 import { CompareService } from '../../services/compare.service';
 import { InsuranceService } from '../../services/insurance.service';
 import { AlptisService } from '../../services/alptis.service';
+import { GeneraliService } from '../../services/generali.service';
 import { BesoinClient } from '../../models/comparateur.model';
 import { InsuranceQuoteForm, InsuredPerson } from '../../models/project-model';
 import { MessageService } from 'primeng/api';
@@ -149,6 +150,7 @@ export class CompareComponent implements OnInit {
     private compareService: CompareService,
     private insuranceService: InsuranceService,
     private alptisService: AlptisService,
+    private generaliService: GeneraliService,
     private messageService: MessageService,
     private router: Router,
     private http: HttpClient,
@@ -738,6 +740,7 @@ export class CompareComponent implements OnInit {
               this.fetchAllUtwinPrices(); // Automatic fetch for Utwin
               this.fetchApiviaPrices(); // Automatic fetch for APIVIA
               this.fetchAlptisPrices(); // Automatic fetch for Alptis
+              this.fetchGeneraliPrices(); // Automatic fetch for Generali
             });
 
             if (response.utwinResponse) {
@@ -766,6 +769,7 @@ export class CompareComponent implements OnInit {
                   this.fetchAllUtwinPrices(); // Automatic fetch for Utwin
                   this.fetchApiviaPrices(); // Automatic fetch for APIVIA
                   this.fetchAlptisPrices(); // Automatic fetch for Alptis
+                  this.fetchGeneraliPrices(); // Automatic fetch for Generali
                 });
             }
           } else {
@@ -1439,6 +1443,156 @@ export class CompareComponent implements OnInit {
         }
       });
 
+    // GENERALI LOGIC
+    } else if (assuranceName.includes('generali')) {
+      console.log('GENERALI product detected. Starting tarification process.');
+      const personalInfo = this.insuranceForm.get('personalInfo')?.value;
+
+      const formatDate = (date: any): string => {
+        if (!date) return '';
+        
+        if (typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
+          return date;
+        }
+        
+        if (date instanceof Date && !isNaN(date.getTime())) {
+          const year = date.getFullYear();
+          const month = (`0${date.getMonth() + 1}`).slice(-2);
+          const day = (`0${date.getDate()}`).slice(-2);
+          return `${year}-${month}-${day}`;
+        }
+        
+        console.warn('Invalid date format for Generali:', date);
+        return '';
+      };
+
+      const calculateAge = (dateNaissance: string): number => {
+        if (!dateNaissance) {
+          console.warn('Date de naissance manquante pour le calcul de l\'âge');
+          return 30; // Âge par défaut
+        }
+        
+        const birth = new Date(dateNaissance);
+        if (isNaN(birth.getTime())) {
+          console.warn('Date de naissance invalide:', dateNaissance);
+          return 30; // Âge par défaut
+        }
+        
+        const today = new Date();
+        let age = today.getFullYear() - birth.getFullYear();
+        const monthDiff = today.getMonth() - birth.getMonth();
+        
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+          age--;
+        }
+        
+        console.log('Âge calculé:', age, 'pour la date:', dateNaissance);
+        return age;
+      };
+
+      const mapCompositionFamiliale = (etatCivil: string, hasConjoint: boolean, hasChildren: boolean): 'isolé' | 'duo' | 'famille' => {
+        if (hasChildren) {
+          return 'famille';
+        }
+        if ((etatCivil === 'marie' || etatCivil === 'unionLibre') && hasConjoint) {
+          return 'duo';
+        }
+        return 'isolé';
+      };
+
+      const formattedDate = formatDate(personalInfo.dateNaissance);
+      console.log('Date formatée pour Generali:', formattedDate);
+      const age = calculateAge(formattedDate);
+      const codePostal = personalInfo.codePostal || '75001';
+      const hasConjoint = personalInfo.conjoint && personalInfo.conjoint.dateNaissance;
+      const hasChildren = personalInfo.enfants && personalInfo.enfants.length > 0;
+      const compositionFamiliale = mapCompositionFamiliale(personalInfo.etatCivil, hasConjoint, hasChildren);
+
+      // Extraire la formule du nom du produit Generali
+      // Extraire le numéro de formule de différents formats possibles
+      let formuleNumber = '2'; // Par défaut
+      if (result.formule) {
+        // Chercher "Niveau X", "Formule X", "TNSR X", "F X", etc.
+        const patterns = [
+          /Niveau\s*(\d+)/i,
+          /Formule\s*(\d+)/i,
+          /TNSR\s*(\d+)/i,
+          /F\s*(\d+)/i,
+          /(\d+)/  // Juste un numéro
+        ];
+        
+        for (const pattern of patterns) {
+          const match = result.formule.match(pattern);
+          if (match && match[1]) {
+            formuleNumber = match[1];
+            break;
+          }
+        }
+      }
+      const formule = formuleNumber;
+      console.log('Formule extraite de:', result.formule, '-> Numéro de formule:', formule);
+
+      const generaliRequest = {
+        age: age,
+        codePostal: codePostal,
+        compositionFamiliale: compositionFamiliale,
+        formule: formule,
+        toutesFormules: false
+      };
+
+      console.log('Generali tarification request:', generaliRequest);
+
+      this.generaliService.getTarification(generaliRequest).pipe(
+        finalize(() => { result.isPricingLoading = false; })
+      ).subscribe({
+        next: (response: any) => {
+          console.log('🔍 FRONTEND - Generali response complète:', JSON.stringify(response, null, 2));
+          console.log('🔍 FRONTEND - Type de response:', typeof response);
+          console.log('🔍 FRONTEND - response.tarifMensuel:', response?.tarifMensuel);
+          console.log('🔍 FRONTEND - response.tarif_mensuel:', response?.tarif_mensuel);
+          console.log('🔍 FRONTEND - response.tarif:', response?.tarif);
+          console.log('🔍 FRONTEND - result object avant mise à jour:', result);
+          console.log('🔍 FRONTEND - result.prix avant:', result.prix);
+          
+          if (response && response.tarif_mensuel && response.tarif_mensuel > 0) {
+            result.prix = response.tarif_mensuel;
+            console.log('✅ FRONTEND - Prix Generali mis à jour avec tarif_mensuel:', result.prix);
+            console.log('✅ FRONTEND - result object après mise à jour:', result);
+          } else if (response && response.tarifMensuel && response.tarifMensuel > 0) {
+            result.prix = response.tarifMensuel;
+            console.log('✅ FRONTEND - Prix Generali mis à jour avec tarifMensuel:', result.prix);
+            console.log('✅ FRONTEND - result object après mise à jour:', result);
+          } else if (response && response.tarif && response.tarif > 0) {
+            result.prix = response.tarif;
+            console.log('✅ FRONTEND - Prix Generali mis à jour avec tarif:', result.prix);
+            console.log('✅ FRONTEND - result object après mise à jour:', result);
+          } else {
+            result.prix = 'N/A';
+            console.warn('❌ FRONTEND - Aucun tarif valide trouvé dans la réponse Generali');
+            console.warn('❌ FRONTEND - Structure de response:', Object.keys(response || {}));
+          }
+          
+          // Force UI update
+          result.isPricingLoading = false;
+          console.log('🔄 FRONTEND - Forçage de la mise à jour UI...');
+          console.log('🔄 FRONTEND - this.comparisonResults:', this.comparisonResults);
+          this.cdr.markForCheck();
+          this.cdr.detectChanges();
+          
+          // Double check après detectChanges
+          setTimeout(() => {
+            console.log('🔄 FRONTEND - Vérification après detectChanges - result.prix:', result.prix);
+            console.log('🔄 FRONTEND - comparisonResults après detectChanges:', this.comparisonResults);
+          }, 100);
+        },
+        error: (error) => {
+          result.prix = 'Erreur tarif';
+          result.isPricingLoading = false;
+          console.error('Erreur tarification Generali:', error);
+          this.cdr.detectChanges();
+        }
+      });
+
     // ALPTIS LOGIC
     } else if (assuranceName.includes('alptis')) {
       console.log('ALPTIS product detected. Starting tarification process.');
@@ -1855,7 +2009,9 @@ export class CompareComponent implements OnInit {
   }
 
   public isNumeric(value: any): boolean {
-    return !isNaN(parseFloat(value)) && isFinite(value);
+    const result = !isNaN(parseFloat(value)) && isFinite(value);
+    console.log('🔍 isNumeric check - value:', value, 'type:', typeof value, 'result:', result);
+    return result;
   }
 
   generateQuote(result: ComparisonResult, action: 'envoiParEmail' | 'telechargement'): void {
@@ -2712,12 +2868,130 @@ export class CompareComponent implements OnInit {
     return details;
   }
 
+  private fetchGeneraliPrices(): void {
+    const personalInfo = this.insuranceForm.get('personalInfo')?.value;
+
+    const formatDate = (date: any): string => {
+      if (!date) return '';
+      
+      if (typeof date === 'string' && /^\d{2}\/\d{2}\/\d{4}$/.test(date)) {
+        return date;
+      }
+      
+      if (date instanceof Date && !isNaN(date.getTime())) {
+        const day = (`0${date.getDate()}`).slice(-2);
+        const month = (`0${date.getMonth() + 1}`).slice(-2);
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+      }
+      
+      return '';
+    };
+
+    const generaliProducts = this.comparisonResults.filter(result => {
+      const assuranceName = result.assurance?.toLowerCase() || '';
+      return assuranceName.includes('generali');
+    });
+
+    if (generaliProducts.length === 0) {
+      return;
+    }
+
+    // Calculer l'âge à partir de la date de naissance
+    const calculateAge = (birthDate: string): number => {
+      if (!birthDate) return 25; // âge par défaut
+      
+      const [day, month, year] = birthDate.split('/');
+      const birth = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+      const today = new Date();
+      let age = today.getFullYear() - birth.getFullYear();
+      const monthDiff = today.getMonth() - birth.getMonth();
+      
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+        age--;
+      }
+      
+      return age;
+    };
+
+    // Mapper la composition familiale
+    const mapCompositionFamiliale = (etatCivil: string, hasConjoint: boolean, hasChildren: boolean): 'isolé' | 'duo' | 'famille' => {
+      if (hasChildren) {
+        return 'famille';
+      }
+      if ((etatCivil === 'marie' || etatCivil === 'unionLibre') && hasConjoint) {
+        return 'duo';
+      }
+      return 'isolé';
+    };
+
+    const age = calculateAge(formatDate(personalInfo.dateNaissance));
+    const codePostal = personalInfo.codePostal || '75001';
+    const hasConjoint = personalInfo.conjoint && personalInfo.conjoint.dateNaissance;
+    const hasChildren = personalInfo.enfants && personalInfo.enfants.length > 0;
+    const compositionFamiliale = mapCompositionFamiliale(personalInfo.etatCivil, hasConjoint, hasChildren);
+
+    generaliProducts.forEach((result, index) => {
+      result.isPricingLoading = true;
+      this.cdr.detectChanges();
+
+      // Extraire la formule du nom du produit Generali
+      // Extraire le numéro de formule de différents formats possibles
+      let formuleNumber = '2'; // Par défaut
+      if (result.formule) {
+        // Chercher "Niveau X", "Formule X", "TNSR X", "F X", etc.
+        const patterns = [
+          /Niveau\s*(\d+)/i,
+          /Formule\s*(\d+)/i,
+          /TNSR\s*(\d+)/i,
+          /F\s*(\d+)/i,
+          /(\d+)/  // Juste un numéro
+        ];
+        
+        for (const pattern of patterns) {
+          const match = result.formule.match(pattern);
+          if (match && match[1]) {
+            formuleNumber = match[1];
+            break;
+          }
+        }
+      }
+      const formule = formuleNumber;
+      console.log('Formule extraite de:', result.formule, '-> Numéro de formule:', formule);
+
+      const generaliRequest = {
+        age: age,
+        codePostal: codePostal,
+        compositionFamiliale: compositionFamiliale,
+        formule: formule,
+        toutesFormules: false
+      };
+
+      this.generaliService.getTarification(generaliRequest).subscribe({
+        next: (response) => {
+          result.isPricingLoading = false;
+          result.prix = response.tarifMensuel;
+          result.tarifGlobal = response.tarifAnnuel;
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          result.isPricingLoading = false;
+          result.prix = 'Erreur tarif';
+          console.error('Erreur tarification Generali:', error);
+          this.cdr.detectChanges();
+        }
+      });
+    });
+  }
+
   // Méthode pour obtenir le nom de l'assureur
   getInsurerName(assurance: string): string {
     if (assurance.toLowerCase().includes('alptis')) {
       return 'Alptis';
     } else if (assurance.toLowerCase().includes('apivia')) {
       return 'Apivia';
+    } else if (assurance.toLowerCase().includes('generali')) {
+      return 'Generali';
     } else if (assurance.toLowerCase().includes('utwin')) {
       return 'Utwin';
     }

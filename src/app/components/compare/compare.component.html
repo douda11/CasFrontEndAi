@@ -870,16 +870,17 @@
                     <th></th>
                     <th class="text-center">Vos Besoins</th>
                     <th *ngFor="let result of results" class="text-center assurance-header">
-                      {{ getInsurerName(result.assurance) }}
+                      {{ getInsurerFirstWord(result.assurance) }}
                     </th>
                   </tr>
                 </thead>
                 <tbody>
-                  <!-- Row for Assurance and Formule -->
+                  <!-- Row for Produit and Formule -->
                   <tr class="border-b">
-                    <td class="font-bold">Assurance</td>
+                    <td class="font-bold">Produit</td>
                     <td></td>
-                    <td *ngFor="let result of results" class="text-center" [innerHTML]="formatFormula(result.formule, result.assurance)">
+                    <td *ngFor="let result of results" class="text-center">
+                      {{ getProductNameWithoutFirstWord(result.assurance, result.formule) }}
                     </td>
                   </tr>
 

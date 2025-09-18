@@ -970,22 +970,42 @@ export class CompareComponent implements OnInit {
       }
     };
 
+    // Debug pour diagnostiquer le problème
+    console.log('🔍 DEBUG Alptis - personalInfo.etatCivil:', personalInfo.etatCivil);
+    console.log('🔍 DEBUG Alptis - personalInfo.conjoint:', personalInfo.conjoint);
+    console.log('🔍 DEBUG Alptis - personalInfo.enfants:', personalInfo.enfants);
+
     // Ajouter conjoint si présent
     if (personalInfo.conjoint && (personalInfo.etatCivil === 'marie' || personalInfo.etatCivil === 'unionLibre') && personalInfo.conjoint.dateNaissance) {
+      console.log('✅ DEBUG Alptis - Ajout du conjoint');
       assures.conjoint = {
         categorie_socioprofessionnelle: personalInfo.categorieSocioProfessionnelle,
         date_naissance: formatDate(personalInfo.conjoint.dateNaissance),
         regime_obligatoire: 'SECURITE_SOCIALE_INDEPENDANTS'
       };
+    } else {
+      console.log('❌ DEBUG Alptis - Conjoint non ajouté - Conditions:', {
+        hasConjoint: !!personalInfo.conjoint,
+        isMarried: personalInfo.etatCivil === 'marie' || personalInfo.etatCivil === 'unionLibre',
+        hasConjointBirthDate: personalInfo.conjoint?.dateNaissance
+      });
     }
 
     // Ajouter enfants si présents
     if (personalInfo.enfants && personalInfo.enfants.length > 0) {
+      console.log('✅ DEBUG Alptis - Ajout des enfants:', personalInfo.enfants.length);
       assures.enfants = personalInfo.enfants.map((enfant: any) => ({
         date_naissance: formatDate(enfant.dateNaissance),
         regime_obligatoire: 'SECURITE_SOCIALE_INDEPENDANTS'
       }));
+    } else {
+      console.log('❌ DEBUG Alptis - Enfants non ajoutés - Conditions:', {
+        hasEnfants: !!personalInfo.enfants,
+        enfantsLength: personalInfo.enfants?.length || 0
+      });
     }
+
+    console.log('🔍 DEBUG Alptis - assures final:', assures);
 
     alptisProducts.forEach(result => {
       result.isPricingLoading = true;
@@ -1006,7 +1026,11 @@ export class CompareComponent implements OnInit {
       const surComplementaire = contractInfo ? contractInfo.sur_complementaire : false;
 
       // Calculer ayants_droit
-      const ayantsDroit: any = {};
+      const ayantsDroit: any = {
+        conjoint: false,
+        enfants: 0
+      };
+      
       if (assures.conjoint) {
         ayantsDroit.conjoint = true;
       }
@@ -1653,8 +1677,54 @@ export class CompareComponent implements OnInit {
         }
       };
 
-      // N'ajouter conjoint et enfants que s'ils existent réellement
-      // L'API Alptis accepte un payload sans ces champs
+      // Debug pour diagnostiquer le problème de famille
+      console.log('🔍 DEBUG Alptis Method 2 - personalInfo.etatCivil:', personalInfo.etatCivil);
+      console.log('🔍 DEBUG Alptis Method 2 - personalInfo.conjoint:', personalInfo.conjoint);
+      console.log('🔍 DEBUG Alptis Method 2 - personalInfo.enfants:', personalInfo.enfants);
+
+      // Ajouter conjoint si présent
+      if (personalInfo.conjoint && (personalInfo.etatCivil === 'marie' || personalInfo.etatCivil === 'unionLibre') && personalInfo.conjoint.dateNaissance) {
+        console.log('✅ DEBUG Alptis Method 2 - Ajout du conjoint');
+        assures.conjoint = {
+          categorie_socioprofessionnelle: personalInfo.categorieSocioProfessionnelle,
+          date_naissance: formatDate(personalInfo.conjoint.dateNaissance),
+          regime_obligatoire: 'SECURITE_SOCIALE_INDEPENDANTS'
+        };
+      } else {
+        console.log('❌ DEBUG Alptis Method 2 - Conjoint non ajouté - Conditions:', {
+          hasConjoint: !!personalInfo.conjoint,
+          isMarried: personalInfo.etatCivil === 'marie' || personalInfo.etatCivil === 'unionLibre',
+          hasConjointBirthDate: personalInfo.conjoint?.dateNaissance
+        });
+      }
+
+      // Ajouter enfants si présents
+      console.log('🔍 DEBUG Alptis Method 2 - Détail enfants:', {
+        enfants: personalInfo.enfants,
+        isArray: Array.isArray(personalInfo.enfants),
+        length: personalInfo.enfants?.length,
+        firstChild: personalInfo.enfants?.[0]
+      });
+
+      if (personalInfo.enfants && personalInfo.enfants.length > 0) {
+        console.log('✅ DEBUG Alptis Method 2 - Ajout des enfants:', personalInfo.enfants.length);
+        assures.enfants = personalInfo.enfants.map((enfant: any, index: number) => {
+          console.log(`🔍 DEBUG Alptis Method 2 - Enfant ${index}:`, enfant);
+          return {
+            date_naissance: formatDate(enfant.dateNaissance),
+            regime_obligatoire: 'SECURITE_SOCIALE_INDEPENDANTS'
+          };
+        });
+        console.log('🔍 DEBUG Alptis Method 2 - assures.enfants final:', assures.enfants);
+      } else {
+        console.log('❌ DEBUG Alptis Method 2 - Enfants non ajoutés - Conditions:', {
+          hasEnfants: !!personalInfo.enfants,
+          enfantsLength: personalInfo.enfants?.length || 0,
+          enfantsType: typeof personalInfo.enfants
+        });
+      }
+
+      console.log('🔍 DEBUG Alptis Method 2 - assures final:', assures);
 
       const niveauMatch = result.formule.match(/Niveau (\d+)/i);
       const niveau = niveauMatch ? `NIVEAU_${niveauMatch[1]}` : 'NIVEAU_1';
@@ -2010,7 +2080,6 @@ export class CompareComponent implements OnInit {
 
   public isNumeric(value: any): boolean {
     const result = !isNaN(parseFloat(value)) && isFinite(value);
-    console.log('🔍 isNumeric check - value:', value, 'type:', typeof value, 'result:', result);
     return result;
   }
 
@@ -2996,5 +3065,19 @@ export class CompareComponent implements OnInit {
       return 'Utwin';
     }
     return assurance;
+  }
+
+  // Méthode pour obtenir seulement le premier mot du nom de l'assureur (pour le header)
+  getInsurerFirstWord(assurance: string): string {
+    // Utiliser le nom complet de l'assurance tel qu'il arrive dans les résultats
+    const fullAssuranceName = assurance;
+    return fullAssuranceName.split(' ')[0];
+  }
+
+  // Méthode pour obtenir le reste du nom (sans le premier mot) avec la formule (pour la ligne Produit)
+  getProductNameWithoutFirstWord(assurance: string, formule: string): string {
+    // La formule contient déjà le reste du nom complet après séparation
+    // Donc on retourne directement la formule qui contient "Santé Pro - Niveau 5" par exemple
+    return formule;
   }
 }

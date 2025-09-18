@@ -44,6 +44,10 @@ export class AuthService {
   private readonly apiUrl = 'http://localhost:8081';
   private readonly tokenKey = 'access_token';
   private readonly userKey = 'current_user';
+  private readonly sessionExpiryKey = 'session_expiry';
+  private readonly lastActivityKey = 'last_activity';
+  private readonly SESSION_DURATION = 2 * 60 * 60 * 1000; // 2 heures en millisecondes
+  private sessionTimer: any = null;
   
   // Subjects for reactive state management
   private currentUserSubject = new BehaviorSubject<UserInfo | null>(null);
@@ -58,6 +62,7 @@ export class AuthService {
   constructor(private http: HttpClient, private router: Router) {
     this.initializeAuthState();
     this.setupHubSpotCallback();
+    this.setupActivityTracking();
   }
 
   /**
@@ -67,20 +72,26 @@ export class AuthService {
     const token = this.getStoredToken();
     const storedUser = this.getStoredUser();
     
+    console.log('🔍 Initialisation auth state:', { hasToken: !!token, hasUser: !!storedUser });
+    
     if (token && storedUser) {
+      // Vérifier si la session n'a pas expiré
+      if (this.isSessionExpired()) {
+        console.log('❌ Session expirée, déconnexion automatique');
+        this.clearAuthState();
+        return;
+      }
+      
+      console.log('✅ Session valide, restauration de l\'état utilisateur');
       this.currentUserSubject.next(storedUser);
       this.isAuthenticatedSubject.next(true);
+      this.startSessionTimer();
       
-      // Validate token with backend
-      this.getCurrentUserProfile().subscribe({
-        next: (user) => {
-          console.log('✅ Token still valid, user loaded:', user);
-        },
-        error: (error) => {
-          console.log('❌ Token invalid or expired, clearing auth state');
-          this.clearAuthState();
-        }
-      });
+      // Ne pas valider avec le backend au démarrage pour éviter les déconnexions
+      // La validation se fera lors de la première requête API
+      this.updateLastActivity();
+    } else {
+      console.log('❌ Pas de token ou utilisateur stocké');
     }
   }
 
@@ -128,6 +139,9 @@ export class AuthService {
             // Store user info
             this.currentUserSubject.next(response.user);
             this.storeUser(response.user);
+            
+            // Initialiser la session
+            this.initializeSession();
             
             this.handlePostLoginRedirect();
           }
@@ -328,10 +342,13 @@ export class AuthService {
   private clearAuthState(): void {
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.userKey);
+    localStorage.removeItem(this.sessionExpiryKey);
+    localStorage.removeItem(this.lastActivityKey);
     localStorage.removeItem('redirectUrl');
     localStorage.removeItem('hubspot_redirect_url');
     localStorage.removeItem('hubspot_auth_success');
     
+    this.clearSessionTimer();
     this.currentUserSubject.next(null);
     this.isAuthenticatedSubject.next(false);
   }
@@ -394,5 +411,116 @@ export class AuthService {
 
     console.error('❌ Auth error:', errorMessage);
     return throwError(() => error);
+  }
+
+  /**
+   * Initialiser la session avec timestamp d'expiration
+   */
+  private initializeSession(): void {
+    const now = Date.now();
+    const expiryTime = now + this.SESSION_DURATION;
+    
+    localStorage.setItem(this.sessionExpiryKey, expiryTime.toString());
+    localStorage.setItem(this.lastActivityKey, now.toString());
+    
+    this.startSessionTimer();
+    console.log('✅ Session initialisée, expiration dans 2 heures');
+  }
+
+  /**
+   * Vérifier si la session a expiré
+   */
+  private isSessionExpired(): boolean {
+    const expiryTime = localStorage.getItem(this.sessionExpiryKey);
+    if (!expiryTime) {
+      console.log('🔍 Pas de timestamp d\'expiration trouvé');
+      return true;
+    }
+    
+    const now = Date.now();
+    const expiry = parseInt(expiryTime);
+    const timeLeft = expiry - now;
+    
+    console.log('🔍 Vérification expiration session:', {
+      now: new Date(now).toLocaleString(),
+      expiry: new Date(expiry).toLocaleString(),
+      timeLeftMinutes: Math.round(timeLeft / (1000 * 60)),
+      isExpired: now > expiry
+    });
+    
+    return now > expiry;
+  }
+
+  /**
+   * Mettre à jour la dernière activité et prolonger la session
+   */
+  private updateLastActivity(): void {
+    const now = Date.now();
+    const newExpiryTime = now + this.SESSION_DURATION;
+    
+    localStorage.setItem(this.lastActivityKey, now.toString());
+    localStorage.setItem(this.sessionExpiryKey, newExpiryTime.toString());
+    
+    // Redémarrer le timer
+    this.startSessionTimer();
+  }
+
+  /**
+   * Démarrer le timer de session
+   */
+  private startSessionTimer(): void {
+    this.clearSessionTimer();
+    
+    const expiryTime = localStorage.getItem(this.sessionExpiryKey);
+    if (!expiryTime) return;
+    
+    const timeUntilExpiry = parseInt(expiryTime) - Date.now();
+    
+    if (timeUntilExpiry > 0) {
+      this.sessionTimer = setTimeout(() => {
+        console.log('⏰ Session expirée automatiquement après 2 heures');
+        this.logout().subscribe();
+      }, timeUntilExpiry);
+    }
+  }
+
+  /**
+   * Nettoyer le timer de session
+   */
+  private clearSessionTimer(): void {
+    if (this.sessionTimer) {
+      clearTimeout(this.sessionTimer);
+      this.sessionTimer = null;
+    }
+  }
+
+  /**
+   * Configurer le suivi d'activité utilisateur
+   */
+  private setupActivityTracking(): void {
+    // Throttle pour éviter trop d'appels
+    let lastUpdate = 0;
+    const throttleDelay = 30000; // 30 secondes
+    
+    // Écouter les événements d'activité utilisateur
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
+    
+    events.forEach(event => {
+      document.addEventListener(event, () => {
+        const now = Date.now();
+        if (this.isAuthenticated() && (now - lastUpdate > throttleDelay)) {
+          this.updateLastActivity();
+          lastUpdate = now;
+        }
+      }, { passive: true });
+    });
+
+    // Vérifier périodiquement l'expiration de session
+    setInterval(() => {
+      if (this.isAuthenticated() && this.isSessionExpired()) {
+        console.log('⏰ Session expirée, déconnexion automatique');
+        this.logout().subscribe();
+      }
+    }, 60000); // Vérifier chaque minute
   }
 }

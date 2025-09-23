@@ -317,10 +317,12 @@
 /* CASHedi Professional Comparison Table Container */
 .comparison-table-container {
   width: 100%;
+  max-width: 100%;
   background: linear-gradient(135deg, var(--cashedi-gray-50) 0%, var(--cashedi-primary-lightest) 100%);
   border-radius: var(--border-radius-xl);
-  padding: 1.5rem;
+  padding: 0.5rem;
   box-shadow: var(--shadow-lg);
+  overflow: hidden;
 }
 
 /* CASHedi Enhanced Comparison Table */
@@ -329,20 +331,37 @@
   table-layout: fixed;
   border-collapse: separate;
   border-spacing: 0;
-  margin: 1rem 0;
-  font-size: 0.875rem;
+  margin: 0.5rem 0;
+  font-size: 0.65rem;
   background: var(--cashedi-white);
   border-radius: var(--border-radius-lg);
   overflow: hidden;
   box-shadow: var(--shadow-md);
 
   th, td {
-    padding: 1rem 0.75rem;
+    padding: 0.4rem 0.2rem;
     border-bottom: 1px solid var(--cashedi-gray-200);
     vertical-align: middle;
     word-wrap: break-word;
     hyphens: auto;
     transition: all 0.3s ease;
+    font-size: 0.65rem;
+    text-align: center;
+  }
+
+  th:first-child, td:first-child {
+    width: 10% !important;
+    text-align: left !important;
+    padding-left: 0.5rem !important;
+    font-size: 0.6rem !important;
+  }
+
+  th:nth-child(2), td:nth-child(2) {
+    width: 7% !important;
+  }
+
+  th:nth-child(n+3), td:nth-child(n+3) {
+    width: 10.375% !important;
   }
 
   thead th {
@@ -363,6 +382,28 @@
     font-weight: 700;
   }
 
+  .compact-header {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    width: 10.375% !important;
+    min-width: 110px !important;
+    max-width: 130px !important;
+    padding: 0.4rem 0.3rem !important;
+    font-size: 0.75rem !important;
+  }
+
+  .insurer-name-compact {
+    font-size: 0.75rem !important;
+    font-weight: 700;
+    line-height: 1.1;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    display: block;
+    text-align: center;
+  }
+
   tbody tr:nth-child(even) {
     background: var(--cashedi-gray-50);
   }
@@ -370,6 +411,14 @@
   tbody tr:hover {
     background: var(--cashedi-primary-lightest);
     transform: scale(1.01);
+  }
+
+  tbody tr:not(.product-row) td {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    height: 35px !important;
+    vertical-align: middle !important;
   }
 
   .font-bold {
@@ -402,6 +451,64 @@
     font-weight: 600;
     color: var(--cashedi-primary);
   }
+
+  .product-row {
+    background: var(--cashedi-gray-50) !important;
+    height: auto !important;
+    min-height: 50px !important;
+  }
+
+  .product-row td {
+    vertical-align: top !important;
+    height: auto !important;
+    min-height: 50px !important;
+  }
+
+  .product-cell {
+    padding: 0.3rem 0.2rem !important;
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    width: 10.375% !important;
+    min-width: 110px !important;
+    max-width: 130px !important;
+    height: auto !important;
+    vertical-align: top !important;
+  }
+
+  .product-info {
+    display: block;
+    width: 100%;
+    line-height: 1.1;
+    text-align: center;
+    word-wrap: break-word;
+    hyphens: auto;
+  }
+
+  .product-name {
+    font-weight: 700 !important;
+    font-size: 0.7rem;
+    color: var(--cashedi-gray-900);
+    white-space: normal !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    display: block;
+    margin-bottom: 0.15rem;
+    word-wrap: break-word;
+    hyphens: auto;
+    line-height: 1.2;
+  }
+
+  .formula-level {
+    font-weight: 400 !important;
+    font-size: 0.65rem;
+    color: var(--cashedi-gray-600);
+    white-space: nowrap !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+    display: block;
+    line-height: 1.1;
+  }
 }
 
 /* CASHedi Professional Animations */
@@ -424,21 +531,21 @@
 
 /* CASHedi Custom Table */
 .custom-table {
-  min-width: 1200px; 
-  table-layout: fixed;
   width: 100%;
+  table-layout: fixed;
   background: var(--cashedi-white);
   border-radius: var(--border-radius-lg);
   overflow: hidden;
   box-shadow: var(--shadow-xl);
+  font-size: 0.7rem;
 }
 
-// Empêcher le scroll automatique global
+/* Empêcher le scroll automatique global */
 :host {
   scroll-behavior: auto !important;
 }
 
-// Stabiliser les toasts PrimeNG
+/* Stabiliser les toasts PrimeNG */
 ::ng-deep .p-toast {
   position: fixed !important;
   z-index: 9999 !important;
@@ -449,7 +556,6 @@
   }
 }
 
-// Empêcher les animations qui peuvent causer des scrolls
 ::ng-deep .p-toast-message-enter {
   transform: none !important;
   animation: none !important;
@@ -458,4 +564,147 @@
 ::ng-deep .p-toast-message-leave {
   transform: none !important;
   animation: none !important;
+}
+
+/* === AJOUTS POUR STABILISATION === */
+.comparison-table th,
+.comparison-table td {
+  white-space: nowrap !important;
+}
+
+/* === CORRECTIONS POUR CHAMBRE PARTICULIERE ET BOUTONS === */
+
+/* Correction pour la ligne Chambre Particulière écrasée */
+.comparison-table tbody tr td {
+  min-height: 45px !important;
+  height: auto !important;
+  padding: 0.6rem 0.3rem !important;
+  vertical-align: middle !important;
+  line-height: 1.3 !important;
+}
+
+/* Correction spécifique pour les cellules de garanties */
+.comparison-table tbody tr:not(.product-row):not(.footer-row) td {
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+}
+
+/* Styles pour les boutons Choisir et Générer - taille réduite */
+.comparison-table .footer-row td {
+  padding: 0.8rem 0.2rem !important;
+  vertical-align: top !important;
+}
+
+/* Boutons compacts pour s'adapter aux colonnes */
+::ng-deep .comparison-table .footer-row p-button {
+  width: 100% !important;
+  max-width: 95px !important;
+}
+
+::ng-deep .comparison-table .footer-row p-button .p-button {
+  width: 100% !important;
+  max-width: 95px !important;
+  padding: 0.3rem 0.2rem !important;
+  font-size: 0.65rem !important;
+  border-radius: 3px !important;
+  min-height: 28px !important;
+  height: 28px !important;
+}
+
+::ng-deep .comparison-table .footer-row p-button .p-button .p-button-label {
+  font-size: 0.65rem !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+}
+
+::ng-deep .comparison-table .footer-row p-button .p-button .p-button-icon {
+  font-size: 0.6rem !important;
+  margin-right: 0.15rem !important;
+}
+
+/* Bouton Choisir spécifique */
+::ng-deep .comparison-table .footer-row p-button:not(.p-button-success) .p-button {
+  background: linear-gradient(135deg, var(--cashedi-primary) 0%, var(--cashedi-primary-light) 100%) !important;
+  border: 1px solid var(--cashedi-primary) !important;
+}
+
+/* Bouton Générer spécifique */
+::ng-deep .comparison-table .footer-row p-button.p-button-success .p-button {
+  background: linear-gradient(135deg, var(--cashedi-success) 0%, #34D399 100%) !important;
+  border: 1px solid var(--cashedi-success) !important;
+}
+
+/* Espacement entre les boutons */
+::ng-deep .comparison-table .footer-row .mt-2 {
+  margin-top: 0.4rem !important;
+}
+
+/* Force la taille des boutons - sélecteurs très spécifiques */
+::ng-deep .comparison-table tbody .footer-row td p-button button {
+  width: 100px !important;
+  max-width: 100px !important;
+  padding: 0.3rem 0.2rem !important;
+  font-size: 0.65rem !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+::ng-deep .comparison-table tbody .footer-row td p-button button span.p-button-label {
+  font-size: 0.6rem !important;
+  padding: 0 !important;
+}
+
+::ng-deep .comparison-table tbody .footer-row td p-button button span.p-button-icon {
+  font-size: 0.55rem !important;
+  margin-right: 0.1rem !important;
+}
+
+/* Conteneur des boutons plus compact */
+::ng-deep .comparison-table .footer-row td {
+  padding: 0.5rem 0.1rem !important;
+  max-width: 110px !important;
+  min-width: 110px !important;
+}
+
+/* Ajustement des colonnes du tableau pour les boutons */
+.comparison-table th:nth-child(n+3), 
+.comparison-table td:nth-child(n+3) {
+  width: 11% !important;
+  min-width: 110px !important;
+  max-width: 110px !important;
+}
+
+/* Correction pour les cellules de garanties avec texte long */
+.comparison-table tbody tr td:first-child {
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  hyphens: auto !important;
+  line-height: 1.2 !important;
+  min-width: 120px !important;
+}
+
+/* Correction pour la colonne "VOS BESOINS" */
+.comparison-table th:nth-child(2),
+.comparison-table td:nth-child(2) {
+  width: 8% !important;
+  min-width: 90px !important;
+  max-width: 90px !important;
+  text-align: center !important;
+  font-weight: 600 !important;
+  white-space: normal !important;
+  word-wrap: break-word !important;
+  padding: 0.5rem 0.2rem !important;
+}
+
+/* Header "Vos Besoins" spécifique */
+.comparison-table th:nth-child(2) {
+  background: linear-gradient(135deg, var(--cashedi-primary) 0%, var(--cashedi-primary-light) 100%) !important;
+  color: var(--cashedi-white) !important;
+  font-size: 0.7rem !important;
+  line-height: 1.1 !important;
 }

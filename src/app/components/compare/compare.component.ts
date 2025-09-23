@@ -35,6 +35,7 @@ import { CompareService } from '../../services/compare.service';
 import { InsuranceService } from '../../services/insurance.service';
 import { AlptisService } from '../../services/alptis.service';
 import { GeneraliService } from '../../services/generali.service';
+import { GeneraliSanteProService } from '../../services/generali-sante-pro.service';
 import { BesoinClient } from '../../models/comparateur.model';
 import { InsuranceQuoteForm, InsuredPerson } from '../../models/project-model';
 import { MessageService } from 'primeng/api';
@@ -151,6 +152,7 @@ export class CompareComponent implements OnInit {
     private insuranceService: InsuranceService,
     private alptisService: AlptisService,
     private generaliService: GeneraliService,
+    private generaliSanteProService: GeneraliSanteProService,
     private messageService: MessageService,
     private router: Router,
     private http: HttpClient,
@@ -740,7 +742,8 @@ export class CompareComponent implements OnInit {
               this.fetchAllUtwinPrices(); // Automatic fetch for Utwin
               this.fetchApiviaPrices(); // Automatic fetch for APIVIA
               this.fetchAlptisPrices(); // Automatic fetch for Alptis
-              this.fetchGeneraliPrices(); // Automatic fetch for Generali
+              this.fetchGeneraliPrices(); // Automatic fetch for Generali TNS
+              this.fetchGeneraliSanteProPrices(); // Automatic fetch for Generali Santé Pro
             });
 
             if (response.utwinResponse) {
@@ -769,7 +772,8 @@ export class CompareComponent implements OnInit {
                   this.fetchAllUtwinPrices(); // Automatic fetch for Utwin
                   this.fetchApiviaPrices(); // Automatic fetch for APIVIA
                   this.fetchAlptisPrices(); // Automatic fetch for Alptis
-                  this.fetchGeneraliPrices(); // Automatic fetch for Generali
+                  this.fetchGeneraliPrices(); // Automatic fetch for Generali TNS
+                  this.fetchGeneraliSanteProPrices(); // Automatic fetch for Generali Santé Pro
                 });
             }
           } else {
@@ -2938,6 +2942,7 @@ export class CompareComponent implements OnInit {
   }
 
   private fetchGeneraliPrices(): void {
+    console.log('🔍 GENERALI TNS - Début de fetchGeneraliPrices');
     const personalInfo = this.insuranceForm.get('personalInfo')?.value;
 
     const formatDate = (date: any): string => {
@@ -2959,10 +2964,17 @@ export class CompareComponent implements OnInit {
 
     const generaliProducts = this.comparisonResults.filter(result => {
       const assuranceName = result.assurance?.toLowerCase() || '';
-      return assuranceName.includes('generali');
+      const formuleName = result.formule?.toLowerCase() || '';
+      // Filtrer seulement les produits TNS (pas Santé Pro)
+      return assuranceName.includes('generali') && 
+             (assuranceName.includes('tns') || formuleName.includes('tns') || formuleName.includes('tnsr'));
     });
 
+    console.log('🔍 GENERALI TNS - Produits trouvés:', generaliProducts.length);
+    console.log('🔍 GENERALI TNS - Produits détails:', generaliProducts.map(p => ({ assurance: p.assurance, formule: p.formule })));
+
     if (generaliProducts.length === 0) {
+      console.log('❌ GENERALI TNS - Aucun produit trouvé');
       return;
     }
 
@@ -3053,12 +3065,158 @@ export class CompareComponent implements OnInit {
     });
   }
 
+  private fetchGeneraliSanteProPrices(): void {
+    console.log('🔍 GENERALI SANTÉ PRO - Début de fetchGeneraliSanteProPrices');
+    const personalInfo = this.insuranceForm.get('personalInfo')?.value;
+
+    const formatDate = (date: any): string => {
+      if (!date) return '';
+      
+      if (typeof date === 'string' && /^\d{2}\/\d{2}\/\d{4}$/.test(date)) {
+        return date;
+      }
+      
+      if (date instanceof Date && !isNaN(date.getTime())) {
+        const day = (`0${date.getDate()}`).slice(-2);
+        const month = (`0${date.getMonth() + 1}`).slice(-2);
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+      }
+      
+      return '';
+    };
+
+    // Filtrer les produits Generali Santé Pro (seulement ceux qui contiennent "santé pro")
+    const generaliSanteProProducts = this.comparisonResults.filter(result => {
+      const assuranceName = result.assurance?.toLowerCase() || '';
+      const formuleName = result.formule?.toLowerCase() || '';
+      // Filtrer seulement les produits Santé Pro (pas TNS)
+      return assuranceName.includes('generali') && 
+             (assuranceName.includes('santé pro') || formuleName.includes('santé pro')) &&
+             !assuranceName.includes('tns') && !formuleName.includes('tns') && !formuleName.includes('tnsr');
+    });
+
+    console.log('🔍 GENERALI SANTÉ PRO - Produits trouvés:', generaliSanteProProducts.length);
+    console.log('🔍 GENERALI SANTÉ PRO - Produits détails:', generaliSanteProProducts.map(p => p.assurance));
+
+    if (generaliSanteProProducts.length === 0) {
+      console.log('❌ GENERALI SANTÉ PRO - Aucun produit trouvé');
+      return;
+    }
+
+    // Calculer l'âge à partir de la date de naissance
+    const calculateAge = (birthDate: string): number => {
+      if (!birthDate) return 25; // âge par défaut
+      
+      const [day, month, year] = birthDate.split('/');
+      const birth = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+      const today = new Date();
+      let age = today.getFullYear() - birth.getFullYear();
+      const monthDiff = today.getMonth() - birth.getMonth();
+      
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+        age--;
+      }
+      
+      return age;
+    };
+
+    // Mapper la composition des assurés
+    const mapCompositionAssures = (etatCivil: string, hasConjoint: boolean, hasChildren: boolean): string => {
+      if (hasConjoint && hasChildren) {
+        return 'Assuré, conjoint et enfants';
+      }
+      if (hasConjoint) {
+        return 'Assuré et conjoint';
+      }
+      if (hasChildren) {
+        const nombreEnfants = personalInfo.enfants?.length || 1;
+        return nombreEnfants === 1 ? 'Assuré et un seul enfant' : 'Assuré et plus d\'un enfant';
+      }
+      return 'Assuré seul';
+    };
+
+    // Mapper la situation familiale
+    const mapSituationFamiliale = (etatCivil: string): string => {
+      switch (etatCivil) {
+        case 'marie': return 'Marié';
+        case 'celibataire': return 'Célibataire';
+        case 'unionLibre': return 'Pacsé';
+        case 'separe': return 'Divorcé';
+        case 'veuf': return 'Veuf';
+        default: return 'Célibataire';
+      }
+    };
+
+    const age = calculateAge(formatDate(personalInfo.dateNaissance));
+    const codePostal = personalInfo.codePostal || '75001';
+    const hasConjoint = personalInfo.conjoint && personalInfo.conjoint.dateNaissance;
+    const hasChildren = personalInfo.enfants && personalInfo.enfants.length > 0;
+    const compositionAssures = mapCompositionAssures(personalInfo.etatCivil, hasConjoint, hasChildren);
+    const situationFamiliale = mapSituationFamiliale(personalInfo.etatCivil);
+    const nombreEnfants = personalInfo.enfants?.length || 0;
+
+    generaliSanteProProducts.forEach((result, index) => {
+      result.isPricingLoading = true;
+      this.cdr.detectChanges();
+
+      // Extraire la formule du nom du produit Generali Santé Pro
+      let formule = 'P0'; // Par défaut
+      if (result.formule) {
+        // Chercher "P0", "P1", "P2", "P3", "P4", "P5", etc.
+        const patterns = [
+          /P(\d+)/i,
+          /Niveau\s*(\d+)/i,
+          /Formule\s*(\d+)/i
+        ];
+        
+        for (const pattern of patterns) {
+          const match = result.formule.match(pattern);
+          if (match && match[1]) {
+            formule = 'P' + match[1];
+            break;
+          }
+        }
+      }
+
+      const generaliSanteProRequest = {
+        age: age,
+        codePostal: codePostal,
+        formule: formule,
+        compositionAssures: compositionAssures,
+        situationFamiliale: situationFamiliale,
+        nombreEnfants: nombreEnfants,
+        anneeEffet: new Date().getFullYear(),
+        toutesFormules: false
+      };
+
+      console.log('🚀 GENERALI SANTÉ PRO - Requête:', generaliSanteProRequest);
+
+      this.generaliSanteProService.getTarification(generaliSanteProRequest).subscribe({
+        next: (response) => {
+          result.isPricingLoading = false;
+          result.prix = response.cotisationMensuelle;
+          result.tarifGlobal = response.cotisationAnnuelle;
+          this.cdr.detectChanges();
+        },
+        error: (error) => {
+          result.isPricingLoading = false;
+          result.prix = 'Erreur tarif';
+          console.error('Erreur tarification Generali Santé Pro:', error);
+          this.cdr.detectChanges();
+        }
+      });
+    });
+  }
+
   // Méthode pour obtenir le nom de l'assureur
   getInsurerName(assurance: string): string {
     if (assurance.toLowerCase().includes('alptis')) {
       return 'Alptis';
     } else if (assurance.toLowerCase().includes('apivia')) {
       return 'Apivia';
+    } else if (assurance.toLowerCase().includes('generali') && assurance.toLowerCase().includes('santé pro')) {
+      return 'Generali Santé Pro';
     } else if (assurance.toLowerCase().includes('generali')) {
       return 'Generali';
     } else if (assurance.toLowerCase().includes('utwin')) {
@@ -3079,5 +3237,53 @@ export class CompareComponent implements OnInit {
     // La formule contient déjà le reste du nom complet après séparation
     // Donc on retourne directement la formule qui contient "Santé Pro - Niveau 5" par exemple
     return formule;
+  }
+
+  // Méthode pour obtenir seulement le nom du produit (en gras)
+  getProductNameOnly(assurance: string, formule: string): string {
+    // Extraire le nom du produit sans le niveau/formule
+    if (formule.includes(' - ')) {
+      return formule.split(' - ')[0];
+    }
+    
+    // Si pas de séparateur, chercher des patterns communs
+    const patterns = [
+      /^(.*?)\s+(Niveau|Formule|F)\s*\d+/i,
+      /^(.*?)\s+(P)\d+/i,
+      /^(.*?)\s+\d+$/
+    ];
+    
+    for (const pattern of patterns) {
+      const match = formule.match(pattern);
+      if (match) {
+        return match[1].trim();
+      }
+    }
+    
+    return formule;
+  }
+
+  // Méthode pour obtenir seulement le niveau/formule (poids normal)
+  getFormulaLevel(formule: string): string {
+    // Extraire le niveau/formule
+    if (formule.includes(' - ')) {
+      return formule.split(' - ')[1] || '';
+    }
+    
+    // Si pas de séparateur, chercher des patterns communs
+    const patterns = [
+      /(Niveau|Formule|F)\s*\d+/i,
+      /(P)\d+/i,
+      /(\d+)$/
+    ];
+    
+    for (const pattern of patterns) {
+      const match = formule.match(pattern);
+      if (match) {
+        return match[0];
+      }
+    }
+    
+    return '';
   }
 }

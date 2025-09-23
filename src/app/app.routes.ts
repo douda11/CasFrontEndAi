@@ -4,7 +4,6 @@ import { ProjectFormComponent } from './components/project-form/project-form.com
 import { CompareComponent } from './components/compare/compare.component';
 import { HubspotCallbackComponent } from './components/hubspot-callback/hubspot-callback.component';
 import { UserManagementComponent } from './components/user-management/user-management.component';
-import { GeneraliTarificationComponent } from './components/generali-tarification/generali-tarification.component';
 import { AuthGuard } from './guards/auth.guard';
 import { AdminGuard } from './guards/admin.guard';
 import { NoAuthGuard } from './guards/no-auth.guard';
@@ -35,11 +34,6 @@ export const routes: Routes = [
   { 
     path: 'tarif-utwin', 
     component: ProjectFormComponent,
-    canActivate: [AuthGuard]
-  },
-  { 
-    path: 'generali', 
-    component: GeneraliTarificationComponent,
     canActivate: [AuthGuard]
   },
   

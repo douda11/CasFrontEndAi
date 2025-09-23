@@ -868,19 +868,24 @@
                 <thead>
                   <tr>
                     <th></th>
-                    <th class="text-center">Vos Besoins</th>
-                    <th *ngFor="let result of results" class="text-center assurance-header">
-                      {{ getInsurerFirstWord(result.assurance) }}
+                    <th class="text-center">VOS<br>BESOINS</th>
+                    <th *ngFor="let result of results" class="text-center assurance-header compact-header">
+                      <div class="insurer-name-compact">
+                        {{ getInsurerFirstWord(result.assurance) }}
+                      </div>
                     </th>
                   </tr>
                 </thead>
                 <tbody>
                   <!-- Row for Produit and Formule -->
-                  <tr class="border-b">
+                  <tr class="border-b product-row">
                     <td class="font-bold">Produit</td>
                     <td></td>
-                    <td *ngFor="let result of results" class="text-center">
-                      {{ getProductNameWithoutFirstWord(result.assurance, result.formule) }}
+                    <td *ngFor="let result of results" class="text-center product-cell">
+                      <div class="product-info">
+                        <span class="product-name">{{ getProductNameOnly(result.assurance, result.formule) }}</span>
+                        <span class="formula-level">{{ getFormulaLevel(result.formule) }}</span>
+                      </div>
                     </td>
                   </tr>
 
@@ -951,7 +956,7 @@
                       <p-button label="Choisir" icon="pi pi-check" (click)="onFormuleSelect(result, result.formule)"></p-button>
                       <div *ngIf="isNumeric(result.prix) || isNumeric(result.tarifGlobal)" class="mt-2">
                         <p-button 
-                          label="Générer un devis"
+                          label="Devis"
                           icon="pi pi-file-pdf" 
                           styleClass="p-button-success"
                           (click)="generateQuote(result, result.assurance.toLowerCase().includes('utwin') ? 'envoiParEmail' : 'telechargement')">

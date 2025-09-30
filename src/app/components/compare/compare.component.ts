@@ -36,6 +36,9 @@ import { InsuranceService } from '../../services/insurance.service';
 import { AlptisService } from '../../services/alptis.service';
 import { GeneraliService } from '../../services/generali.service';
 import { GeneraliSanteProService } from '../../services/generali-sante-pro.service';
+import { ValueAnalyzerService, SliderConfig, ContractAnalysis } from '../../services/value-analyzer.service';
+import { ProximityService } from '../../services/proximity.service';
+import { ContractsService } from '../../services/contracts.service';
 import { BesoinClient } from '../../models/comparateur.model';
 import { InsuranceQuoteForm, InsuredPerson } from '../../models/project-model';
 import { MessageService } from 'primeng/api';
@@ -50,13 +53,13 @@ interface ApiviaBeneficiaire {
 }
 
 interface GuaranteeValues {
-  hospitalisation: number;
-  honoraires: number;
-  chambreParticuliere: number;
-  dentaire: number;
-  orthodontie: number;
-  forfaitDentaire: number;
-  forfaitOptique: number;
+  hospitalisation: number | string;
+  honoraires: number | string;
+  chambreParticuliere: number | string;
+  dentaire: number | string;
+  orthodontie: number | string;
+  forfaitDentaire: number | string;
+  forfaitOptique: number | string;
 }
 
 interface ComparisonResult {
@@ -109,6 +112,14 @@ export class CompareComponent implements OnInit {
   availableInsurers: { label: string, value: string }[] = [];
   availableLevels: { label: string, value: string }[] = [];
   contractsData: any[] = [];
+
+  // Nouvelles propriétés pour l'analyse automatique des valeurs
+  extractedContract: any = null;
+  contractAnalysis: ContractAnalysis | null = null;
+  dynamicSliders: SliderConfig[] = [];
+  isAnalyzingValues: boolean = false;
+  showDynamicSliders: boolean = false;
+  slidersByCategory: { [category: string]: SliderConfig[] } = {};
   steps = [
     { label: 'Informations personnelles' },
     { label: 'Garanties' },
@@ -118,7 +129,12 @@ export class CompareComponent implements OnInit {
   garanties: GarantieDefinition[] = [];
 
   civiliteOptions = [{ label: 'Monsieur', value: 'M' }, { label: 'Madame', value: 'F' }];
-  regimeOptions = [{ label: 'Sécurité Sociale des Indépendants', value: 'TNS' }];
+  regimeOptions = [
+    { label: 'Sécurité Sociale des Indépendants', value: 'TNS' },
+    { label: 'Profession Libérale', value: 'PROF_LIBE' },
+    { label: 'Régime Général', value: 'REGIME_GENERAL' },
+    { label: 'Professions Médicales et Non Médicales Non Salariées', value: 'PROF_MED_NON_MED_NON_SAL' }
+  ];
   EtatcivilOptions = [
     { label: 'Célibataire', value: 'celibataire' }, { label: 'Marié(e)', value: 'marie' },
     { label: 'Parent isolé', value: 'parentIsole' }, { label: 'Séparé(e)', value: 'separe' },
@@ -153,20 +169,36 @@ export class CompareComponent implements OnInit {
     private alptisService: AlptisService,
     private generaliService: GeneraliService,
     private generaliSanteProService: GeneraliSanteProService,
+    private valueAnalyzerService: ValueAnalyzerService,
+    private proximityService: ProximityService,
+    private contractsService: ContractsService,
     private messageService: MessageService,
     private router: Router,
     private http: HttpClient,
     private cdr: ChangeDetectorRef
   ) {
     const today = new Date();
-    this.minDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
-    this.maxDate = new Date(today.getFullYear() + 1, today.getMonth(), today.getDate());
   }
 
   ngOnInit(): void {
     this.initializeForm();
-    this.initializeSteps();
+    this.setupGaranties();
     this.setupConjointListener();
+    
+    // Charger les contrats depuis le fichier JSON
+    this.contractsService.loadContracts().subscribe({
+      next: (contracts) => {
+        console.log(`✅ ${contracts.length} contrats chargés avec succès`);
+        // Afficher le résumé des contrats disponibles
+        this.contractsService.getContractsSummary();
+      },
+      error: (error) => {
+        console.error('❌ Erreur lors du chargement des contrats:', error);
+      }
+    });
+  }
+
+  ngAfterViewInit(): void {
     this.setupPostalCodeListener();
     this.setupGaranties();
     this.initializeAvailableInsurers();
@@ -401,7 +433,7 @@ export class CompareComponent implements OnInit {
       '13009': 'Marseille', '13010': 'Marseille', '13011': 'Marseille', '13012': 'Marseille',
       '13013': 'Marseille', '13014': 'Marseille', '13015': 'Marseille', '13016': 'Marseille',
       '13100': 'Aix-en-Provence', '13200': 'Arles', '13300': 'Salon-de-Provence',
-      '13400': 'Aubagne', '13500': 'Martigues', '13600': 'La Ciotat',
+      '13400': 'Aubagne', '13500': 'Martigues', '13600': 'La Ciotat', '13640': 'La Roque-d\'Anthéron',
       
       // Bordeaux et région
       '33000': 'Bordeaux', '33100': 'Bordeaux', '33200': 'Bordeaux', '33300': 'Bordeaux',
@@ -533,6 +565,8 @@ export class CompareComponent implements OnInit {
       'clermont-ferrand': '63000',
       'le havre': '76600',
       'aix-en-provence': '13100',
+      'la-roque-d-antheron': '13640',
+      'la roque d antheron': '13640',
       'brest': '29200',
       'tours': '37000',
       'amiens': '80000',
@@ -588,8 +622,14 @@ export class CompareComponent implements OnInit {
 
     if (foundPostalCode) {
       console.log('Code postal trouvé pour', ville, ':', foundPostalCode);
-      // Toujours mettre à jour le code postal, même s'il y en a déjà un
-      codePostalControl.setValue(foundPostalCode);
+      // Ne mettre à jour le code postal que s'il est vide
+      const currentPostalCode = codePostalControl.value;
+      if (!currentPostalCode || currentPostalCode.trim() === '') {
+        codePostalControl.setValue(foundPostalCode);
+        console.log('Code postal mis à jour automatiquement:', foundPostalCode);
+      } else {
+        console.log('Code postal existant conservé:', currentPostalCode);
+      }
       paysControl.setValue('France');
     } else {
       console.log('Aucun code postal trouvé pour', ville);
@@ -735,15 +775,21 @@ export class CompareComponent implements OnInit {
       .subscribe({
         next: (response: any) => {
           if (response && response.table) {
-            this.results = this.parseMarkdownTable(response.table);
-            this.comparisonResults = this.results;
+            this.comparisonResults = this.parseMarkdownTable(response.table);
+            this.results = this.comparisonResults;
+            
+            // Appliquer les couleurs de proximité aux résultats
+            this.applyProximityColorsToResults();
+            
+            // 🔧 CORRECTION : Mettre à jour toutes les garanties avec les vraies données JSON
+            this.updateAllGuaranteesFromContracts();
+            
             setTimeout(() => {
               this.fetchAprilPrices();
               this.fetchAllUtwinPrices(); // Automatic fetch for Utwin
               this.fetchApiviaPrices(); // Automatic fetch for APIVIA
               this.fetchAlptisPrices(); // Automatic fetch for Alptis
-              this.fetchGeneraliPrices(); // Automatic fetch for Generali TNS
-              this.fetchGeneraliSanteProPrices(); // Automatic fetch for Generali Santé Pro
+              this.fetchAllGeneraliPrices(); // Automatic fetch for ALL Generali products (remplace TNS + Santé Pro)
             });
 
             if (response.utwinResponse) {
@@ -765,15 +811,21 @@ export class CompareComponent implements OnInit {
 }
           
             if (err.error.table) { // Handle markdown table even in case of 400 error
-                this.results = this.parseMarkdownTable(err.error.table);
-                this.comparisonResults = this.results;
+                this.comparisonResults = this.parseMarkdownTable(err.error.table);
+                this.results = this.comparisonResults;
+                
+                // Appliquer les couleurs de proximité aux résultats
+                this.applyProximityColorsToResults();
+                
+                // 🔧 CORRECTION : Mettre à jour toutes les garanties avec les vraies données JSON
+                this.updateAllGuaranteesFromContracts();
+                
                 setTimeout(() => {
                   this.fetchAprilPrices();
                   this.fetchAllUtwinPrices(); // Automatic fetch for Utwin
                   this.fetchApiviaPrices(); // Automatic fetch for APIVIA
                   this.fetchAlptisPrices(); // Automatic fetch for Alptis
-                  this.fetchGeneraliPrices(); // Automatic fetch for Generali TNS
-                  this.fetchGeneraliSanteProPrices(); // Automatic fetch for Generali Santé Pro
+                  this.fetchAllGeneraliPrices(); // Automatic fetch for ALL Generali products (remplace TNS + Santé Pro)
                 });
             }
           } else {
@@ -815,6 +867,24 @@ export class CompareComponent implements OnInit {
       return '';
     };
 
+    // Helper for Apivia regime mapping
+    // IMPORTANT: Apivia mapping rules selon documentation
+    
+    // Pour typeRegime: Toujours GE pour Apivia
+    const mapApiviaTypeRegime = (regime: string): string => {
+      return 'GE'; // Toujours GE peu importe le régime
+    };
+
+    // Pour regimeSocial: PROF_LIBE garde sa valeur, tous les autres → TNS
+    const mapApiviaRegimeSocial = (regime: string): string => {
+      switch (regime.toUpperCase()) {
+        case 'PROF_LIBE':
+          return 'PROF_LIBE'; // Profession libérale garde sa valeur
+        default:
+          return 'TNS'; // Tous les autres (TNS, REGIME_GENERAL, PROF_MED_NON_MED_NON_SAL) → TNS
+      }
+    };
+
     const apiviaProducts = this.comparisonResults.filter(result => {
       const assuranceName = result.assurance?.toLowerCase() || '';
       return assuranceName.includes('apivia');
@@ -827,30 +897,67 @@ export class CompareComponent implements OnInit {
     const beneficiaires: ApiviaBeneficiaire[] = [];
 
     // Main Insured
+    const mainTypeRegime = mapApiviaTypeRegime(personalInfo.regime || 'TNS');
+    const mainRegimeSocial = mapApiviaRegimeSocial(personalInfo.regime || 'TNS');
     beneficiaires.push({
       typeBeneficiaire: 'PRINCIPAL',
       dateDeNaissance: formatDate(personalInfo.dateNaissance),
-      typeRegime: 'GE',
-      regimeSocial: personalInfo.regime
+      typeRegime: mainTypeRegime,
+      regimeSocial: mainRegimeSocial
     });
 
-    // Conjoint
-    if (personalInfo.conjoint && (personalInfo.etatCivil === 'marie' || personalInfo.etatCivil === 'unionLibre') && personalInfo.conjoint.dateNaissance) {
-        beneficiaires.push({
+    // Conjoint - Logique intelligente pour Apivia
+    const isMarried = personalInfo.etatCivil === 'marie' || personalInfo.etatCivil === 'unionLibre';
+    const hasConjointInfo = personalInfo.conjoint && personalInfo.conjoint.dateNaissance;
+    
+    if (isMarried || hasConjointInfo) {
+        // Utiliser les données du conjoint si disponibles, sinon générer un âge valide
+        let conjointDateNaissance = personalInfo.conjoint?.dateNaissance;
+        
+        if (!conjointDateNaissance) {
+            // Générer une date de naissance valide (30 ans par défaut)
+            const today = new Date();
+            const validAge = 30;
+            const fallbackDate = new Date(today.getFullYear() - validAge, today.getMonth(), today.getDate());
+            conjointDateNaissance = `${fallbackDate.getDate().toString().padStart(2, '0')}/${(fallbackDate.getMonth() + 1).toString().padStart(2, '0')}/${fallbackDate.getFullYear()}`;
+            console.log(`⚠️ Date conjoint générée automatiquement (Apivia - ${validAge} ans):`, conjointDateNaissance);
+        }
+        
+        // Mapping correct du régime du conjoint pour Apivia
+        const conjointOriginalRegime = personalInfo.conjoint?.regime || personalInfo.regime || 'TNS';
+        const conjointTypeRegime = mapApiviaTypeRegime(conjointOriginalRegime);
+        const conjointRegimeSocial = mapApiviaRegimeSocial(conjointOriginalRegime);
+        
+        console.log(`🔍 Mapping régime conjoint Apivia: ${conjointOriginalRegime} → typeRegime: ${conjointTypeRegime}, regimeSocial: ${conjointRegimeSocial}`);
+        
+        const conjointBeneficiaire = {
             typeBeneficiaire: 'CONJOINT',
-            dateDeNaissance: formatDate(personalInfo.conjoint.dateNaissance),
-            typeRegime: 'GE',
-            regimeSocial: personalInfo.conjoint.regime || 'GE' // Default to GE if not provided
-        });
+            dateDeNaissance: formatDate(conjointDateNaissance),
+            typeRegime: conjointTypeRegime,
+            regimeSocial: conjointRegimeSocial
+        };
+        
+        console.log('🔍 Bénéficiaire conjoint final:', conjointBeneficiaire);
+        beneficiaires.push(conjointBeneficiaire);
+        
+        if (hasConjointInfo) {
+            console.log('✅ Conjoint ajouté (Apivia - données complètes)');
+        } else {
+            console.log('✅ Conjoint ajouté (Apivia - âge généré automatiquement)');
+        }
     }
 
     // Enfants
     personalInfo.enfants.forEach((enfant: any) => {
+        const enfantOriginalRegime = enfant.regime || personalInfo.regime || 'TNS';
+        const enfantTypeRegime = mapApiviaTypeRegime(enfantOriginalRegime);
+        const enfantRegimeSocial = mapApiviaRegimeSocial(enfantOriginalRegime);
+        
         beneficiaires.push({
             typeBeneficiaire: 'AUTRE',
             dateDeNaissance: formatDate(enfant.dateNaissance),
-            typeRegime: 'GE',
-            regimeSocial: enfant.regime || 'GE' // Default to GE if not provided
+            typeRegime: enfantTypeRegime,
+            regimeSocial: enfantRegimeSocial
         });
     });
 
@@ -890,6 +997,10 @@ export class CompareComponent implements OnInit {
                 const pricingInfo = response.list.find((item: any) => item.formule === formulaNumber);
                 if (pricingInfo && pricingInfo.cotisation_mensuelle) {
                     result.prix = parseFloat(pricingInfo.cotisation_mensuelle);
+                    
+                    // 🔧 CORRECTION : Mettre à jour les garanties avec les vraies données Apivia
+                    this.updateApiviaGuarantees(result, formulaNumber);
+                    
                     this.messageService.add({ severity: 'success', summary: 'Tarif APIVIA Récupéré', detail: `Prix pour ${result.formule} mis à jour.` });
                 } else {
                     result.prix = 'N/A';
@@ -908,6 +1019,220 @@ export class CompareComponent implements OnInit {
           }
         });
     });
+  }
+
+  /**
+   * Met à jour toutes les garanties avec les vraies données des contrats JSON
+   */
+  private updateAllGuaranteesFromContracts(): void {
+    console.log('🔧 Mise à jour de toutes les garanties depuis les contrats JSON');
+    
+    this.comparisonResults.forEach(result => {
+      // Normaliser le nom en supprimant les accents et en mettant en minuscules
+      const assuranceName = (result.assurance || '')
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, ''); // Supprime les accents
+      
+      console.log(`🔍 Assurance détectée: "${result.assurance}" -> normalisé: "${assuranceName}"`);
+      
+      // Identifier l'assureur et mettre à jour ses garanties
+      if (assuranceName.includes('apivia')) {
+        this.updateAssureurGuarantees(result, 'apivia');
+      } else if (assuranceName.includes('henner')) {
+        this.updateAssureurGuarantees(result, 'henner');
+      } else if (assuranceName.includes('harmonie')) {
+        this.updateAssureurGuarantees(result, 'harmonie');
+      } else if (assuranceName.includes('aesio')) {
+        this.updateAssureurGuarantees(result, 'aesio');
+      } else if (assuranceName.includes('alptis')) {
+        this.updateAssureurGuarantees(result, 'alptis');
+      } else if (assuranceName.includes('april')) {
+        this.updateAssureurGuarantees(result, 'april');
+      } else if (assuranceName.includes('utwin')) {
+        this.updateAssureurGuarantees(result, 'utwin');
+      } else if (assuranceName.includes('malakoff')) {
+        this.updateAssureurGuarantees(result, 'malakoff');
+      } else if (assuranceName.includes('asaf')) {
+        this.updateAssureurGuarantees(result, 'asaf');
+      } else if (assuranceName.includes('entoria')) {
+        this.updateAssureurGuarantees(result, 'entoria');
+      } else if (assuranceName.includes('swisslife')) {
+        this.updateAssureurGuarantees(result, 'swisslife');
+      } else if (assuranceName.includes('generali')) {
+        this.updateAssureurGuarantees(result, 'generali');
+      } else if (assuranceName.includes('solly')) {
+        this.updateAssureurGuarantees(result, 'sollyazar');
+      }
+    });
+    
+    // Forcer la détection de changement après toutes les mises à jour
+    // Utiliser setTimeout pour laisser Angular terminer son cycle de rendu
+    setTimeout(() => {
+      this.cdr.detectChanges();
+      console.log('✅ Détection de changement forcée après mise à jour des garanties');
+      console.log('📊 RESULTS FINAL:', JSON.stringify(this.results.map(r => ({
+        assureur: r.assureur,
+        garanties: r.garanties
+      })), null, 2));
+    }, 0);
+  }
+
+  /**
+   * Met à jour les garanties d'un assureur spécifique
+   */
+  private updateAssureurGuarantees(result: ComparisonResult, assureur: string): void {
+    console.log(`🔍 DEBUG ${assureur.toUpperCase()} - Formule recherchée: "${result.formule}"`);
+    
+    // Utiliser le nouveau service simple et efficace
+    const contract = this.contractsService.findContractByAssureurAndFormule(assureur, result.formule);
+    
+    if (contract && contract.benefits) {
+      console.log(`📋 Contrat ${assureur} trouvé:`, {
+        insurer: contract.insurer,
+        contract_name: contract.contract_name,
+        level_name: contract.level_name,
+        benefits: contract.benefits
+      });
+      
+      const benefits = contract.benefits;
+
+      // L'approche la plus simple et la plus fiable.
+      const extract = (value: string | undefined): number | string => {
+        if (!value) return 0;
+        const num = this.extractNumericValue(value);
+        return isNaN(num) ? 0 : num;
+      };
+
+      const finalGuarantees: GuaranteeValues = {
+        hospitalisation: extract(benefits?.HOSPITALISATION?.['honoraires_chirurgien_optam']),
+        honoraires: extract(benefits?.SOINS_COURANTS?.['consultation_generaliste_optam']),
+        chambreParticuliere: extract(benefits?.HOSPITALISATION?.['chambre_particuliere']),
+        dentaire: extract(benefits?.DENTAIRE?.['soins_dentaires']),
+        orthodontie: extract(benefits?.DENTAIRE?.['orthodontie']),
+        forfaitDentaire: extract(benefits?.DENTAIRE?.['implantologie']),
+        forfaitOptique: extract(benefits?.OPTIQUE?.['verres_complexes'])
+      };
+
+      // Remplacer TOUTES les valeurs par les vraies données du JSON
+      // Cela écrase les "-" et les 0 du parseMarkdownTable
+      Object.keys(finalGuarantees).forEach(key => {
+        (result.garanties as any)[key] = (finalGuarantees as any)[key];
+      });
+      
+      console.log(`✅ Garanties ${assureur} mises à jour:`, JSON.stringify(finalGuarantees, null, 2));
+      console.log(`✅ result.garanties après assignation:`, JSON.stringify(result.garanties, null, 2));
+    } else {
+      console.warn(`⚠️ Contrat ${assureur} non trouvé pour la formule "${result.formule}"`);
+      
+      // Debug: lister les contrats disponibles pour cet assureur
+      const availableContracts = this.contractsService.findContractsByAssureur(assureur);
+      console.log(`📋 Contrats disponibles pour ${assureur}:`, 
+        availableContracts.map(c => `${c.contract_name} - ${c.level_name}`)
+      );
+    }
+  }
+
+
+  /**
+   * Met à jour les garanties Apivia avec les vraies données du contracts.json
+   */
+  private updateApiviaGuarantees(result: ComparisonResult, formulaNumber: string): void {
+    console.log(`🔧 Mise à jour des garanties Apivia pour formule ${formulaNumber}`);
+    
+    // Chercher le contrat Apivia correspondant dans le JSON
+    const apiviaContract = this.findApiviaContract(formulaNumber);
+    
+    if (apiviaContract && apiviaContract.benefits) {
+      console.log('📋 Contrat Apivia trouvé:', apiviaContract);
+      
+      const benefits = apiviaContract.benefits;
+      const updatedGuarantees: GuaranteeValues = {
+        // Mapping des garanties Apivia selon la structure JSON
+        hospitalisation: this.extractNumericValue(benefits.HOSPITALISATION?.honoraires_chirurgien_optam || '0'),
+        honoraires: this.extractNumericValue(benefits.SOINS_COURANTS?.consultation_generaliste_optam || '0'),
+        chambreParticuliere: this.extractNumericValue(benefits.HOSPITALISATION?.chambre_particuliere || '0'),
+        dentaire: this.extractNumericValue(benefits.DENTAIRE?.soins_dentaires || '0'),
+        orthodontie: this.extractNumericValue(benefits.DENTAIRE?.orthodontie || '0'),
+        forfaitDentaire: this.extractNumericValue(benefits.DENTAIRE?.implantologie || '0'),
+        forfaitOptique: this.extractNumericValue(benefits.OPTIQUE?.verres_complexes || '0')
+      };
+      
+      // Mettre à jour les garanties du résultat
+      result.garanties = updatedGuarantees;
+      
+      console.log('✅ Garanties Apivia mises à jour:', updatedGuarantees);
+    } else {
+      console.warn(`⚠️ Contrat Apivia non trouvé pour la formule ${formulaNumber}`);
+    }
+  }
+
+  /**
+   * Trouve le contrat Apivia correspondant dans le contracts.json
+   */
+  private findApiviaContract(formulaNumber: string): any {
+    // Simuler la recherche dans le contracts.json
+    // En production, ces données devraient être chargées depuis le service
+    const apiviaContracts = [
+      {
+        level_name: "Niveau 1",
+        benefits: {
+          HOSPITALISATION: { honoraires_chirurgien_optam: "200%", chambre_particuliere: "60 €/jour" },
+          SOINS_COURANTS: { consultation_generaliste_optam: "225%" },
+          DENTAIRE: { soins_dentaires: "125%", implantologie: "300 €", orthodontie: "225%" },
+          OPTIQUE: { verres_complexes: "300 €" }
+        }
+      },
+      {
+        level_name: "Niveau 2",
+        benefits: {
+          HOSPITALISATION: { honoraires_chirurgien_optam: "225%", chambre_particuliere: "70 €/jour" },
+          SOINS_COURANTS: { consultation_generaliste_optam: "250%" },
+          DENTAIRE: { soins_dentaires: "135%", implantologie: "350 €", orthodontie: "250%" },
+          OPTIQUE: { verres_complexes: "325 €" }
+        }
+      },
+      {
+        level_name: "Niveau 3",
+        benefits: {
+          HOSPITALISATION: { honoraires_chirurgien_optam: "240%", chambre_particuliere: "75 €/jour" },
+          SOINS_COURANTS: { consultation_generaliste_optam: "260%" },
+          DENTAIRE: { soins_dentaires: "140%", implantologie: "375 €", orthodontie: "260%" },
+          OPTIQUE: { verres_complexes: "340 €" }
+        }
+      },
+      {
+        level_name: "Niveau 4",
+        benefits: {
+          HOSPITALISATION: { honoraires_chirurgien_optam: "250%", chambre_particuliere: "80 €/jour" },
+          SOINS_COURANTS: { consultation_generaliste_optam: "275%" },
+          DENTAIRE: { soins_dentaires: "150%", implantologie: "400 €", orthodontie: "275%" },
+          OPTIQUE: { verres_complexes: "350 €" }
+        }
+      },
+      {
+        level_name: "Niveau 5",
+        benefits: {
+          HOSPITALISATION: { honoraires_chirurgien_optam: "275%", chambre_particuliere: "90 €/jour" },
+          SOINS_COURANTS: { consultation_generaliste_optam: "300%" },
+          DENTAIRE: { soins_dentaires: "175%", implantologie: "450 €", orthodontie: "300%" },
+          OPTIQUE: { verres_complexes: "400 €" }
+        }
+      },
+      {
+        level_name: "Niveau 6",
+        benefits: {
+          HOSPITALISATION: { honoraires_chirurgien_optam: "300%", chambre_particuliere: "100 €/jour" },
+          SOINS_COURANTS: { consultation_generaliste_optam: "325%" },
+          DENTAIRE: { soins_dentaires: "200%", implantologie: "500 €", orthodontie: "325%" },
+          OPTIQUE: { verres_complexes: "450 €" }
+        }
+      }
+    ];
+    
+    return apiviaContracts.find(contract => 
+      contract.level_name === `Niveau ${formulaNumber}`
+    );
   }
 
   private fetchAlptisPrices(): void {
@@ -932,6 +1257,22 @@ export class CompareComponent implements OnInit {
       
       console.warn('Invalid date format for Alptis:', date);
       return '';
+    };
+
+    // Helper for Alptis regime mapping
+    const mapAlptisRegime = (regime: string): string => {
+      switch (regime.toUpperCase()) {
+        case 'TNS':
+          return 'SECURITE_SOCIALE_INDEPENDANTS';
+        case 'PROF_LIBE':
+          return 'SECURITE_SOCIALE_INDEPENDANTS'; // Profession libérale for Alptis
+        case 'REGIME_GENERAL':
+          return 'REGIME_GENERAL'; // Régime général for Alptis
+        case 'PROF_MED_NON_MED_NON_SAL':
+          return 'SECURITE_SOCIALE_INDEPENDANTS'; // Professions médicales et non médicales non salariées
+        default:
+          return 'SECURITE_SOCIALE_INDEPENDANTS'; // Default fallback
+      }
     };
 
     const alptisProducts = this.comparisonResults.filter(result => {
@@ -966,7 +1307,7 @@ export class CompareComponent implements OnInit {
         code_postal: personalInfo.codePostal,
         date_naissance: formatDate(personalInfo.dateNaissance),
         micro_entrepreneur: true,
-        regime_obligatoire: 'SECURITE_SOCIALE_INDEPENDANTS',
+        regime_obligatoire: mapAlptisRegime(personalInfo.regime || 'TNS'),
         statut_professionnel: getStatutProfessionnel(
           personalInfo.categorieSocioProfessionnelle,
           personalInfo.statutProfessionnel
@@ -985,7 +1326,7 @@ export class CompareComponent implements OnInit {
       assures.conjoint = {
         categorie_socioprofessionnelle: personalInfo.categorieSocioProfessionnelle,
         date_naissance: formatDate(personalInfo.conjoint.dateNaissance),
-        regime_obligatoire: 'SECURITE_SOCIALE_INDEPENDANTS'
+        regime_obligatoire: mapAlptisRegime(personalInfo.conjoint.regime || personalInfo.regime || 'TNS')
       };
     } else {
       console.log('❌ DEBUG Alptis - Conjoint non ajouté - Conditions:', {
@@ -1000,7 +1341,7 @@ export class CompareComponent implements OnInit {
       console.log('✅ DEBUG Alptis - Ajout des enfants:', personalInfo.enfants.length);
       assures.enfants = personalInfo.enfants.map((enfant: any) => ({
         date_naissance: formatDate(enfant.dateNaissance),
-        regime_obligatoire: 'SECURITE_SOCIALE_INDEPENDANTS'
+        regime_obligatoire: mapAlptisRegime(enfant.regime || personalInfo.regime || 'TNS')
       }));
     } else {
       console.log('❌ DEBUG Alptis - Enfants non ajoutés - Conditions:', {
@@ -1152,20 +1493,63 @@ export class CompareComponent implements OnInit {
       addressType: 'Actuelle'
     });
 
-    // Conjoint
-    if (personalInfo.conjoint && (personalInfo.etatCivil === 'marie' || personalInfo.etatCivil === 'unionLibre') && personalInfo.conjoint.dateNaissance) {
-      insuredPersons.push({
-        lastName: personalInfo.conjoint.nom,
-        firstName: personalInfo.conjoint.prenom,
-        birthDate: parseFormDate(personalInfo.conjoint.dateNaissance),
-        gender: personalInfo.conjoint.civilite,
+    // Conjoint - Debug détaillé
+    console.log('🔍 DEBUG CONJOINT (transformFormToQuote):');
+    console.log('- personalInfo.conjoint:', personalInfo.conjoint);
+    console.log('- personalInfo.etatCivil:', personalInfo.etatCivil);
+    console.log('- conjoint.dateNaissance:', personalInfo.conjoint?.dateNaissance);
+    console.log('- Type de conjoint.dateNaissance:', typeof personalInfo.conjoint?.dateNaissance);
+    console.log('- Conjoint existe?', !!personalInfo.conjoint);
+    console.log('- Date conjoint existe?', !!personalInfo.conjoint?.dateNaissance);
+    
+    // Logique intelligente : inclure le conjoint si marié OU si conjoint renseigné
+    const isMarried = personalInfo.etatCivil === 'marie' || personalInfo.etatCivil === 'unionLibre';
+    const hasConjointInfo = personalInfo.conjoint && personalInfo.conjoint.dateNaissance;
+    
+    if (isMarried || hasConjointInfo) {
+      // Utiliser les données du conjoint si disponibles, sinon générer un âge valide
+      let conjointDateNaissance = personalInfo.conjoint?.dateNaissance;
+      
+      if (!conjointDateNaissance) {
+        // Générer une date de naissance valide (30 ans par défaut)
+        const today = new Date();
+        const validAge = 30;
+        const fallbackDate = new Date(today.getFullYear() - validAge, today.getMonth(), today.getDate());
+        
+        // Format DD/MM/YYYY pour être compatible avec parseFormDate
+        const day = fallbackDate.getDate().toString().padStart(2, '0');
+        const month = (fallbackDate.getMonth() + 1).toString().padStart(2, '0');
+        const year = fallbackDate.getFullYear();
+        conjointDateNaissance = `${day}/${month}/${year}`;
+        
+        console.log(`⚠️ Date conjoint générée automatiquement (April - ${validAge} ans):`, conjointDateNaissance);
+        console.log(`🔍 Date générée détaillée: ${day}/${month}/${year} (${validAge} ans)`);
+      }
+      
+      const conjointPerson = {
+        lastName: personalInfo.conjoint?.nom || 'Conjoint',
+        firstName: personalInfo.conjoint?.prenom || '',
+        birthDate: parseFormDate(conjointDateNaissance),
+        gender: personalInfo.conjoint?.civilite || 'M',
         address: insuredPersons[0].address,
-        email: personalInfo.conjoint.email,
+        email: personalInfo.conjoint?.email || '',
         phoneNumber: '',
-        regime: personalInfo.conjoint.regime,
+        regime: personalInfo.conjoint?.regime || personalInfo.regime,
         situation: personalInfo.etatCivil,
-        addressType: 'Actuelle'
-      });
+        addressType: 'Actuelle' as 'Actuelle'
+      };
+      
+      if (hasConjointInfo) {
+        console.log('✅ Conjoint ajouté (April - données complètes):', conjointPerson);
+      } else {
+        console.log('✅ Conjoint ajouté (April - âge généré automatiquement):', conjointPerson);
+      }
+      insuredPersons.push(conjointPerson);
+    } else {
+      console.log('❌ Conjoint non ajouté (April) - Conditions:');
+      console.log('  - etatCivil marié/unionLibre:', isMarried);
+      console.log('  - conjoint avec dateNaissance:', hasConjointInfo);
+      console.log('  - Note: Besoin d\'au moins une de ces conditions');
     }
 
     // Enfants
@@ -1207,16 +1591,16 @@ export class CompareComponent implements OnInit {
 
     const dataRows = lines.slice(2);
 
-    const extractValue = (text: string, keywords: string[]): number => {
+    const extractValue = (text: string, keywords: string[]): number | string => {
       for (const keyword of keywords) {
         const regex = new RegExp(`${keyword}[^\\d]*(\\d+)`, 'i');
         const match = text.match(regex);
         if (match && match[1]) {
           const value = parseFloat(match[1]);
-          return isNaN(value) ? 0 : value;
+          return isNaN(value) ? '-' : value;
         }
       }
-      return 0;
+      return '-';
     };
 
     return dataRows.map((row): ComparisonResult | null => {
@@ -1471,155 +1855,40 @@ export class CompareComponent implements OnInit {
         }
       });
 
-    // GENERALI LOGIC
+    // GENERALI LOGIC - Utilisation de la nouvelle logique universelle
     } else if (assuranceName.includes('generali')) {
-      console.log('GENERALI product detected. Starting tarification process.');
-      const personalInfo = this.insuranceForm.get('personalInfo')?.value;
+      console.log('GENERALI product detected. Using universal logic.');
+      const personalInfoData = this.insuranceForm.get('personalInfo')?.value;
+      
+      // Utiliser la nouvelle logique universelle
+      const selectedFormule = formule?.toLowerCase() || '';
+      
+      // Détecter si c'est Santé Pro ou TNS
+      const isSantePro = assuranceName.includes('santé pro') || 
+                        assuranceName.includes('santépro') || 
+                        assuranceName.includes('sante pro') ||
+                        selectedFormule.includes('santé pro') ||
+                        selectedFormule.includes('santépro') ||
+                        selectedFormule.includes('sante pro') ||
+                        /formule\s*p\d+/i.test(selectedFormule) ||
+                        /\bp\d+\b/i.test(selectedFormule) ||
+                        /p\d+/i.test(assuranceName);
+      
+      const isTNS = assuranceName.includes('tns') || 
+                   selectedFormule.includes('tns') || 
+                   selectedFormule.includes('tnsr');
 
-      const formatDate = (date: any): string => {
-        if (!date) return '';
-        
-        if (typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
-          return date;
-        }
-        
-        if (date instanceof Date && !isNaN(date.getTime())) {
-          const year = date.getFullYear();
-          const month = (`0${date.getMonth() + 1}`).slice(-2);
-          const day = (`0${date.getDate()}`).slice(-2);
-          return `${year}-${month}-${day}`;
-        }
-        
-        console.warn('Invalid date format for Generali:', date);
-        return '';
-      };
+      console.log('🔍 onFormuleSelect - Produit:', assuranceName, '| Formule:', selectedFormule, '| isSantePro:', isSantePro, '| isTNS:', isTNS);
 
-      const calculateAge = (dateNaissance: string): number => {
-        if (!dateNaissance) {
-          console.warn('Date de naissance manquante pour le calcul de l\'âge');
-          return 30; // Âge par défaut
-        }
-        
-        const birth = new Date(dateNaissance);
-        if (isNaN(birth.getTime())) {
-          console.warn('Date de naissance invalide:', dateNaissance);
-          return 30; // Âge par défaut
-        }
-        
-        const today = new Date();
-        let age = today.getFullYear() - birth.getFullYear();
-        const monthDiff = today.getMonth() - birth.getMonth();
-        
-        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-          age--;
-        }
-        
-        console.log('Âge calculé:', age, 'pour la date:', dateNaissance);
-        return age;
-      };
-
-      const mapCompositionFamiliale = (etatCivil: string, hasConjoint: boolean, hasChildren: boolean): 'isolé' | 'duo' | 'famille' => {
-        if (hasChildren) {
-          return 'famille';
-        }
-        if ((etatCivil === 'marie' || etatCivil === 'unionLibre') && hasConjoint) {
-          return 'duo';
-        }
-        return 'isolé';
-      };
-
-      const formattedDate = formatDate(personalInfo.dateNaissance);
-      console.log('Date formatée pour Generali:', formattedDate);
-      const age = calculateAge(formattedDate);
-      const codePostal = personalInfo.codePostal || '75001';
-      const hasConjoint = personalInfo.conjoint && personalInfo.conjoint.dateNaissance;
-      const hasChildren = personalInfo.enfants && personalInfo.enfants.length > 0;
-      const compositionFamiliale = mapCompositionFamiliale(personalInfo.etatCivil, hasConjoint, hasChildren);
-
-      // Extraire la formule du nom du produit Generali
-      // Extraire le numéro de formule de différents formats possibles
-      let formuleNumber = '2'; // Par défaut
-      if (result.formule) {
-        // Chercher "Niveau X", "Formule X", "TNSR X", "F X", etc.
-        const patterns = [
-          /Niveau\s*(\d+)/i,
-          /Formule\s*(\d+)/i,
-          /TNSR\s*(\d+)/i,
-          /F\s*(\d+)/i,
-          /(\d+)/  // Juste un numéro
-        ];
-        
-        for (const pattern of patterns) {
-          const match = result.formule.match(pattern);
-          if (match && match[1]) {
-            formuleNumber = match[1];
-            break;
-          }
-        }
+      if (isSantePro && !isTNS) {
+        console.log('✅ onFormuleSelect - Utilisation API Santé Pro pour:', assuranceName);
+        this.callGeneraliSanteProAPI(result, personalInfoData);
+      } else {
+        console.log('✅ onFormuleSelect - Utilisation API TNS pour:', assuranceName);
+        this.callGeneraliTNSAPI(result, personalInfoData);
       }
-      const formule = formuleNumber;
-      console.log('Formule extraite de:', result.formule, '-> Numéro de formule:', formule);
-
-      const generaliRequest = {
-        age: age,
-        codePostal: codePostal,
-        compositionFamiliale: compositionFamiliale,
-        formule: formule,
-        toutesFormules: false
-      };
-
-      console.log('Generali tarification request:', generaliRequest);
-
-      this.generaliService.getTarification(generaliRequest).pipe(
-        finalize(() => { result.isPricingLoading = false; })
-      ).subscribe({
-        next: (response: any) => {
-          console.log('🔍 FRONTEND - Generali response complète:', JSON.stringify(response, null, 2));
-          console.log('🔍 FRONTEND - Type de response:', typeof response);
-          console.log('🔍 FRONTEND - response.tarifMensuel:', response?.tarifMensuel);
-          console.log('🔍 FRONTEND - response.tarif_mensuel:', response?.tarif_mensuel);
-          console.log('🔍 FRONTEND - response.tarif:', response?.tarif);
-          console.log('🔍 FRONTEND - result object avant mise à jour:', result);
-          console.log('🔍 FRONTEND - result.prix avant:', result.prix);
-          
-          if (response && response.tarif_mensuel && response.tarif_mensuel > 0) {
-            result.prix = response.tarif_mensuel;
-            console.log('✅ FRONTEND - Prix Generali mis à jour avec tarif_mensuel:', result.prix);
-            console.log('✅ FRONTEND - result object après mise à jour:', result);
-          } else if (response && response.tarifMensuel && response.tarifMensuel > 0) {
-            result.prix = response.tarifMensuel;
-            console.log('✅ FRONTEND - Prix Generali mis à jour avec tarifMensuel:', result.prix);
-            console.log('✅ FRONTEND - result object après mise à jour:', result);
-          } else if (response && response.tarif && response.tarif > 0) {
-            result.prix = response.tarif;
-            console.log('✅ FRONTEND - Prix Generali mis à jour avec tarif:', result.prix);
-            console.log('✅ FRONTEND - result object après mise à jour:', result);
-          } else {
-            result.prix = 'N/A';
-            console.warn('❌ FRONTEND - Aucun tarif valide trouvé dans la réponse Generali');
-            console.warn('❌ FRONTEND - Structure de response:', Object.keys(response || {}));
-          }
-          
-          // Force UI update
-          result.isPricingLoading = false;
-          console.log('🔄 FRONTEND - Forçage de la mise à jour UI...');
-          console.log('🔄 FRONTEND - this.comparisonResults:', this.comparisonResults);
-          this.cdr.markForCheck();
-          this.cdr.detectChanges();
-          
-          // Double check après detectChanges
-          setTimeout(() => {
-            console.log('🔄 FRONTEND - Vérification après detectChanges - result.prix:', result.prix);
-            console.log('🔄 FRONTEND - comparisonResults après detectChanges:', this.comparisonResults);
-          }, 100);
-        },
-        error: (error) => {
-          result.prix = 'Erreur tarif';
-          result.isPricingLoading = false;
-          console.error('Erreur tarification Generali:', error);
-          this.cdr.detectChanges();
-        }
-      });
+      
+      return; // Sortir de la méthode
 
     // ALPTIS LOGIC
     } else if (assuranceName.includes('alptis')) {
@@ -2062,16 +2331,64 @@ export class CompareComponent implements OnInit {
     return 'coverage-low';
   }
 
-  // Nouvelle méthode pour les classes CASHedi
+  /**
+   * Nouvelle méthode améliorée pour obtenir la classe CSS basée sur la proximité
+   * Plus la valeur est proche du besoin, plus c'est vert. Plus c'est loin, plus c'est rouge/orange
+   */
+  getProximityBasedCoverageClass(actualValue: string | number, neededValue: string | number, guaranteeType: string = ''): string {
+    // Utiliser notre service de proximité pour calculer la classe
+    const proximityClass = this.proximityService.getCellClass(neededValue, actualValue);
+    return proximityClass;
+  }
+
+  /**
+   * Obtient la description textuelle de la proximité pour les tooltips
+   */
+  getProximityDescription(actualValue: string | number, neededValue: string | number): string {
+    const proximityInfo = this.proximityService.getProximityInfo(neededValue, actualValue);
+    return proximityInfo.description;
+  }
+
+  /**
+   * Obtient le score de proximité en pourcentage
+   */
+  getProximityScore(actualValue: string | number, neededValue: string | number): number {
+    const proximityInfo = this.proximityService.getProximityInfo(neededValue, actualValue);
+    return proximityInfo.proximityScore;
+  }
+
+  /**
+   * Méthode de test pour vérifier le système de couleurs de proximité
+   * À appeler depuis la console du navigateur pour tester
+   */
+  testProximityColors(): void {
+    console.log('🎨 Test du système de couleurs de proximité:');
+    
+    const testCases = [
+      { need: 100, actual: 100, description: 'Identique' },
+      { need: 100, actual: 105, description: 'Très proche (+5%)' },
+      { need: 100, actual: 120, description: 'Proche (+20%)' },
+      { need: 100, actual: 150, description: 'Un peu loin (+50%)' },
+      { need: 100, actual: 200, description: 'Loin (+100%)' },
+      { need: 100, actual: 350, description: 'Très loin (+250%)' },
+      { need: 100, actual: 0, description: 'Pas de couverture' },
+      { need: '100%', actual: '125%', description: 'Pourcentages' },
+      { need: '50€', actual: '75€', description: 'Euros' }
+    ];
+
+    testCases.forEach(test => {
+      const cssClass = this.getProximityBasedCoverageClass(test.actual, test.need);
+      const description = this.getProximityDescription(test.actual, test.need);
+      const score = this.getProximityScore(test.actual, test.need);
+      
+      console.log(`${test.description}: Besoin=${test.need}, Actuel=${test.actual} → ${cssClass} (${description}, Score: ${score}%)`);
+    });
+  }
+
+  // Méthode CASHedi mise à jour avec le système de proximité
   getCashediCoverageClass(actualValue: number, neededValue: number): string {
-    if (!actualValue || actualValue === 0) return 'cashedi-coverage-none';
-    
-    const ratio = actualValue / neededValue;
-    
-    if (ratio >= 1.2) return 'cashedi-coverage-excellent';
-    if (ratio >= 1.0) return 'cashedi-coverage-good';
-    if (ratio >= 0.7) return 'cashedi-coverage-average';
-    return 'cashedi-coverage-poor';
+    // Utiliser notre nouveau système de proximité plus précis
+    return this.getProximityBasedCoverageClass(actualValue, neededValue);
   }
 
   // Méthode pour les classes de correspondance
@@ -2538,16 +2855,48 @@ export class CompareComponent implements OnInit {
     console.log('Principal assuré data:', principalData);
     assures.push(principalData);
 
-    // Conjoint
-    if (personalInfo.conjoint && personalInfo.conjoint.dateNaissance && 
-        (personalInfo.etatCivil === 'marie' || personalInfo.etatCivil === 'unionLibre')) {
+    // Conjoint - Debug détaillé
+    console.log('🔍 DEBUG CONJOINT:');
+    console.log('- personalInfo.conjoint:', personalInfo.conjoint);
+    console.log('- personalInfo.etatCivil:', personalInfo.etatCivil);
+    console.log('- conjoint.dateNaissance:', personalInfo.conjoint?.dateNaissance);
+    
+    // Logique intelligente : inclure le conjoint si marié OU si conjoint renseigné
+    const isMarried = personalInfo.etatCivil === 'marie' || personalInfo.etatCivil === 'unionLibre';
+    const hasConjointInfo = personalInfo.conjoint && personalInfo.conjoint.dateNaissance;
+    
+    if (isMarried || hasConjointInfo) {
+      // Utiliser les données du conjoint si disponibles, sinon générer un âge valide
+      let conjointDateNaissance = personalInfo.conjoint?.dateNaissance;
+      
+      if (!conjointDateNaissance) {
+        // Générer une date de naissance valide pour Utwin (entre 18 et 54 ans)
+        const today = new Date();
+        const validAge = 30; // Âge par défaut sûr pour Utwin
+        const fallbackDate = new Date(today.getFullYear() - validAge, today.getMonth(), today.getDate());
+        conjointDateNaissance = fallbackDate.toISOString().split('T')[0]; // Format YYYY-MM-DD
+        console.log(`⚠️ Date conjoint générée automatiquement (${validAge} ans):`, conjointDateNaissance);
+      }
+      
+      const conjointRegime = personalInfo.conjoint?.regime || personalInfo.regime;
+      
       const conjointData = {
-        codeRegimeObligatoire: this.mapRegimeToUtwin(personalInfo.conjoint.regime) || 'SSI',
+        codeRegimeObligatoire: this.mapRegimeToUtwin(conjointRegime) || 'SSI',
         codeTypeRole: 'Conjoint',
-        dateDeNaissance: formatDateISO(personalInfo.conjoint.dateNaissance)
+        dateDeNaissance: formatDateISO(conjointDateNaissance)
       };
-      console.log('Conjoint data:', conjointData);
+      
+      if (hasConjointInfo) {
+        console.log('✅ Conjoint ajouté (données complètes):', conjointData);
+      } else {
+        console.log('✅ Conjoint ajouté (âge généré automatiquement):', conjointData);
+      }
       assures.push(conjointData);
+    } else {
+      console.log('❌ Conjoint non ajouté (Utwin) - Conditions:');
+      console.log('  - etatCivil marié/unionLibre:', isMarried);
+      console.log('  - conjoint avec dateNaissance:', hasConjointInfo);
+      console.log('  - Note: Besoin d\'au moins une de ces conditions');
     }
 
     // Enfants
@@ -2786,16 +3135,22 @@ export class CompareComponent implements OnInit {
 
   private handlePdfExtractionSuccess(extractedData: any): void {
     try {
-      // Mapping des garanties PDF vers les sliders
+      // Stocker le contrat extrait
+      this.extractedContract = extractedData;
+      
+      // Nouvelle logique : Analyser automatiquement les valeurs
+      this.analyzeExtractedValues(extractedData);
+      
+      // Ancienne logique : Mapping des garanties PDF vers les sliders existants
       const guaranteeMapping = this.mapPdfToSliders(extractedData);
       
       if (guaranteeMapping) {
-        // Remplir automatiquement les sliders
+        // Remplir automatiquement les sliders existants
         this.populateSliders(guaranteeMapping);
         
         this.pdfExtractionMessage = {
           type: 'success',
-          text: 'Extraction réussie ! Les sliders ont été remplis automatiquement.'
+          text: 'Extraction réussie ! Les sliders ont été configurés automatiquement selon les types de valeurs détectées.'
         };
       } else {
         this.pdfExtractionMessage = {
@@ -2827,59 +3182,297 @@ export class CompareComponent implements OnInit {
     };
   }
 
+  /**
+   * Nouvelle méthode : Analyse automatique des valeurs extraites
+   * Détecte si les valeurs sont en euros ou pourcentage et configure les sliders appropriés
+   */
+  private analyzeExtractedValues(extractedData: any): void {
+    try {
+      this.isAnalyzingValues = true;
+      
+      console.log('🔍 Analyse automatique des valeurs extraites:', extractedData);
+      
+      // Analyser le contrat avec le service ValueAnalyzer
+      this.contractAnalysis = this.valueAnalyzerService.analyzeExtractedContract(extractedData);
+      
+      console.log('📊 Résultat de l\'analyse:', this.contractAnalysis);
+      
+      // Extraire les sliders dynamiques
+      this.dynamicSliders = this.contractAnalysis.frontendConfig.sliders;
+      
+      // Organiser par catégorie
+      this.slidersByCategory = this.contractAnalysis.frontendConfig.formStructure;
+      
+      // Activer l'affichage des sliders dynamiques
+      this.showDynamicSliders = true;
+      
+      // Mettre à jour les sliders existants avec les nouvelles configurations
+      this.updateExistingSlidersWithAnalysis();
+      
+      // Afficher un résumé de l'analyse
+      this.displayAnalysisSummary();
+      
+    } catch (error) {
+      console.error('❌ Erreur lors de l\'analyse des valeurs:', error);
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Analyse des valeurs',
+        detail: 'Impossible d\'analyser automatiquement les valeurs. Utilisation des sliders par défaut.'
+      });
+    } finally {
+      this.isAnalyzingValues = false;
+    }
+  }
+
+  /**
+   * Met à jour les sliders existants avec les configurations analysées
+   */
+  private updateExistingSlidersWithAnalysis(): void {
+    if (!this.contractAnalysis) return;
+
+    this.dynamicSliders.forEach(slider => {
+      // Mettre à jour les sliders existants si ils correspondent
+      const existingSliderKey = this.findExistingSliderKey(slider.guarantee);
+      
+      if (existingSliderKey && this.insuranceForm.get('coverageSliders')?.get(existingSliderKey)) {
+        // Mettre à jour la valeur par défaut
+        this.insuranceForm.get('coverageSliders')?.get(existingSliderKey)?.setValue(slider.default);
+        
+        console.log(`🎛️ Slider ${existingSliderKey} mis à jour: ${slider.default}${slider.unit} (${slider.extractedValue})`);
+      }
+    });
+  }
+
+  /**
+   * Trouve la clé du slider existant correspondant à une garantie
+   */
+  private findExistingSliderKey(guarantee: string): string | null {
+    const guaranteeMapping: { [key: string]: string } = {
+      'honoraires_chirurgien_optam': 'honoraires',
+      'consultation_generaliste_optam': 'honoraires',
+      'chambre_particuliere': 'chambreParticuliere',
+      'soins_dentaires': 'dentaire',
+      'verres_complexes': 'forfaitOptique',
+      'implantologie': 'forfaitDentaire',
+      'orthodontie': 'orthodontie'
+    };
+
+    return guaranteeMapping[guarantee] || null;
+  }
+
+  /**
+   * Affiche un résumé de l'analyse dans la console et via toast
+   */
+  private displayAnalysisSummary(): void {
+    if (!this.contractAnalysis) return;
+
+    const summary = this.contractAnalysis.analysis.summary;
+    
+    console.log('📈 Résumé de l\'analyse automatique:');
+    console.log(`   - Total garanties: ${summary.totalGuarantees}`);
+    console.log(`   - Valeurs en pourcentage: ${summary.percentageCount}`);
+    console.log(`   - Valeurs en euros: ${summary.eurosCount}`);
+    console.log(`   - Valeurs inconnues: ${summary.unknownCount}`);
+
+    // Afficher les sliders configurés
+    console.log('🎛️ Sliders configurés automatiquement:');
+    this.dynamicSliders.forEach(slider => {
+      console.log(`   - ${slider.label}: ${slider.extractedValue} → Slider ${slider.min}-${slider.max}${slider.unit}`);
+    });
+
+    // Toast informatif
+    this.messageService.add({
+      severity: 'info',
+      summary: 'Analyse automatique terminée',
+      detail: `${summary.totalGuarantees} garanties analysées (${summary.percentageCount} en %, ${summary.eurosCount} en €)`,
+      life: 5000
+    });
+  }
+
+  /**
+   * Applique les couleurs de proximité aux résultats de comparaison
+   */
+  applyProximityColorsToResults(): void {
+    if (!this.comparisonResults || this.comparisonResults.length === 0) {
+      return;
+    }
+
+    const userNeeds = this.getUserNeedsFromForm();
+    
+    this.comparisonResults = this.comparisonResults.map(result => {
+      const enhancedResult = { ...result };
+      
+      // Calculer les couleurs de proximité pour chaque garantie
+      enhancedResult.proximityColors = {};
+      
+      // Mapping des garanties du résultat vers les besoins utilisateur
+      const guaranteeFields = [
+        'hospitalisation', 'honoraires', 'orthodontie', 
+        'forfaitOptique', 'forfaitDentaire', 'dentaire', 
+        'chambreParticuliere'
+      ];
+      
+      guaranteeFields.forEach(field => {
+        if (result[field] && userNeeds[field]) {
+          const proximityClass = this.proximityService.getCellClass(
+            userNeeds[field], 
+            result[field]
+          );
+          enhancedResult.proximityColors[field] = proximityClass;
+        }
+      });
+      
+      // Calculer un score global de proximité
+      enhancedResult.globalProximityScore = this.calculateGlobalProximityScore(result, userNeeds);
+      enhancedResult.globalProximityClass = this.getGlobalProximityClass(enhancedResult.globalProximityScore);
+      
+      return enhancedResult;
+    });
+    
+    console.log('🎨 Couleurs de proximité appliquées aux résultats:', this.comparisonResults);
+  }
+
+  /**
+   * Extrait les besoins utilisateur depuis le formulaire
+   */
+  private getUserNeedsFromForm(): any {
+    const coverageSliders = this.insuranceForm.get('coverageSliders')?.value || {};
+    
+    return {
+      hospitalisation: `${coverageSliders.hospitalisation || 100}%`,
+      honoraires: `${coverageSliders.honoraires || 100}%`,
+      orthodontie: `${coverageSliders.orthodontie || 150}%`,
+      forfaitOptique: `${coverageSliders.forfaitOptique || 190}€`,
+      forfaitDentaire: `${coverageSliders.forfaitDentaire || 130}€`,
+      dentaire: `${coverageSliders.dentaire || 100}%`,
+      chambreParticuliere: `${coverageSliders.chambreParticuliere || 50}€`
+    };
+  }
+
+  /**
+   * Calcule un score global de proximité pour un résultat
+   */
+  private calculateGlobalProximityScore(result: any, userNeeds: any): number {
+    const guaranteeFields = [
+      'hospitalisation', 'honoraires', 'orthodontie', 
+      'forfaitOptique', 'forfaitDentaire', 'dentaire', 
+      'chambreParticuliere'
+    ];
+    
+    let totalScore = 0;
+    let validFields = 0;
+    
+    guaranteeFields.forEach(field => {
+      if (result[field] && userNeeds[field]) {
+        const proximityInfo = this.proximityService.getProximityInfo(
+          userNeeds[field], 
+          result[field]
+        );
+        totalScore += proximityInfo.proximityScore;
+        validFields++;
+      }
+    });
+    
+    return validFields > 0 ? Math.round(totalScore / validFields) : 0;
+  }
+
+  /**
+   * Détermine la classe CSS globale selon le score de proximité
+   */
+  private getGlobalProximityClass(score: number): string {
+    if (score >= 95) return 'coverage-identical';
+    if (score >= 80) return 'coverage-very-close';
+    if (score >= 70) return 'coverage-close';
+    if (score >= 50) return 'coverage-somewhat-far';
+    if (score >= 30) return 'coverage-far';
+    return 'coverage-very-far';
+  }
+
+  /**
+   * Obtient la classe CSS de proximité pour une cellule spécifique
+   */
+  getCellProximityClass(result: any, field: string): string {
+    if (result.proximityColors && result.proximityColors[field]) {
+      return result.proximityColors[field];
+    }
+    return '';
+  }
+
   private mapPdfToSliders(extractedData: any): any {
     if (!extractedData?.benefits) {
+      console.log('❌ Aucun benefits trouvé dans extractedData');
       return null;
     }
 
     const benefits = extractedData.benefits;
     const mapping: any = {};
 
+    console.log('📋 Mapping des garanties Apivia:', benefits);
+
     // Mapping selon les correspondances spécifiées
     // "honoraires_chirurgien_optam" -> Hospitalisation
     if (benefits.HOSPITALISATION?.honoraires_chirurgien_optam) {
+      console.log('🏥 Hospitalisation:', benefits.HOSPITALISATION.honoraires_chirurgien_optam);
       mapping.hospitalisation = this.extractNumericValue(benefits.HOSPITALISATION.honoraires_chirurgien_optam);
     }
 
     // "chambre_particuliere" -> Chambre particulière
     if (benefits.HOSPITALISATION?.chambre_particuliere) {
+      console.log('🛏️ Chambre particulière:', benefits.HOSPITALISATION.chambre_particuliere);
       mapping.chambreParticuliere = this.extractNumericValue(benefits.HOSPITALISATION.chambre_particuliere);
     }
 
     // "consultation_generaliste_optam" -> Honoraires
     if (benefits.SOINS_COURANTS?.consultation_generaliste_optam) {
+      console.log('👨‍⚕️ Honoraires:', benefits.SOINS_COURANTS.consultation_generaliste_optam);
       mapping.honoraires = this.extractNumericValue(benefits.SOINS_COURANTS.consultation_generaliste_optam);
     }
 
     // "soins_dentaires" -> Dentaire
     if (benefits.DENTAIRE?.soins_dentaires) {
+      console.log('🦷 Dentaire:', benefits.DENTAIRE.soins_dentaires);
       mapping.dentaire = this.extractNumericValue(benefits.DENTAIRE.soins_dentaires);
     }
 
     // "implantologie" -> Forfait dentaire
     if (benefits.DENTAIRE?.implantologie) {
+      console.log('🦷💰 Forfait dentaire:', benefits.DENTAIRE.implantologie);
       mapping.forfaitDentaire = this.extractNumericValue(benefits.DENTAIRE.implantologie);
     }
 
     // "orthodontie" -> Orthodontie
     if (benefits.DENTAIRE?.orthodontie) {
+      console.log('🦷📐 Orthodontie:', benefits.DENTAIRE.orthodontie);
       mapping.orthodontie = this.extractNumericValue(benefits.DENTAIRE.orthodontie);
     }
 
     // "verres_complexes" -> Forfait optique
     if (benefits.OPTIQUE?.verres_complexes) {
+      console.log('👓 Forfait optique:', benefits.OPTIQUE.verres_complexes);
       mapping.forfaitOptique = this.extractNumericValue(benefits.OPTIQUE.verres_complexes);
     }
 
+    console.log('✅ Mapping final:', mapping);
     return Object.keys(mapping).length > 0 ? mapping : null;
   }
 
   private extractNumericValue(value: string): number {
-    if (!value) return 0;
-    
-    // Extraire les nombres de la chaîne (ex: "250 % BRSS" -> 250, "60 €" -> 60)
-    const match = value.match(/(\d+)/);
-    return match ? parseInt(match[1], 10) : 0;
+    if (!value) return NaN; // Utiliser NaN pour un échec clair
+
+    const cleanValue = value.toString().trim();
+    console.log(`[EXTRACTION] Tentative sur: "${cleanValue}"`);
+
+    // Regex qui cible le premier nombre trouvé dans la chaîne
+    const match = cleanValue.match(/(\d*\.?\d+)/);
+
+    if (match && match[0]) {
+      const num = parseFloat(match[0]);
+      console.log(`[EXTRACTION] → Succès: ${num}`);
+      return num;
+    }
+
+    console.log(`[EXTRACTION] → Échec`);
+    return NaN; // Retourner NaN si aucun nombre n'est trouvé
   }
 
   private populateSliders(mapping: any): void {
@@ -2942,6 +3535,9 @@ export class CompareComponent implements OnInit {
   }
 
   private fetchGeneraliPrices(): void {
+    console.log('⚠️ GENERALI TNS - Méthode désactivée - Utilisation de fetchAllGeneraliPrices()');
+    return; // Désactivé - remplacé par fetchAllGeneraliPrices()
+    
     console.log('🔍 GENERALI TNS - Début de fetchGeneraliPrices');
     const personalInfo = this.insuranceForm.get('personalInfo')?.value;
 
@@ -2965,9 +3561,12 @@ export class CompareComponent implements OnInit {
     const generaliProducts = this.comparisonResults.filter(result => {
       const assuranceName = result.assurance?.toLowerCase() || '';
       const formuleName = result.formule?.toLowerCase() || '';
-      // Filtrer seulement les produits TNS (pas Santé Pro)
+      // Exclure les produits déjà traités par Santé Pro
+      const alreadyProcessed = (result as any).processedBySantePro;
+      // Filtrer seulement les produits TNS (pas Santé Pro) et pas déjà traités
       return assuranceName.includes('generali') && 
-             (assuranceName.includes('tns') || formuleName.includes('tns') || formuleName.includes('tnsr'));
+             (assuranceName.includes('tns') || formuleName.includes('tns') || formuleName.includes('tnsr')) &&
+             !alreadyProcessed;
     });
 
     console.log('🔍 GENERALI TNS - Produits trouvés:', generaliProducts.length);
@@ -3066,6 +3665,9 @@ export class CompareComponent implements OnInit {
   }
 
   private fetchGeneraliSanteProPrices(): void {
+    console.log('⚠️ GENERALI SANTÉ PRO - Méthode désactivée - Utilisation de fetchAllGeneraliPrices()');
+    return; // Désactivé - remplacé par fetchAllGeneraliPrices()
+    
     console.log('🔍 GENERALI SANTÉ PRO - Début de fetchGeneraliSanteProPrices');
     const personalInfo = this.insuranceForm.get('personalInfo')?.value;
 
@@ -3091,13 +3693,39 @@ export class CompareComponent implements OnInit {
       const assuranceName = result.assurance?.toLowerCase() || '';
       const formuleName = result.formule?.toLowerCase() || '';
       // Filtrer seulement les produits Santé Pro (pas TNS)
-      return assuranceName.includes('generali') && 
-             (assuranceName.includes('santé pro') || formuleName.includes('santé pro')) &&
-             !assuranceName.includes('tns') && !formuleName.includes('tns') && !formuleName.includes('tnsr');
+      const isSantePro = assuranceName.includes('generali') && 
+                        (assuranceName.includes('santé pro') || 
+                         assuranceName.includes('santépro') || 
+                         assuranceName.includes('sante pro') ||
+                         formuleName.includes('santé pro') ||
+                         formuleName.includes('santépro') ||
+                         formuleName.includes('sante pro') ||
+                         // Détecter par formule P (P0, P1, P2, P3, etc.)
+                         /formule\s*p\d+/i.test(formuleName) ||
+                         /\bp\d+\b/i.test(formuleName) ||
+                         /p\d+/i.test(assuranceName));
+      const isTNS = assuranceName.includes('tns') || formuleName.includes('tns') || formuleName.includes('tnsr');
+      
+      console.log('🔍 DEBUG - Produit:', assuranceName, '| Formule:', formuleName, '| isSantePro:', isSantePro, '| isTNS:', isTNS);
+      
+      return isSantePro && !isTNS;
     });
 
     console.log('🔍 GENERALI SANTÉ PRO - Produits trouvés:', generaliSanteProProducts.length);
-    console.log('🔍 GENERALI SANTÉ PRO - Produits détails:', generaliSanteProProducts.map(p => p.assurance));
+    console.log('🔍 GENERALI SANTÉ PRO - Produits détails:', generaliSanteProProducts.map(p => ({ 
+      assurance: p.assurance, 
+      formule: p.formule 
+    })));
+    
+    // Debug : afficher TOUS les produits Generali pour voir le problème
+    const allGeneraliProducts = this.comparisonResults.filter(result => {
+      const assuranceName = result.assurance?.toLowerCase() || '';
+      return assuranceName.includes('generali');
+    });
+    console.log('🔍 DEBUG - TOUS les produits Generali:', allGeneraliProducts.map(p => ({ 
+      assurance: p.assurance, 
+      formule: p.formule 
+    })));
 
     if (generaliSanteProProducts.length === 0) {
       console.log('❌ GENERALI SANTÉ PRO - Aucun produit trouvé');
@@ -3157,6 +3785,8 @@ export class CompareComponent implements OnInit {
     const nombreEnfants = personalInfo.enfants?.length || 0;
 
     generaliSanteProProducts.forEach((result, index) => {
+      // Marquer comme traité par Santé Pro pour éviter le double traitement
+      (result as any).processedBySantePro = true;
       result.isPricingLoading = true;
       this.cdr.detectChanges();
 
@@ -3206,6 +3836,237 @@ export class CompareComponent implements OnInit {
           this.cdr.detectChanges();
         }
       });
+    });
+  }
+
+  private fetchAllGeneraliPrices(): void {
+    console.log('🔍 GENERALI UNIVERSAL - Début de fetchAllGeneraliPrices');
+    const personalInfo = this.insuranceForm.get('personalInfo')?.value;
+
+    // Filtrer TOUS les produits Generali
+    const allGeneraliProducts = this.comparisonResults.filter(result => {
+      const assuranceName = result.assurance?.toLowerCase() || '';
+      return assuranceName.includes('generali');
+    });
+
+    console.log('🔍 GENERALI UNIVERSAL - Tous les produits Generali trouvés:', allGeneraliProducts.length);
+    console.log('🔍 GENERALI UNIVERSAL - Détails:', allGeneraliProducts.map(p => ({ 
+      assurance: p.assurance, 
+      formule: p.formule 
+    })));
+
+    if (allGeneraliProducts.length === 0) {
+      console.log('❌ GENERALI UNIVERSAL - Aucun produit trouvé');
+      return;
+    }
+
+    // Pour chaque produit, déterminer le bon endpoint
+    allGeneraliProducts.forEach((result, index) => {
+      const assuranceName = result.assurance?.toLowerCase() || '';
+      const formuleName = result.formule?.toLowerCase() || '';
+      
+      // Détecter si c'est Santé Pro ou TNS
+      const isSantePro = assuranceName.includes('santé pro') || 
+                        assuranceName.includes('santépro') || 
+                        assuranceName.includes('sante pro') ||
+                        formuleName.includes('santé pro') ||
+                        formuleName.includes('santépro') ||
+                        formuleName.includes('sante pro') ||
+                        /formule\s*p\d+/i.test(formuleName) ||
+                        /\bp\d+\b/i.test(formuleName) ||
+                        /p\d+/i.test(assuranceName);
+      
+      const isTNS = assuranceName.includes('tns') || 
+                   formuleName.includes('tns') || 
+                   formuleName.includes('tnsr');
+
+      console.log('🔍 GENERALI UNIVERSAL - Produit:', assuranceName, '| isSantePro:', isSantePro, '| isTNS:', isTNS);
+
+      if (isSantePro && !isTNS) {
+        console.log('✅ GENERALI UNIVERSAL - Utilisation API Santé Pro pour:', assuranceName);
+        this.callGeneraliSanteProAPI(result, personalInfo);
+      } else if (isTNS || (!isSantePro && !isTNS)) {
+        console.log('✅ GENERALI UNIVERSAL - Utilisation API TNS pour:', assuranceName);
+        this.callGeneraliTNSAPI(result, personalInfo);
+      }
+    });
+  }
+
+  private callGeneraliSanteProAPI(result: any, personalInfo: any): void {
+    result.isPricingLoading = true;
+    this.cdr.detectChanges();
+
+    const formatDate = (date: any): string => {
+      if (!date) return '';
+      if (typeof date === 'string' && /^\d{2}\/\d{2}\/\d{4}$/.test(date)) return date;
+      if (date instanceof Date && !isNaN(date.getTime())) {
+        const day = (`0${date.getDate()}`).slice(-2);
+        const month = (`0${date.getMonth() + 1}`).slice(-2);
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+      }
+      return '';
+    };
+
+    const calculateAge = (birthDate: string): number => {
+      if (!birthDate) return 25;
+      const [day, month, year] = birthDate.split('/');
+      const birth = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+      const today = new Date();
+      let age = today.getFullYear() - birth.getFullYear();
+      const monthDiff = today.getMonth() - birth.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) age--;
+      return age;
+    };
+
+    const mapCompositionAssures = (etatCivil: string, hasConjoint: boolean, hasChildren: boolean): string => {
+      if (hasConjoint && hasChildren) return 'Assuré, conjoint et enfants';
+      if (hasConjoint) return 'Assuré et conjoint';
+      if (hasChildren) {
+        const nombreEnfants = personalInfo.enfants?.length || 1;
+        return nombreEnfants === 1 ? 'Assuré et un seul enfant' : 'Assuré et plus d\'un enfant';
+      }
+      return 'Assuré seul';
+    };
+
+    const mapSituationFamiliale = (etatCivil: string): string => {
+      switch (etatCivil) {
+        case 'marie': return 'Marié';
+        case 'celibataire': return 'Célibataire';
+        case 'unionLibre': return 'Pacsé';
+        case 'separe': return 'Divorcé';
+        case 'veuf': return 'Veuf';
+        default: return 'Célibataire';
+      }
+    };
+
+    const age = calculateAge(formatDate(personalInfo.dateNaissance));
+    const codePostal = personalInfo.codePostal || '75001';
+    const hasConjoint = personalInfo.conjoint && personalInfo.conjoint.dateNaissance;
+    const hasChildren = personalInfo.enfants && personalInfo.enfants.length > 0;
+    const compositionAssures = mapCompositionAssures(personalInfo.etatCivil, hasConjoint, hasChildren);
+    const situationFamiliale = mapSituationFamiliale(personalInfo.etatCivil);
+    const nombreEnfants = personalInfo.enfants?.length || 0;
+
+    // Extraire la formule
+    let formule = 'P0';
+    if (result.formule) {
+      const patterns = [/P(\d+)/i, /Niveau\s*(\d+)/i, /Formule\s*(\d+)/i];
+      for (const pattern of patterns) {
+        const match = result.formule.match(pattern);
+        if (match && match[1]) {
+          formule = 'P' + match[1];
+          break;
+        }
+      }
+    }
+
+    const request = {
+      age: age,
+      codePostal: codePostal,
+      formule: formule,
+      compositionAssures: compositionAssures,
+      situationFamiliale: situationFamiliale,
+      nombreEnfants: nombreEnfants,
+      anneeEffet: new Date().getFullYear(),
+      toutesFormules: false
+    };
+
+    console.log('🚀 GENERALI SANTÉ PRO API - Requête:', request);
+
+    this.generaliSanteProService.getTarification(request).subscribe({
+      next: (response) => {
+        result.isPricingLoading = false;
+        result.prix = response.cotisationMensuelle;
+        result.tarifGlobal = response.cotisationAnnuelle;
+        console.log('✅ GENERALI SANTÉ PRO API - Prix mis à jour:', result.prix, '€/mois');
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        result.isPricingLoading = false;
+        result.prix = 'Erreur tarif';
+        console.error('❌ GENERALI SANTÉ PRO API - Erreur:', error);
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  private callGeneraliTNSAPI(result: any, personalInfo: any): void {
+    result.isPricingLoading = true;
+    this.cdr.detectChanges();
+
+    const formatDate = (date: any): string => {
+      if (!date) return '';
+      if (typeof date === 'string' && /^\d{2}\/\d{2}\/\d{4}$/.test(date)) return date;
+      if (date instanceof Date && !isNaN(date.getTime())) {
+        const day = (`0${date.getDate()}`).slice(-2);
+        const month = (`0${date.getMonth() + 1}`).slice(-2);
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+      }
+      return '';
+    };
+
+    const calculateAge = (birthDate: string): number => {
+      if (!birthDate) return 25;
+      const [day, month, year] = birthDate.split('/');
+      const birth = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+      const today = new Date();
+      let age = today.getFullYear() - birth.getFullYear();
+      const monthDiff = today.getMonth() - birth.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) age--;
+      return age;
+    };
+
+    const mapCompositionFamiliale = (etatCivil: string, hasConjoint: boolean, hasChildren: boolean): 'isolé' | 'duo' | 'famille' => {
+      if (hasConjoint && hasChildren) return 'famille';
+      if (hasConjoint) return 'duo';
+      return 'isolé';
+    };
+
+    const age = calculateAge(formatDate(personalInfo.dateNaissance));
+    const codePostal = personalInfo.codePostal || '75001';
+    const hasConjoint = personalInfo.conjoint && personalInfo.conjoint.dateNaissance;
+    const hasChildren = personalInfo.enfants && personalInfo.enfants.length > 0;
+    const compositionFamiliale = mapCompositionFamiliale(personalInfo.etatCivil, hasConjoint, hasChildren);
+
+    // Extraire la formule pour TNS
+    let formule = '4';
+    if (result.formule) {
+      const patterns = [/F(\d+)/i, /Formule\s*(\d+)/i, /Niveau\s*(\d+)/i, /(\d+)/];
+      for (const pattern of patterns) {
+        const match = result.formule.match(pattern);
+        if (match && match[1]) {
+          formule = match[1];
+          break;
+        }
+      }
+    }
+
+    const request = {
+      age: age,
+      codePostal: codePostal,
+      compositionFamiliale: compositionFamiliale,
+      formule: formule,
+      toutesFormules: false
+    };
+
+    console.log('🚀 GENERALI TNS API - Requête:', request);
+
+    this.generaliService.getTarification(request).subscribe({
+      next: (response: any) => {
+        result.isPricingLoading = false;
+        result.prix = response.tarifMensuel || response.tarif_mensuel || response.cotisationMensuelle;
+        result.tarifGlobal = response.tarifAnnuel || response.tarif_annuel || response.cotisationAnnuelle;
+        console.log('✅ GENERALI TNS API - Prix mis à jour:', result.prix, '€/mois');
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        result.isPricingLoading = false;
+        result.prix = 'Erreur tarif';
+        console.error('❌ GENERALI TNS API - Erreur:', error);
+        this.cdr.detectChanges();
+      }
     });
   }
 
@@ -3285,5 +4146,43 @@ export class CompareComponent implements OnInit {
     }
     
     return '';
+  }
+
+  /**
+   * Extrait une valeur en préservant les tirets originaux du JSON
+   */
+  private extractValuePreservingDashes(value: string | undefined): number | string {
+    // Si la valeur n'existe pas ou est undefined
+    if (!value) {
+      return '-';
+    }
+
+    // Si la valeur est explicitement un tiret dans le JSON, la conserver
+    if (value === '-' || value.trim() === '-') {
+      return '-';
+    }
+
+    // Si la valeur est vide ou contient seulement des espaces
+    if (value.trim() === '') {
+      return '-';
+    }
+
+    // Pour les valeurs spéciales comme "cf. grille optique", les conserver telles quelles
+    if (value.toLowerCase().includes('cf.') || 
+        value.toLowerCase().includes('grille') ||
+        value.toLowerCase().includes('non précisé') ||
+        value.toLowerCase().includes('non remboursé')) {
+      return value;
+    }
+
+    // Sinon, utiliser la méthode d'extraction normale
+    const numericValue = this.extractNumericValue(value);
+
+    // Si l'extraction numérique échoue (retourne NaN), on affiche un tiret.
+    if (isNaN(numericValue)) {
+      return '-';
+    }
+
+    return numericValue;
   }
 }

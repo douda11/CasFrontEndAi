@@ -895,8 +895,11 @@
                     <td class="text-center">
                       {{ insuranceForm.get('coverageSliders.' + garantie.formControlName)?.value }}{{ garantie.unit }}
                     </td>
-                    <td *ngFor="let result of results" class="text-center" [ngClass]="getCoverageClass(result.garanties[garantie.formControlName])">
-                      <ng-container *ngIf="result.garanties[garantie.formControlName] > 0; else noValue">
+                    <td *ngFor="let result of results" 
+                        class="text-center" 
+                        [ngClass]="getProximityBasedCoverageClass(result.garanties[garantie.formControlName], insuranceForm.get('coverageSliders.' + garantie.formControlName)?.value, garantie.formControlName)"
+                        [title]="getProximityDescription(result.garanties[garantie.formControlName], insuranceForm.get('coverageSliders.' + garantie.formControlName)?.value) + ' (Score: ' + getProximityScore(result.garanties[garantie.formControlName], insuranceForm.get('coverageSliders.' + garantie.formControlName)?.value) + '%)'">
+                      <ng-container *ngIf="result.garanties && result.garanties[garantie.formControlName] !== undefined && result.garanties[garantie.formControlName] !== null && result.garanties[garantie.formControlName] !== '-' && result.garanties[garantie.formControlName] !== 0; else noValue">
                         {{ result.garanties[garantie.formControlName] }}{{ garantie.unit }}
                       </ng-container>
                       <ng-template #noValue>-</ng-template>

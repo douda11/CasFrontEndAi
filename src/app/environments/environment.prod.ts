@@ -1,8 +1,8 @@
 export const environment = {
   production: true,
-  // This should be the full URL of your deployed backend API.
-  apiUrl: 'https://your-production-api.com/api',
+  // Configuration pour le serveur Flask local
+  apiUrl: 'http://127.0.0.1:5000',
   endpoints: {
-    comparateur: '/comparateur'
+    comparateur: '/compare'
   }
 };

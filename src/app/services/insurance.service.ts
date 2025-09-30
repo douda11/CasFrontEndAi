@@ -153,6 +153,22 @@ export class InsuranceService {
   private transformToAprilPayload(form: InsuranceQuoteForm, productCode: string, levelCode: string): AprilPayload {
     const mainPersonInfo = form.insuredPersons[0];
 
+    // Helper for April regime mapping
+    const mapAprilRegime = (regime: string): string => {
+      switch (regime.toUpperCase()) {
+        case 'TNS':
+          return 'TNS'; // Keep TNS as is for April
+        case 'PROF_LIBE':
+          return 'PROF_LIBE'; // Profession libérale for April
+        case 'REGIME_GENERAL':
+          return 'SALARIE'; // Régime général mapped to SALARIE for April
+        case 'PROF_MED_NON_MED_NON_SAL':
+          return 'PROF_LIBE'; // Professions médicales et non médicales non salariées mapped to PROF_LIBE
+        default:
+          return 'TNS'; // Default fallback
+      }
+    };
+
     const persons: AprilPerson[] = form.insuredPersons.map((p, index) => {
       const personId = `i-${index + 1}`;
       return {
@@ -161,7 +177,7 @@ export class InsuranceService {
         title: p.gender === 'M' ? 'Monsieur' : 'Madame',
         lastName: p.lastName,
         firstName: p.firstName,
-        mandatoryScheme: p.regime || 'TNS',
+        mandatoryScheme: mapAprilRegime(p.regime || 'TNS'),
         familyStatus: p.situation || 'Celibataire',
         mobilePhone: {
           prefix: '+33',
@@ -186,7 +202,15 @@ export class InsuranceService {
       };
     });
 
-    const coverages = this.getGuaranteeCoverages(productCode, 'a-1', levelCode);
+    // Générer les coverages pour tous les assurés
+    const allCoverages: AprilCoverage[] = [];
+    insureds.forEach((insured, index) => {
+      const insuredRef = `a-${index + 1}`;
+      const insuredCoverages = this.getGuaranteeCoverages(productCode, insuredRef, levelCode);
+      allCoverages.push(...insuredCoverages);
+    });
+    
+    console.log(`✅ Coverages générées pour ${insureds.length} assurés:`, allCoverages);
 
     const payload: AprilPayload = {
       $type: 'PrevPro',
@@ -209,7 +233,7 @@ export class InsuranceService {
           productCode: productCode,
           effectiveDate: formatDate(form.effectDate, 'yyyy-MM-dd', 'en-US'),
           insureds: insureds,
-          coverages: coverages
+          coverages: allCoverages
         }
       ]
     };
@@ -288,10 +312,18 @@ export class InsuranceService {
 
     // Helper for regime mapping based on user requirements
     const mapRegime = (regime: string): string => {
-      if (regime.toUpperCase() === 'TNS') {
-        return 'SSI'; // 'TNS' in form becomes 'SSI' for Utwin
+      switch (regime.toUpperCase()) {
+        case 'TNS':
+          return 'SSI'; // 'TNS' in form becomes 'SSI' for Utwin
+        case 'REGIME_GENERAL':
+          return 'RG'; // 'REGIME_GENERAL' in form becomes 'RG' for Utwin
+        case 'PROF_LIBE':
+          return 'SSI'; // Profession libérale mapped to SSI for Utwin
+        case 'PROF_MED_NON_MED_NON_SAL':
+          return 'SSI'; // Professions médicales et non médicales non salariées mapped to SSI
+        default:
+          return 'RG'; // Default fallback
       }
-      return 'RG'; // Default or 'GENERAL' becomes 'RG'
     };
 
     const payload = {

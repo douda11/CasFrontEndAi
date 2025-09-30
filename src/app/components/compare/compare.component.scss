@@ -136,8 +136,21 @@
   }
 }
 
-/* CASHedi Coverage Level Styling */
-.coverage-high {
+/* CASHedi Coverage Level Styling - Basé sur la proximité réelle aux besoins */
+
+/* IDENTIQUE OU TRÈS PROCHE - Vert foncé */
+.coverage-identical {
+  background: linear-gradient(135deg, #059669 0%, #10B981 100%);
+  color: var(--cashedi-white);
+  font-weight: 700;
+  border-radius: var(--border-radius-sm);
+  padding: 0.5rem;
+  box-shadow: 0 4px 6px rgba(5, 150, 105, 0.3);
+  border: 1px solid #047857;
+}
+
+/* TRÈS PROCHE (±10-20%) - Vert standard */
+.coverage-very-close {
   background: linear-gradient(135deg, var(--cashedi-success) 0%, #34D399 100%);
   color: var(--cashedi-white);
   font-weight: 600;
@@ -146,8 +159,19 @@
   box-shadow: var(--shadow-sm);
 }
 
-.coverage-medium {
-  background: linear-gradient(135deg, var(--cashedi-warning) 0%, #FBBF24 100%);
+/* PROCHE (±20-50%) - Vert clair */
+.coverage-close {
+  background: linear-gradient(135deg, #22C55E 0%, #4ADE80 100%);
+  color: var(--cashedi-white);
+  font-weight: 600;
+  border-radius: var(--border-radius-sm);
+  padding: 0.5rem;
+  box-shadow: 0 2px 4px rgba(34, 197, 94, 0.2);
+}
+
+/* UN PEU LOIN (±50-100%) - Orange clair */
+.coverage-somewhat-far {
+  background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%);
   color: var(--cashedi-white);
   font-weight: 600;
   border-radius: var(--border-radius-sm);
@@ -155,7 +179,18 @@
   box-shadow: var(--shadow-sm);
 }
 
-.coverage-low {
+/* LOIN (±100-200%) - Orange foncé */
+.coverage-far {
+  background: linear-gradient(135deg, #EA580C 0%, #F97316 100%);
+  color: var(--cashedi-white);
+  font-weight: 600;
+  border-radius: var(--border-radius-sm);
+  padding: 0.5rem;
+  box-shadow: 0 2px 4px rgba(234, 88, 12, 0.3);
+}
+
+/* TRÈS LOIN (>200% d'écart) - Rouge */
+.coverage-very-far {
   background: linear-gradient(135deg, var(--cashedi-error) 0%, #F87171 100%);
   color: var(--cashedi-white);
   font-weight: 600;
@@ -163,6 +198,25 @@
   padding: 0.5rem;
   box-shadow: var(--shadow-sm);
 }
+
+/* PAS DE COUVERTURE - Rouge foncé */
+.coverage-none {
+  background: linear-gradient(135deg, #DC2626 0%, #EF4444 100%);
+  color: var(--cashedi-white);
+  font-weight: 700;
+  border-radius: var(--border-radius-sm);
+  padding: 0.5rem;
+  box-shadow: 0 4px 6px rgba(220, 38, 38, 0.4);
+  border: 1px solid #B91C1C;
+}
+
+/* Classes de compatibilité */
+.coverage-excellent { @extend .coverage-identical; }
+.coverage-high { @extend .coverage-very-close; }
+.coverage-good { @extend .coverage-close; }
+.coverage-medium { @extend .coverage-somewhat-far; }
+.coverage-low { @extend .coverage-far; }
+.coverage-poor { @extend .coverage-very-far; }
 
 /* CASHedi Professional Comparison Container */
 .comparison-container {
@@ -297,8 +351,20 @@
   border-left: 4px solid var(--cashedi-gray-400);
 }
 
-/* CASHedi Professional Cell States */
-.cell-good {
+/* CASHedi Professional Cell States - Basé sur la pertinence de comparaison */
+
+/* EXCELLENT (80-100%) - Vert foncé - Couvre intégralement les besoins */
+.cell-excellent {
+  background: linear-gradient(135deg, #059669 0%, #10B981 100%) !important;
+  color: var(--cashedi-white) !important;
+  font-weight: 700;
+  border-radius: var(--border-radius-sm);
+  box-shadow: 0 4px 6px rgba(5, 150, 105, 0.3);
+  border: 1px solid #047857;
+}
+
+/* TRÈS BON (65-79%) - Vert - Très bonne correspondance */
+.cell-high {
   background: linear-gradient(135deg, var(--cashedi-success) 0%, #34D399 100%) !important;
   color: var(--cashedi-white) !important;
   font-weight: 600;
@@ -306,6 +372,43 @@
   box-shadow: var(--shadow-sm);
 }
 
+/* BON (50-64%) - Vert clair - Bonne correspondance */
+.cell-good {
+  background: linear-gradient(135deg, #22C55E 0%, #4ADE80 100%) !important;
+  color: var(--cashedi-white) !important;
+  font-weight: 600;
+  border-radius: var(--border-radius-sm);
+  box-shadow: 0 2px 4px rgba(34, 197, 94, 0.2);
+}
+
+/* MOYEN (35-49%) - Orange clair - Correspondance partielle */
+.cell-medium {
+  background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%) !important;
+  color: var(--cashedi-white) !important;
+  font-weight: 600;
+  border-radius: var(--border-radius-sm);
+  box-shadow: var(--shadow-sm);
+}
+
+/* FAIBLE (20-34%) - Orange foncé - Correspondance limitée */
+.cell-low {
+  background: linear-gradient(135deg, #EA580C 0%, #F97316 100%) !important;
+  color: var(--cashedi-white) !important;
+  font-weight: 600;
+  border-radius: var(--border-radius-sm);
+  box-shadow: 0 2px 4px rgba(234, 88, 12, 0.3);
+}
+
+/* TRÈS FAIBLE (0-19%) - Rouge - Ne correspond pas aux besoins */
+.cell-poor {
+  background: linear-gradient(135deg, var(--cashedi-error) 0%, #F87171 100%) !important;
+  color: var(--cashedi-white) !important;
+  font-weight: 600;
+  border-radius: var(--border-radius-sm);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Ancienne classe pour compatibilité */
 .cell-bad {
   background: linear-gradient(135deg, var(--cashedi-error) 0%, #F87171 100%) !important;
   color: var(--cashedi-white) !important;
@@ -386,22 +489,24 @@
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
-    width: 10.375% !important;
-    min-width: 110px !important;
-    max-width: 130px !important;
+    width: 12% !important;
+    min-width: 160px !important;
+    max-width: 160px !important;
     padding: 0.4rem 0.3rem !important;
     font-size: 0.75rem !important;
+    vertical-align: middle !important;
   }
 
   .insurer-name-compact {
     font-size: 0.75rem !important;
     font-weight: 700;
-    line-height: 1.1;
+    line-height: 1.2;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
     display: block;
     text-align: center;
+    padding: 0.1rem 0 !important;
   }
 
   tbody tr:nth-child(even) {
@@ -426,21 +531,69 @@
     color: var(--cashedi-gray-900);
   }
 
-  .coverage-good {
-    background: linear-gradient(135deg, var(--cashedi-success) 0%, #34D399 100%);
-    color: var(--cashedi-white);
-    font-weight: 600;
+  /* Classes de pertinence pour les cellules du tableau */
+  .coverage-excellent {
+    background: linear-gradient(135deg, #059669 0%, #10B981 100%) !important;
+    color: var(--cashedi-white) !important;
+    font-weight: 700 !important;
     border-radius: var(--border-radius-sm);
-    padding: 0.5rem;
+    padding: 0.4rem !important;
+    box-shadow: 0 4px 6px rgba(5, 150, 105, 0.3);
+    border: 1px solid #047857;
+  }
+
+  .coverage-high {
+    background: linear-gradient(135deg, var(--cashedi-success) 0%, #34D399 100%) !important;
+    color: var(--cashedi-white) !important;
+    font-weight: 600 !important;
+    border-radius: var(--border-radius-sm);
+    padding: 0.4rem !important;
     box-shadow: var(--shadow-sm);
   }
 
-  .coverage-bad {
-    background: linear-gradient(135deg, var(--cashedi-error) 0%, #F87171 100%);
-    color: var(--cashedi-white);
-    font-weight: 600;
+  .coverage-good {
+    background: linear-gradient(135deg, #22C55E 0%, #4ADE80 100%) !important;
+    color: var(--cashedi-white) !important;
+    font-weight: 600 !important;
     border-radius: var(--border-radius-sm);
-    padding: 0.5rem;
+    padding: 0.4rem !important;
+    box-shadow: 0 2px 4px rgba(34, 197, 94, 0.2);
+  }
+
+  .coverage-medium {
+    background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%) !important;
+    color: var(--cashedi-white) !important;
+    font-weight: 600 !important;
+    border-radius: var(--border-radius-sm);
+    padding: 0.4rem !important;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .coverage-low {
+    background: linear-gradient(135deg, #EA580C 0%, #F97316 100%) !important;
+    color: var(--cashedi-white) !important;
+    font-weight: 600 !important;
+    border-radius: var(--border-radius-sm);
+    padding: 0.4rem !important;
+    box-shadow: 0 2px 4px rgba(234, 88, 12, 0.3);
+  }
+
+  .coverage-poor {
+    background: linear-gradient(135deg, var(--cashedi-error) 0%, #F87171 100%) !important;
+    color: var(--cashedi-white) !important;
+    font-weight: 600 !important;
+    border-radius: var(--border-radius-sm);
+    padding: 0.4rem !important;
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* Ancienne classe pour compatibilité */
+  .coverage-bad {
+    background: linear-gradient(135deg, var(--cashedi-error) 0%, #F87171 100%) !important;
+    color: var(--cashedi-white) !important;
+    font-weight: 600 !important;
+    border-radius: var(--border-radius-sm);
+    padding: 0.4rem !important;
     box-shadow: var(--shadow-sm);
   }
 
@@ -469,9 +622,9 @@
     white-space: normal !important;
     overflow: visible !important;
     text-overflow: clip !important;
-    width: 10.375% !important;
-    min-width: 110px !important;
-    max-width: 130px !important;
+    width: 12% !important;
+    min-width: 160px !important;
+    max-width: 160px !important;
     height: auto !important;
     vertical-align: top !important;
   }
@@ -643,12 +796,12 @@
 
 /* Force la taille des boutons - sélecteurs très spécifiques */
 ::ng-deep .comparison-table tbody .footer-row td p-button button {
-  width: 100px !important;
-  max-width: 100px !important;
-  padding: 0.3rem 0.2rem !important;
-  font-size: 0.65rem !important;
-  height: 30px !important;
-  min-height: 30px !important;
+  width: 140px !important;
+  max-width: 140px !important;
+  padding: 0.4rem 0.3rem !important;
+  font-size: 0.7rem !important;
+  height: 32px !important;
+  min-height: 32px !important;
   white-space: nowrap !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
@@ -667,16 +820,16 @@
 /* Conteneur des boutons plus compact */
 ::ng-deep .comparison-table .footer-row td {
   padding: 0.5rem 0.1rem !important;
-  max-width: 110px !important;
-  min-width: 110px !important;
+  max-width: 160px !important;
+  min-width: 160px !important;
 }
 
 /* Ajustement des colonnes du tableau pour les boutons */
 .comparison-table th:nth-child(n+3), 
 .comparison-table td:nth-child(n+3) {
-  width: 11% !important;
-  min-width: 110px !important;
-  max-width: 110px !important;
+  width: 12% !important;
+  min-width: 160px !important;
+  max-width: 160px !important;
 }
 
 /* Correction pour les cellules de garanties avec texte long */

@@ -50,7 +50,7 @@ export interface GeneraliSanteProCompositions {
   providedIn: 'root'
 })
 export class GeneraliSanteProService {
-  private apiUrl = 'http://localhost:8081/api/v1/generali-sante-pro';
+  private apiUrl = 'http://localhost:8081/api/v1/generali/sante-pro';
 
   constructor(private http: HttpClient) {}
 

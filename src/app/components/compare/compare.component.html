@@ -870,13 +870,27 @@
                     <th></th>
                     <th class="text-center">VOS<br>BESOINS</th>
                     <th *ngFor="let result of results" class="text-center assurance-header compact-header">
-                      <div class="insurer-name-compact">
-                        {{ getInsurerFirstWord(result.assurance) }}
+                      <div class="insurer-logo-container">
+                        <img [src]="getInsurerLogo(result.assurance)" 
+                             [alt]="getInsurerFirstWord(result.assurance)" 
+                             class="insurer-logo"
+                             [title]="result.assurance" />
                       </div>
                     </th>
                   </tr>
                 </thead>
                 <tbody>
+                  <!-- Row for Insurer Name -->
+                  <tr class="border-b insurer-name-row">
+                    <td class="font-bold">Assureur</td>
+                    <td></td>
+                    <td *ngFor="let result of results" class="text-center insurer-name-cell">
+                      <div class="insurer-name-text">
+                        {{ getInsurerFirstWord(result.assurance) }}
+                      </div>
+                    </td>
+                  </tr>
+
                   <!-- Row for Produit and Formule -->
                   <tr class="border-b product-row">
                     <td class="font-bold">Produit</td>

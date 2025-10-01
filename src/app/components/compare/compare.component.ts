@@ -162,6 +162,27 @@ export class CompareComponent implements OnInit {
   showWeakPointDialog: boolean = false;
   selectedWeakPointDetails: any = null;
 
+  // Mapping des logos des assureurs
+  insurerLogos: { [key: string]: string } = {
+    '2ma': 'assets/images/logos/2MA.PNG',
+    'aesio': 'assets/images/logos/AESIO.PNG',
+    'alptis': 'assets/images/logos/ALPTIS.PNG',
+    'apicil': 'assets/images/logos/APICIL.PNG',
+    'apivia': 'assets/images/logos/APIVIA.png',
+    'april': 'assets/images/logos/APRIL.PNG',
+    'asaf': 'assets/images/logos/ASAF.PNG',
+    'entoria': 'assets/images/logos/ENTORIA.PNG',
+    'generali': 'assets/images/logos/GENERALI.PNG',
+    'harmonie': 'assets/images/logos/HARMONIE.PNG',
+    'malakoff': 'assets/images/logos/MALAKOFF.PNG',
+    'henner': 'assets/images/logos/HENNER.PNG',
+    'solly': 'assets/images/logos/SOLLYAZAR.PNG',
+    'spvie': 'assets/images/logos/SPIVE.PNG',
+    'swisslife': 'assets/images/logos/SWISSLIFE.PNG',
+    'utwin': 'assets/images/logos/UTWIN.PNG',
+    'zenioo': 'assets/images/logos/ZENIO.PNG'
+  };
+
   constructor(
     private fb: FormBuilder,
     private compareService: CompareService,
@@ -924,7 +945,13 @@ export class CompareComponent implements OnInit {
         }
         
         // Mapping correct du régime du conjoint pour Apivia
+        console.log('🔍 DEBUG - personalInfo.conjoint:', personalInfo.conjoint);
+        console.log('🔍 DEBUG - personalInfo.conjoint?.regime:', personalInfo.conjoint?.regime);
+        console.log('🔍 DEBUG - personalInfo.regime:', personalInfo.regime);
+        
         const conjointOriginalRegime = personalInfo.conjoint?.regime || personalInfo.regime || 'TNS';
+        console.log('🔍 DEBUG - conjointOriginalRegime final:', conjointOriginalRegime);
+        
         const conjointTypeRegime = mapApiviaTypeRegime(conjointOriginalRegime);
         const conjointRegimeSocial = mapApiviaRegimeSocial(conjointOriginalRegime);
         
@@ -934,10 +961,17 @@ export class CompareComponent implements OnInit {
             typeBeneficiaire: 'CONJOINT',
             dateDeNaissance: formatDate(conjointDateNaissance),
             typeRegime: conjointTypeRegime,
-            regimeSocial: conjointRegimeSocial
+            regimeSocial: conjointRegimeSocial || 'TNS' // Sécurité: jamais vide
         };
         
         console.log('🔍 Bénéficiaire conjoint final:', conjointBeneficiaire);
+        
+        // Validation finale
+        if (!conjointBeneficiaire.regimeSocial || conjointBeneficiaire.regimeSocial.trim() === '') {
+            console.error('❌ ERREUR: regimeSocial du conjoint est vide!');
+            conjointBeneficiaire.regimeSocial = 'TNS'; // Forcer TNS par défaut
+        }
+        
         beneficiaires.push(conjointBeneficiaire);
         
         if (hasConjointInfo) {
@@ -985,7 +1019,8 @@ export class CompareComponent implements OnInit {
           beneficiaires: beneficiaires
         };
 
-        console.log('Sending APIVIA Payload:', apiviaPayload);
+        console.log('📤 Sending APIVIA Payload:', apiviaPayload);
+        console.log('📋 Bénéficiaires détaillés:', JSON.stringify(beneficiaires, null, 2));
 
         this.insuranceService.getApiviaTarif(apiviaPayload).pipe(
           finalize(() => { result.isPricingLoading = false; })
@@ -1828,17 +1863,33 @@ export class CompareComponent implements OnInit {
             console.log('Code formule recherché:', codeFormuleToFind);
             
             // Chercher la proposition avec commission 30/10 et le bon code formule
-            const matchingProposition = response.propositions.find((p: any) => 
-              p.codeFormule === codeFormuleToFind && 
-              p.codeTauxCommissionRetenu === '30/10' &&
-              p.libelleProduit?.includes("MULTI' Santé")
-            );
+            // Support both camelCase and snake_case formats from API
+            const matchingProposition = response.propositions.find((p: any) => {
+              const apiCodeFormule = p.code_formule || p.codeFormule;
+              const apiCommission = p.code_taux_commission_retenu || p.codeTauxCommissionRetenu;
+              const apiProduct = p.libelle_produit || p.libelleProduit;
+              
+              return apiCodeFormule === codeFormuleToFind && 
+                     apiCommission === '30/10' &&
+                     apiProduct?.includes("MULTI' Santé");
+            });
 
-            if (matchingProposition?.cotisationMensuelleEuros) {
-              result.prix = matchingProposition.cotisationMensuelleEuros;
-              console.log('Prix Utwin trouvé:', matchingProposition.cotisationMensuelleEuros);
+            if (matchingProposition) {
+              const prix = matchingProposition.cotisation_mensuelle_euros || matchingProposition.cotisationMensuelleEuros;
+              if (prix) {
+                result.prix = prix;
+                console.log('Prix Utwin trouvé:', prix);
+              } else {
+                console.log('Prix non trouvé dans la proposition:', matchingProposition);
+                result.prix = 'N/A';
+              }
             } else {
               console.log('Aucune proposition Utwin correspondante trouvée pour:', codeFormuleToFind);
+              console.log('Propositions disponibles:', response.propositions.map((p: any) => ({
+                code: p.code_formule || p.codeFormule,
+                commission: p.code_taux_commission_retenu || p.codeTauxCommissionRetenu,
+                produit: p.libelle_produit || p.libelleProduit
+              })));
               result.prix = 'N/A';
             }
           } else {
@@ -2333,12 +2384,60 @@ export class CompareComponent implements OnInit {
 
   /**
    * Nouvelle méthode améliorée pour obtenir la classe CSS basée sur la proximité
-   * Plus la valeur est proche du besoin, plus c'est vert. Plus c'est loin, plus c'est rouge/orange
+   * Logique des couleurs :
+   * - Vert clair : Résultat = Besoin (égalité)
+   * - Vert foncé : Résultat > Besoin (supérieur)
+   * - Orange : Résultat < Besoin de moins de 50 (%) ou moins de 100 (€)
+   * - Rouge : Résultat < Besoin de plus de 50 (%) ou plus de 100 (€)
    */
   getProximityBasedCoverageClass(actualValue: string | number, neededValue: string | number, guaranteeType: string = ''): string {
-    // Utiliser notre service de proximité pour calculer la classe
-    const proximityClass = this.proximityService.getCellClass(neededValue, actualValue);
-    return proximityClass;
+    // Convertir les valeurs en nombres
+    const actual = typeof actualValue === 'number' ? actualValue : this.extractNumericValue(actualValue);
+    const needed = typeof neededValue === 'number' ? neededValue : this.extractNumericValue(neededValue);
+    
+    // Si pas de valeur ou valeur invalide
+    if (actual === 0 || needed === 0 || actual === null || needed === null) {
+      return 'coverage-none';
+    }
+    
+    // Déterminer si c'est un forfait (€) ou un pourcentage (%)
+    const isForfait = this.isForfaitGarantie(guaranteeType);
+    const seuil = isForfait ? 100 : 50; // Seuil : 100€ pour forfaits, 50% pour pourcentages
+    
+    // Calculer la différence
+    const difference = actual - needed;
+    
+    // Logique des couleurs
+    let cssClass = '';
+    if (difference === 0) {
+      // Égalité : Vert clair
+      cssClass = 'coverage-exact';
+    } else if (difference > 0) {
+      // Supérieur : Vert foncé
+      cssClass = 'coverage-excellent';
+    } else if (Math.abs(difference) < seuil) {
+      // Inférieur de moins de seuil : Orange
+      cssClass = 'coverage-partial';
+    } else {
+      // Inférieur de plus de seuil : Rouge
+      cssClass = 'coverage-insufficient';
+    }
+    
+    // Log de debug (à désactiver en production)
+    if (Math.random() < 0.1) { // Log seulement 10% du temps pour ne pas surcharger
+      console.log(`🎨 Couleur: ${guaranteeType} | Besoin: ${needed} | Résultat: ${actual} | Diff: ${difference} | Seuil: ${seuil} | Classe: ${cssClass}`);
+    }
+    
+    return cssClass;
+  }
+  
+  /**
+   * Détermine si une garantie est un forfait (€) ou un pourcentage (%)
+   */
+  private isForfaitGarantie(guaranteeType: string): boolean {
+    // Trouver la garantie dans la liste
+    const garantie = this.garanties.find(g => g.formControlName === guaranteeType);
+    return garantie?.unit === '€';
   }
 
   /**
@@ -4091,6 +4190,51 @@ export class CompareComponent implements OnInit {
     // Utiliser le nom complet de l'assurance tel qu'il arrive dans les résultats
     const fullAssuranceName = assurance;
     return fullAssuranceName.split(' ')[0];
+  }
+
+  // Méthode pour obtenir le logo d'un assureur
+  getInsurerLogo(assurance: string): string {
+    const assuranceLower = assurance.toLowerCase();
+    
+    // Mapping des noms d'assureurs vers les clés du dictionnaire
+    if (assuranceLower.includes('2ma') || assuranceLower.includes('acheel') || assuranceLower.includes('3cao') || assuranceLower.includes('2maltitude')) {
+      return this.insurerLogos['2ma'];
+    } else if (assuranceLower.includes('aesio') || assuranceLower.includes('aésio')) {
+      return this.insurerLogos['aesio'];
+    } else if (assuranceLower.includes('alptis')) {
+      return this.insurerLogos['alptis'];
+    } else if (assuranceLower.includes('apicil')) {
+      return this.insurerLogos['apicil'];
+    } else if (assuranceLower.includes('apivia')) {
+      return this.insurerLogos['apivia'];
+    } else if (assuranceLower.includes('april')) {
+      return this.insurerLogos['april'];
+    } else if (assuranceLower.includes('asaf')) {
+      return this.insurerLogos['asaf'];
+    } else if (assuranceLower.includes('entoria')) {
+      return this.insurerLogos['entoria'];
+    } else if (assuranceLower.includes('generali')) {
+      return this.insurerLogos['generali'];
+    } else if (assuranceLower.includes('harmonie')) {
+      return this.insurerLogos['harmonie'];
+    } else if (assuranceLower.includes('malakoff') || assuranceLower.includes('humanis')) {
+      return this.insurerLogos['malakoff'];
+    } else if (assuranceLower.includes('henner')) {
+      return this.insurerLogos['henner'];
+    } else if (assuranceLower.includes('solly') || assuranceLower.includes('azar')) {
+      return this.insurerLogos['solly'];
+    } else if (assuranceLower.includes('spvie')) {
+      return this.insurerLogos['spvie'];
+    } else if (assuranceLower.includes('swiss') || assuranceLower.includes('swisslife')) {
+      return this.insurerLogos['swisslife'];
+    } else if (assuranceLower.includes('utwin')) {
+      return this.insurerLogos['utwin'];
+    } else if (assuranceLower.includes('zenioo')) {
+      return this.insurerLogos['zenioo'];
+    }
+    
+    // Logo par défaut si non trouvé
+    return 'assets/images/logos/default.png';
   }
 
   // Méthode pour obtenir le reste du nom (sans le premier mot) avec la formule (pour la ligne Produit)

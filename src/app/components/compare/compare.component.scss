@@ -509,6 +509,32 @@
     padding: 0.1rem 0 !important;
   }
 
+  .insurer-logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.3rem 0.2rem;
+    min-height: 55px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: var(--border-radius-sm);
+    backdrop-filter: blur(5px);
+  }
+
+  .insurer-logo {
+    max-width: 90%;
+    max-height: 45px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    transition: all 0.3s ease;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+  }
+
+  .insurer-logo:hover {
+    transform: scale(1.08);
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+  }
+
   tbody tr:nth-child(even) {
     background: var(--cashedi-gray-50);
   }
@@ -597,12 +623,90 @@
     box-shadow: var(--shadow-sm);
   }
 
+  /* 🎨 NOUVELLE LOGIQUE DES COULEURS - Basée sur besoin vs résultat */
+  
+  /* Vert clair : Résultat = Besoin (égalité parfaite) */
+  .coverage-exact {
+    background: linear-gradient(135deg, #86EFAC 0%, #6EE7B7 100%) !important;
+    color: #065F46 !important;
+    font-weight: 700 !important;
+    border-radius: var(--border-radius-sm);
+    padding: 0.4rem !important;
+    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+    border: 2px solid #10B981;
+  }
+
+  /* Vert foncé : Résultat > Besoin (supérieur au besoin) */
+  .coverage-excellent {
+    background: linear-gradient(135deg, #059669 0%, #10B981 100%) !important;
+    color: var(--cashedi-white) !important;
+    font-weight: 700 !important;
+    border-radius: var(--border-radius-sm);
+    padding: 0.4rem !important;
+    box-shadow: 0 4px 6px rgba(5, 150, 105, 0.3);
+    border: 1px solid #047857;
+  }
+
+  /* Orange : Résultat < Besoin de moins de 50% ou moins de 100€ */
+  .coverage-partial {
+    background: linear-gradient(135deg, #F59E0B 0%, #FBBF24 100%) !important;
+    color: var(--cashedi-white) !important;
+    font-weight: 600 !important;
+    border-radius: var(--border-radius-sm);
+    padding: 0.4rem !important;
+    box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
+    border: 1px solid #D97706;
+  }
+
+  /* Rouge : Résultat < Besoin de plus de 50% ou plus de 100€ */
+  .coverage-insufficient {
+    background: linear-gradient(135deg, #DC2626 0%, #EF4444 100%) !important;
+    color: var(--cashedi-white) !important;
+    font-weight: 700 !important;
+    border-radius: var(--border-radius-sm);
+    padding: 0.4rem !important;
+    box-shadow: 0 4px 6px rgba(220, 38, 38, 0.4);
+    border: 2px solid #B91C1C;
+  }
+
+  /* Pas de couverture ou valeur invalide */
+  .coverage-none {
+    background: linear-gradient(135deg, #6B7280 0%, #9CA3AF 100%) !important;
+    color: var(--cashedi-white) !important;
+    font-weight: 500 !important;
+    border-radius: var(--border-radius-sm);
+    padding: 0.4rem !important;
+    box-shadow: 0 2px 4px rgba(107, 114, 128, 0.2);
+    border: 1px solid #4B5563;
+  }
+
   .footer-row td {
     border: none;
     padding-top: 1.5rem;
     background: transparent;
     font-weight: 600;
     color: var(--cashedi-primary);
+  }
+
+  .insurer-name-row {
+    background: linear-gradient(135deg, var(--cashedi-primary-lightest) 0%, rgba(161, 2, 242, 0.1) 100%) !important;
+    height: auto !important;
+    min-height: 40px !important;
+    border-bottom: 2px solid var(--cashedi-primary) !important;
+  }
+
+  .insurer-name-cell {
+    padding: 0.5rem 0.2rem !important;
+    vertical-align: middle !important;
+  }
+
+  .insurer-name-text {
+    font-size: 0.8rem !important;
+    font-weight: 700 !important;
+    color: var(--cashedi-primary) !important;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    line-height: 1.2;
   }
 
   .product-row {

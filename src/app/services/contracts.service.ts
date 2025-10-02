@@ -114,10 +114,10 @@ export class ContractsService {
         return bestMatch;
     }
 
-    // Niveau 3: Correspondance par Inclusion (le nom du produit de recherche inclut le nom du contrat)
-    const candidates = insurerContracts.filter(c => {
+    // Niveau 3: Correspondance par Inclusion (le nom du produit de recherche inclut le nom du contrat ou vice-versa)
+    let candidates = insurerContracts.filter(c => {
         const contractNameNorm = this.normalizeText(c.contract_name || '');
-        return searchProductNorm.includes(contractNameNorm);
+        return searchProductNorm.includes(contractNameNorm) || contractNameNorm.includes(searchProductNorm);
     });
 
     if (candidates.length > 0) {
@@ -125,6 +125,33 @@ export class ContractsService {
         if (bestMatch) {
             console.log(`[MATCHING] ✅ Niveau 3 (Inclusion Produit + Niveau): ${bestMatch.contract_name} - ${bestMatch.level_name}`);
             return bestMatch;
+        }
+    }
+
+    // Niveau 3.5: Correspondance par mots-clés communs (pour les noms de produits complexes)
+    if (searchLevel > 0) {
+        const searchWords = searchProductNorm.split(/\s+/).filter(w => w.length > 2);
+        const scoredCandidates = insurerContracts.map(c => {
+            const contractNameNorm = this.normalizeText(c.contract_name || '');
+            const contractWords = contractNameNorm.split(/\s+/).filter(w => w.length > 2);
+            const commonWords = searchWords.filter(w => contractWords.includes(w));
+            const score = commonWords.length / Math.max(searchWords.length, contractWords.length);
+            return { contract: c, score };
+        }).filter(item => item.score > 0.4); // Au moins 40% de similarité
+
+        if (scoredCandidates.length > 0) {
+            // Trier par score décroissant
+            scoredCandidates.sort((a, b) => b.score - a.score);
+            
+            // Chercher le meilleur match avec le bon niveau
+            bestMatch = scoredCandidates.find(item => 
+                this.extractLevel(this.normalizeText(item.contract.level_name || '')) === searchLevel
+            )?.contract;
+            
+            if (bestMatch) {
+                console.log(`[MATCHING] ✅ Niveau 3.5 (Mots-clés + Niveau): ${bestMatch.contract_name} - ${bestMatch.level_name}`);
+                return bestMatch;
+            }
         }
     }
 
@@ -160,16 +187,73 @@ export class ContractsService {
       .replace(/'/g, ' '); // Enlève les apostrophes
 
     if (isAssureur) {
-        // Mappings spécifiques pour assureurs
+        // Mappings spécifiques pour assureurs - Normalisation complète
         const insurerMappings: { [key: string]: string } = {
-            'solly azar': 'sollyazar',
-            'swiss life': 'swisslife',
+            // AÉSIO et variantes
+            'aesio mutuelle': 'aesio',
+            'aesio': 'aesio',
+            
+            // Alptis et variantes
+            'alptis assurances': 'alptis',
+            'alptis': 'alptis',
+            
+            // Apivia et variantes
+            'apivia mutuelle': 'apivia',
+            'apivia': 'apivia',
+            
+            // April et variantes
+            'april sante prevoyance': 'april',
+            'april': 'april',
+            
+            // ASAF et variantes
+            'asaf afps': 'asaf',
+            'asaf': 'asaf',
+            
+            // AXA et variantes
+            'axa': 'axa',
+            
+            // Entoria et variantes
+            'entoria': 'entoria',
+            
+            // Generali et variantes
+            'generali france': 'generali',
+            'generali': 'generali',
+            
+            // Harmonie et variantes
             'harmonie mutuelle': 'harmonie',
-            'malakoff humanis': 'malakoff'
+            'harmonie': 'harmonie',
+            
+            // Henner et variantes
+            'henner': 'henner',
+            
+            // Malakoff et variantes
+            'malakoff humanis': 'malakoff',
+            'malakoff': 'malakoff',
+            
+            // SPVIE et toutes ses variantes (Mutualia)
+            'mutualia alliance sante': 'spvie',
+            'mutualia': 'spvie',
+            'spvie assurances': 'spvie',
+            'spvie': 'spvie',
+            
+            // Solly Azar et variantes
+            'solly azar': 'sollyazar',
+            'sollyazar': 'sollyazar',
+            'solly': 'sollyazar',
+            
+            // SwissLife et variantes
+            'swiss life': 'swisslife',
+            'swisslife': 'swisslife',
+            
+            // Utwin et variantes
+            'utwin': 'utwin'
         };
+        
+        // Appliquer les mappings dans l'ordre (les plus spécifiques en premier)
         for (const key in insurerMappings) {
             if (normalized.includes(key)) {
                 normalized = insurerMappings[key];
+                break; // Arrêter après le premier match
             }
         }
     } else {

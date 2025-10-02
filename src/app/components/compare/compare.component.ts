@@ -1002,10 +1002,10 @@ export class CompareComponent implements OnInit {
         const formulaMatch = result.formule.match(/Formule (\d+)|Niveau (\d+)/i);
         let formulaNumber = formulaMatch ? (formulaMatch[1] || formulaMatch[2]) : '*';
         
-        // Vérifier que le numéro de formule est valide pour Apivia (1-6)
-        if (formulaNumber !== '*' && (parseInt(formulaNumber) < 1 || parseInt(formulaNumber) > 6)) {
-          console.warn(`Formule Apivia invalide: ${formulaNumber}. Utilisation de la formule 6 par défaut.`);
-          formulaNumber = '6';
+        // Vérifier que le numéro de formule est valide pour Apivia (1-7)
+        if (formulaNumber !== '*' && (parseInt(formulaNumber) < 1 || parseInt(formulaNumber) > 7)) {
+          console.warn(`Formule Apivia invalide: ${formulaNumber}. Utilisation de la formule 7 par défaut.`);
+          formulaNumber = '7';
         }
 
         const apiviaPayload = {
@@ -1084,6 +1084,8 @@ export class CompareComponent implements OnInit {
         this.updateAssureurGuarantees(result, 'alptis');
       } else if (assuranceName.includes('april')) {
         this.updateAssureurGuarantees(result, 'april');
+      } else if (assuranceName.includes('axa')) {
+        this.updateAssureurGuarantees(result, 'axa');
       } else if (assuranceName.includes('utwin')) {
         this.updateAssureurGuarantees(result, 'utwin');
       } else if (assuranceName.includes('malakoff')) {
@@ -1098,6 +1100,8 @@ export class CompareComponent implements OnInit {
         this.updateAssureurGuarantees(result, 'generali');
       } else if (assuranceName.includes('solly')) {
         this.updateAssureurGuarantees(result, 'sollyazar');
+      } else if (assuranceName.includes('spvie') || assuranceName.includes('mutualia')) {
+        this.updateAssureurGuarantees(result, 'spvie');
       }
     });
     

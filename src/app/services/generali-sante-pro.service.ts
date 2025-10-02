@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 export interface GeneraliSanteProRequest {
   age: number;
@@ -62,10 +63,32 @@ export class GeneraliSanteProService {
       'Content-Type': 'application/json'
     });
 
-    return this.http.post<GeneraliSanteProResponse>(
+    return this.http.post<any>(
       `${this.apiUrl}/tarification`,
       request,
       { headers }
+    ).pipe(
+      map((response: any) => {
+        // Mapper snake_case vers camelCase
+        return {
+          assureur: response.assureur,
+          produit: response.produit,
+          formule: response.formule,
+          zone: response.zone,
+          zoneDescription: response.zone_description || response.zoneDescription,
+          compositionAssures: response.composition_assures || response.compositionAssures,
+          situationFamiliale: response.situation_familiale || response.situationFamiliale,
+          cotisationMensuelle: response.cotisation_mensuelle || response.cotisationMensuelle,
+          cotisationAnnuelle: response.cotisation_annuelle || response.cotisationAnnuelle,
+          details: {
+            age: response.details?.age,
+            codePostal: response.details?.code_postal || response.details?.codePostal,
+            nombreEnfants: response.details?.nombre_enfants || response.details?.nombreEnfants,
+            anneeEffet: response.details?.annee_effet || response.details?.anneeEffet
+          },
+          toutesFormules: response.toutes_formules || response.toutesFormules
+        } as GeneraliSanteProResponse;
+      })
     );
   }
 

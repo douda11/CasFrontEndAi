@@ -1116,12 +1116,11 @@ export class CompareComponent implements OnInit {
   /**
    * Met à jour les garanties d'un assureur spécifique
    */
-  private updateAssureurGuarantees(result: ComparisonResult, assureur: string): void {
+      private updateAssureurGuarantees(result: ComparisonResult, assureur: string): void {
     console.log(`🔍 DEBUG ${assureur.toUpperCase()} - Formule recherchée: "${result.formule}"`);
-    
-    // Utiliser le nouveau service simple et efficace
+
     const contract = this.contractsService.findContractByAssureurAndFormule(assureur, result.formule);
-    
+
     if (contract && contract.benefits) {
       console.log(`📋 Contrat ${assureur} trouvé:`, {
         insurer: contract.insurer,
@@ -1129,17 +1128,19 @@ export class CompareComponent implements OnInit {
         level_name: contract.level_name,
         benefits: contract.benefits
       });
-      
+
       const benefits = contract.benefits;
 
-      // L'approche la plus simple et la plus fiable.
-      const extract = (value: string | undefined): number | string => {
-        if (!value) return 0;
+      const extract = (value: string | undefined): string => {
+        if (!value) return '-';
+        if (value.includes('(') && value.includes(')')) {
+          return this.extractComplexValue(value);
+        }
         const num = this.extractNumericValue(value);
-        return isNaN(num) ? 0 : num;
+        return isNaN(num) ? (value.includes('%') ? '0%' : (value.includes('€') ? '0€' : '-')) : String(num);
       };
 
-      const finalGuarantees: GuaranteeValues = {
+      const finalGuarantees: any = {
         hospitalisation: extract(benefits?.HOSPITALISATION?.['honoraires_chirurgien_optam']),
         honoraires: extract(benefits?.SOINS_COURANTS?.['consultation_generaliste_optam']),
         chambreParticuliere: extract(benefits?.HOSPITALISATION?.['chambre_particuliere']),
@@ -1149,18 +1150,13 @@ export class CompareComponent implements OnInit {
         forfaitOptique: extract(benefits?.OPTIQUE?.['verres_complexes'])
       };
 
-      // Remplacer TOUTES les valeurs par les vraies données du JSON
-      // Cela écrase les "-" et les 0 du parseMarkdownTable
       Object.keys(finalGuarantees).forEach(key => {
         (result.garanties as any)[key] = (finalGuarantees as any)[key];
       });
-      
+
       console.log(`✅ Garanties ${assureur} mises à jour:`, JSON.stringify(finalGuarantees, null, 2));
-      console.log(`✅ result.garanties après assignation:`, JSON.stringify(result.garanties, null, 2));
     } else {
       console.warn(`⚠️ Contrat ${assureur} non trouvé pour la formule "${result.formule}"`);
-      
-      // Debug: lister les contrats disponibles pour cet assureur
       const availableContracts = this.contractsService.findContractsByAssureur(assureur);
       console.log(`📋 Contrats disponibles pour ${assureur}:`, 
         availableContracts.map(c => `${c.contract_name} - ${c.level_name}`)
@@ -1205,6 +1201,40 @@ export class CompareComponent implements OnInit {
   /**
    * Trouve le contrat Apivia correspondant dans le contracts.json
    */
+    /**
+   * Extrait la valeur numérique principale et le texte entre parenthèses.
+   * Ex: "450 % BR (100€ max / an)" -> "450 (100€ max / an)"
+   */
+  private extractComplexValue(value: string | undefined): string {
+    if (!value) {
+      return '-';
+    }
+
+    const cleanValue = value.toString().trim();
+    
+    // Regex pour extraire le premier nombre et le contenu des parenthèses
+    const numericMatch = cleanValue.match(/(\d*\.?\d+)/);
+    const parenthesisMatch = cleanValue.match(/\(([^)]+)\)/);
+
+    const numericPart = numericMatch ? numericMatch[0] : null;
+    const parenthesisPart = parenthesisMatch ? `(${parenthesisMatch[1]})` : null;
+
+    if (numericPart && parenthesisPart) {
+      return `${numericPart} ${parenthesisPart}`;
+    }
+    
+    if (numericPart) {
+      return numericPart;
+    }
+
+    // Si c'est juste du texte sans nombre (ex: "-"), le retourner
+    if (!numericPart && !parenthesisPart) {
+        return cleanValue;
+    }
+
+    return '-';
+  }
+
   private findApiviaContract(formulaNumber: string): any {
     // Simuler la recherche dans le contracts.json
     // En production, ces données devraient être chargées depuis le service
@@ -4075,10 +4105,12 @@ export class CompareComponent implements OnInit {
 
     this.generaliSanteProService.getTarification(request).subscribe({
       next: (response) => {
+        console.log('✅ GENERALI SANTÉ PRO API - Réponse complète:', response);
         result.isPricingLoading = false;
         result.prix = response.cotisationMensuelle;
         result.tarifGlobal = response.cotisationAnnuelle;
-        console.log('✅ GENERALI SANTÉ PRO API - Prix mis à jour:', result.prix, '€/mois');
+        console.log('✅ GENERALI SANTÉ PRO API - Prix mis à jour:', result.prix, '€/mois (annuel:', result.tarifGlobal, '€)');
+        console.log('✅ GENERALI SANTÉ PRO API - Type de prix:', typeof result.prix, '| isNumeric:', this.isNumeric(result.prix));
         this.cdr.detectChanges();
       },
       error: (error) => {

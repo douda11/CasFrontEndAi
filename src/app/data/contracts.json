@@ -13,7 +13,7 @@
         "SOINS_COURANTS": {
           "consultation_generaliste_optam": "100 % BR"
         },
-        " ": {
+        "DENTAIRE": {
           "soins_dentaires": "125 % BR",
           "implantologie": "100 €",
           "orthodontie": "150 % BR"

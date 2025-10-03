@@ -553,20 +553,26 @@
                       <div class="col-12 md:col-4">
                         <div class="field">
                           <label for="conjointDateNaissance" class="block mb-2">Date de naissance</label>
-                          <p-calendar 
-                            id="conjointDateNaissance" 
-                            formControlName="dateNaissance" 
-                            [showIcon]="true" 
-                            dateFormat="dd/mm/yy" 
-                            [style]="{ width: '100%' }" 
-                            [inputStyle]="{ width: '100%' }"
+                          <input
+                            id="conjointDateNaissance"
+                            type="text"
+                            formControlName="dateNaissance"
+                            pInputText
                             placeholder="JJ/MM/AAAA"
-                            [maxDate]="minDate"
-                            [yearNavigator]="true"
-                            yearRange="1920:2010"
-                            [monthNavigator]="true"
-                            [readonlyInput]="false"
-                          ></p-calendar>
+                            maxlength="10"
+                            class="w-full"
+                            (input)="formatDateInput($event, 'conjoint.dateNaissance')"
+                          />
+                          <small
+                            *ngIf="
+                              insuranceForm.get('personalInfo.conjoint.dateNaissance')?.invalid &&
+                              insuranceForm.get('personalInfo.conjoint.dateNaissance')?.touched
+                            "
+                            class="p-error"
+                          >
+                            <span *ngIf="insuranceForm.get('personalInfo.conjoint.dateNaissance')?.errors?.['invalidDate']"
+                              >Format de date invalide (JJ/MM/AAAA).</span>
+                          </small>
                         </div>
                       </div>
                       <div class="col-12 md:col-4">

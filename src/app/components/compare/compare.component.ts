@@ -134,7 +134,8 @@ export class CompareComponent implements OnInit {
     { label: 'Sécurité Sociale des Indépendants', value: 'TNS' },
     { label: 'Profession Libérale', value: 'PROF_LIBE' },
     { label: 'Régime Général', value: 'REGIME_GENERAL' },
-    { label: 'Professions Médicales et Non Médicales Non Salariées', value: 'PROF_MED_NON_MED_NON_SAL' }
+    { label: 'Professions Médicales et Non Médicales Non Salariées', value: 'PROF_MED_NON_MED_NON_SAL' },
+    { label: 'Sécurité Sociale', value: 'SS' }
   ];
   EtatcivilOptions = [
     { label: 'Célibataire', value: 'celibataire' }, { label: 'Marié(e)', value: 'marie' },
@@ -907,7 +908,7 @@ export class CompareComponent implements OnInit {
         case 'PROF_LIBE':
           return 'PROF_LIBE'; // Profession libérale garde sa valeur
         default:
-          return 'TNS'; // Tous les autres (TNS, REGIME_GENERAL, PROF_MED_NON_MED_NON_SAL) → TNS
+          return 'TNS'; // Tous les autres (TNS, REGIME_GENERAL, PROF_MED_NON_MED_NON_SAL, SS) → TNS
       }
     };
 
@@ -1344,6 +1345,8 @@ export class CompareComponent implements OnInit {
           return 'REGIME_GENERAL'; // Régime général for Alptis
         case 'PROF_MED_NON_MED_NON_SAL':
           return 'SECURITE_SOCIALE_INDEPENDANTS'; // Professions médicales et non médicales non salariées
+        case 'SS':
+          return 'REGIME_GENERAL'; // Sécurité Sociale mapped to REGIME_GENERAL for Alptis
         default:
           return 'SECURITE_SOCIALE_INDEPENDANTS'; // Default fallback
       }

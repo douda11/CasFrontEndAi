@@ -164,6 +164,8 @@ export class InsuranceService {
           return 'SALARIE'; // Régime général mapped to SALARIE for April
         case 'PROF_MED_NON_MED_NON_SAL':
           return 'PROF_LIBE'; // Professions médicales et non médicales non salariées mapped to PROF_LIBE
+        case 'SS':
+          return 'SALARIE'; // Sécurité Sociale mapped to SALARIE for April
         default:
           return 'TNS'; // Default fallback
       }
@@ -321,6 +323,8 @@ export class InsuranceService {
           return 'SSI'; // Profession libérale mapped to SSI for Utwin
         case 'PROF_MED_NON_MED_NON_SAL':
           return 'SSI'; // Professions médicales et non médicales non salariées mapped to SSI
+        case 'SS':
+          return 'RG'; // Sécurité Sociale mapped to RG for Utwin
         default:
           return 'RG'; // Default fallback
       }

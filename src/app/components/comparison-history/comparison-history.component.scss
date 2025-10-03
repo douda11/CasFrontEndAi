@@ -1,0 +1,470 @@
+.comparison-history-container {
+  padding: 1.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  min-height: calc(100vh - 80px);
+}
+
+/* En-tête */
+.header-section {
+  margin-bottom: 2rem;
+}
+
+.page-title {
+  color: #A102F2;
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  
+  i {
+    font-size: 1.8rem;
+  }
+}
+
+/* Cartes de statistiques */
+.statistics-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, #A102F2 0%, #8A00D4 100%);
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(161, 2, 242, 0.15);
+  
+  ::ng-deep .p-card-body {
+    padding: 1.5rem;
+  }
+  
+  ::ng-deep .p-card-content {
+    padding: 0;
+  }
+}
+
+.stat-content {
+  text-align: center;
+  color: white;
+}
+
+.stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Panel de filtres */
+.filters-panel {
+  margin-bottom: 1.5rem;
+  
+  ::ng-deep .p-panel-header {
+    background: linear-gradient(135deg, #A102F2 0%, #8A00D4 100%);
+    color: white;
+    border-radius: 8px 8px 0 0;
+  }
+  
+  ::ng-deep .p-panel-content {
+    padding: 1.5rem;
+  }
+}
+
+.filters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  align-items: end;
+}
+
+.filter-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  
+  label {
+    font-weight: 600;
+    color: #495057;
+    font-size: 0.9rem;
+  }
+}
+
+.filter-actions {
+  display: flex;
+  align-items: end;
+}
+
+/* Actions globales */
+.global-actions {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  justify-content: flex-end;
+}
+
+/* Carte du tableau */
+.table-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  
+  ::ng-deep .p-card-body {
+    padding: 0;
+  }
+  
+  ::ng-deep .p-card-content {
+    padding: 0;
+  }
+}
+
+/* Tableau */
+.history-table {
+  ::ng-deep .p-datatable-header {
+    background: linear-gradient(135deg, #A102F2 0%, #8A00D4 100%);
+    color: white;
+    border-radius: 12px 12px 0 0;
+  }
+  
+  ::ng-deep .p-datatable-thead > tr > th {
+    background: linear-gradient(135deg, #A102F2 0%, #8A00D4 100%);
+    color: white;
+    border: none;
+    padding: 1rem;
+    font-weight: 600;
+    
+    &:first-child {
+      border-radius: 12px 0 0 0;
+    }
+    
+    &:last-child {
+      border-radius: 0 12px 0 0;
+    }
+  }
+  
+  ::ng-deep .p-datatable-tbody > tr {
+    transition: all 0.3s ease;
+    
+    &:hover {
+      background-color: rgba(161, 2, 242, 0.05);
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    > td {
+      padding: 1rem;
+      border-bottom: 1px solid #e9ecef;
+      vertical-align: top;
+    }
+  }
+  
+  ::ng-deep .p-paginator {
+    background: #f8f9fa;
+    border: none;
+    border-radius: 0 0 12px 12px;
+    padding: 1rem;
+  }
+}
+
+/* Cellules du tableau */
+.date-cell {
+  .date-main {
+    font-weight: 600;
+    color: #495057;
+  }
+}
+
+.user-cell {
+  .user-name {
+    font-weight: 600;
+    color: #495057;
+    display: block;
+    margin-bottom: 0.25rem;
+  }
+  
+  .user-email {
+    font-size: 0.85rem;
+    color: #6c757d;
+  }
+}
+
+.principal-cell {
+  .principal-name {
+    font-weight: 600;
+    color: #495057;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+  
+  .principal-details {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  
+  .age-badge {
+    background: linear-gradient(135deg, #A102F2 0%, #8A00D4 100%);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  
+  .birth-date {
+    font-size: 0.8rem;
+    color: #6c757d;
+  }
+}
+
+.family-cell {
+  .family-details {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    
+    .conjoint-info,
+    .enfants-info {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.25rem;
+      color: #6c757d;
+      
+      i {
+        color: #A102F2;
+      }
+    }
+  }
+}
+
+.details-cell {
+  .detail-item {
+    display: flex;
+    margin-bottom: 0.25rem;
+    font-size: 0.85rem;
+    
+    .detail-label {
+      font-weight: 600;
+      color: #6c757d;
+      min-width: 80px;
+    }
+    
+    .detail-value {
+      color: #495057;
+    }
+  }
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* État vide */
+.empty-message {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.empty-state {
+  .empty-icon {
+    font-size: 3rem;
+    color: #A102F2;
+    margin-bottom: 1rem;
+  }
+  
+  h3 {
+    color: #495057;
+    margin-bottom: 0.5rem;
+  }
+  
+  p {
+    color: #6c757d;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+}
+
+/* Dialog de détails */
+.comparison-details {
+  .detail-panel {
+    margin-bottom: 1.5rem;
+    
+    ::ng-deep .p-panel-header {
+      background: linear-gradient(135deg, #A102F2 0%, #8A00D4 100%);
+      color: white;
+    }
+  }
+  
+  .detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+  }
+  
+  .detail-row {
+    display: flex;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #e9ecef;
+    
+    .detail-label {
+      font-weight: 600;
+      color: #6c757d;
+      min-width: 150px;
+    }
+    
+    .detail-value {
+      color: #495057;
+    }
+  }
+  
+  .assure-section {
+    margin-bottom: 1.5rem;
+    
+    h4 {
+      color: #A102F2;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .assure-details {
+      padding-left: 1.5rem;
+      
+      .assure-name {
+        font-weight: 600;
+        color: #495057;
+        display: block;
+        margin-bottom: 0.25rem;
+      }
+      
+      .assure-info {
+        color: #6c757d;
+        font-size: 0.9rem;
+      }
+    }
+  }
+  
+  .enfants-list {
+    padding-left: 1.5rem;
+    
+    .enfant-item {
+      display: flex;
+      margin-bottom: 0.5rem;
+      
+      .enfant-label {
+        font-weight: 600;
+        color: #6c757d;
+        min-width: 80px;
+      }
+      
+      .enfant-info {
+        color: #495057;
+      }
+    }
+  }
+  
+  .results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1rem;
+  }
+  
+  .result-card {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 1rem;
+    
+    .result-header {
+      margin-bottom: 0.75rem;
+      
+      h5 {
+        color: #A102F2;
+        margin: 0 0 0.25rem 0;
+      }
+      
+      .result-formule {
+        color: #6c757d;
+        font-size: 0.9rem;
+      }
+    }
+    
+    .result-price {
+      margin-bottom: 0.75rem;
+      
+      .price-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #28a745;
+      }
+      
+      .price-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+      }
+    }
+    
+    .result-guarantees {
+      .guarantee-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 0.25rem;
+        font-size: 0.85rem;
+        
+        .guarantee-name {
+          color: #6c757d;
+        }
+        
+        .guarantee-value {
+          color: #495057;
+          font-weight: 600;
+        }
+      }
+    }
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .comparison-history-container {
+    padding: 1rem;
+  }
+  
+  .page-title {
+    font-size: 1.5rem;
+  }
+  
+  .statistics-cards {
+    grid-template-columns: 1fr;
+  }
+  
+  .filters-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .global-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .results-grid {
+    grid-template-columns: 1fr;
+  }
+}

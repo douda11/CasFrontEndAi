@@ -1,0 +1,350 @@
+<div class="comparison-history-container">
+  <!-- En-tête avec statistiques -->
+  <div class="header-section">
+    <h1 class="page-title">
+      <i class="pi pi-history"></i>
+      Historique des Comparaisons
+    </h1>
+    
+    <div class="statistics-cards">
+      <p-card class="stat-card">
+        <div class="stat-content">
+          <div class="stat-number">{{ statistics.totalComparisons || 0 }}</div>
+          <div class="stat-label">Comparaisons</div>
+        </div>
+      </p-card>
+      
+      <p-card class="stat-card">
+        <div class="stat-content">
+          <div class="stat-number">{{ statistics.uniqueUsers || 0 }}</div>
+          <div class="stat-label">Utilisateurs</div>
+        </div>
+      </p-card>
+      
+      <p-card class="stat-card">
+        <div class="stat-content">
+          <div class="stat-number">{{ statistics.averageResultsPerComparison | number:'1.1-1' }}</div>
+          <div class="stat-label">Résultats/Comparaison</div>
+        </div>
+      </p-card>
+    </div>
+  </div>
+
+  <!-- Filtres -->
+  <p-panel header="Filtres" [toggleable]="true" [collapsed]="true" class="filters-panel">
+    <div class="filters-grid">
+      <div class="filter-item">
+        <label for="searchText">Recherche</label>
+        <input 
+          pInputText 
+          id="searchText"
+          [(ngModel)]="searchText" 
+          (input)="applyFilters()"
+          placeholder="Nom, prénom, utilisateur..."
+          class="w-full"
+        />
+      </div>
+      
+      <div class="filter-item">
+        <label for="userFilter">Utilisateur</label>
+        <p-dropdown
+          id="userFilter"
+          [(ngModel)]="selectedUser"
+          [options]="userOptions"
+          (onChange)="applyFilters()"
+          placeholder="Sélectionner un utilisateur"
+          class="w-full"
+        ></p-dropdown>
+      </div>
+      
+      <div class="filter-item">
+        <label for="dateRange">Période</label>
+        <p-calendar
+          id="dateRange"
+          [(ngModel)]="dateRange"
+          (onSelect)="applyFilters()"
+          selectionMode="range"
+          [readonlyInput]="false"
+          placeholder="Sélectionner une période"
+          dateFormat="dd/mm/yy"
+          class="w-full"
+        ></p-calendar>
+      </div>
+      
+      <div class="filter-actions">
+        <p-button 
+          label="Réinitialiser" 
+          icon="pi pi-refresh" 
+          (onClick)="resetFilters()"
+          severity="secondary"
+          size="small"
+        ></p-button>
+      </div>
+    </div>
+  </p-panel>
+
+  <!-- Actions globales -->
+  <div class="global-actions">
+    <p-button 
+      label="Exporter CSV" 
+      icon="pi pi-download" 
+      (onClick)="exportToCsv()"
+      severity="info"
+      size="small"
+    ></p-button>
+    
+    <p-button 
+      label="Vider l'historique" 
+      icon="pi pi-trash" 
+      (onClick)="clearAllHistory()"
+      severity="danger"
+      size="small"
+      [disabled]="filteredHistory.length === 0"
+    ></p-button>
+  </div>
+
+  <!-- Tableau des comparaisons -->
+  <p-card class="table-card">
+    <p-table 
+      [value]="filteredHistory" 
+      [paginator]="true" 
+      [rows]="10"
+      [rowsPerPageOptions]="[5, 10, 20, 50]"
+      [sortField]="'date'"
+      [sortOrder]="-1"
+      responsiveLayout="scroll"
+      [globalFilterFields]="['userName', 'principalName', 'principalFirstName']"
+      class="history-table"
+    >
+      <ng-template pTemplate="header">
+        <tr>
+          <th pSortableColumn="date">
+            Date 
+            <p-sortIcon field="date"></p-sortIcon>
+          </th>
+          <th pSortableColumn="userName">
+            Utilisateur
+            <p-sortIcon field="userName"></p-sortIcon>
+          </th>
+          <th>Assuré Principal</th>
+          <th>Composition Familiale</th>
+          <th>Détails</th>
+          <th pSortableColumn="totalResults">
+            Résultats
+            <p-sortIcon field="totalResults"></p-sortIcon>
+          </th>
+          <th>Actions</th>
+        </tr>
+      </ng-template>
+      
+      <ng-template pTemplate="body" let-comparison>
+        <tr>
+          <td>
+            <div class="date-cell">
+              <div class="date-main">{{ formatDate(comparison.date) }}</div>
+            </div>
+          </td>
+          
+          <td>
+            <div class="user-cell">
+              <div class="user-name">{{ comparison.userName }}</div>
+              <div class="user-email">{{ comparison.userEmail }}</div>
+            </div>
+          </td>
+          
+          <td>
+            <div class="principal-cell">
+              <div class="principal-name">{{ comparison.principalFirstName }} {{ comparison.principalName }}</div>
+              <div class="principal-details">
+                <span class="age-badge">{{ comparison.principalAge }} ans</span>
+                <span class="birth-date">{{ comparison.principalBirthDate }}</span>
+              </div>
+            </div>
+          </td>
+          
+          <td>
+            <div class="family-cell">
+              <p-tag 
+                [value]="getFamilyComposition(comparison)"
+                [severity]="comparison.conjoint ? 'success' : 'info'"
+              ></p-tag>
+              
+              <div class="family-details" *ngIf="comparison.conjoint || comparison.enfants">
+                <div *ngIf="comparison.conjoint" class="conjoint-info">
+                  <i class="pi pi-users"></i>
+                  {{ comparison.conjoint.firstName }} {{ comparison.conjoint.name }}
+                  ({{ comparison.conjoint.age }} ans)
+                </div>
+                
+                <div *ngIf="comparison.enfants" class="enfants-info">
+                  <i class="pi pi-heart"></i>
+                  {{ comparison.enfants.count }} enfant{{ comparison.enfants.count > 1 ? 's' : '' }}
+                </div>
+              </div>
+            </div>
+          </td>
+          
+          <td>
+            <div class="details-cell">
+              <div class="detail-item">
+                <span class="detail-label">Régime:</span>
+                <span class="detail-value">{{ comparison.regimeObligatoire }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Code postal:</span>
+                <span class="detail-value">{{ comparison.codePostal }}</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-label">Date effet:</span>
+                <span class="detail-value">{{ comparison.dateEffet }}</span>
+              </div>
+            </div>
+          </td>
+          
+          <td>
+            <p-tag 
+              [value]="comparison.totalResults.toString()"
+              [severity]="getResultsSeverity(comparison.totalResults)"
+            ></p-tag>
+          </td>
+          
+          <td>
+            <div class="action-buttons">
+              <p-button 
+                icon="pi pi-eye" 
+                (onClick)="showDetails(comparison)"
+                severity="info"
+                size="small"
+                [text]="true"
+                pTooltip="Voir les détails"
+              ></p-button>
+              
+              <p-button 
+                icon="pi pi-trash" 
+                (onClick)="deleteComparison(comparison)"
+                severity="danger"
+                size="small"
+                [text]="true"
+                pTooltip="Supprimer"
+              ></p-button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+      
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="7" class="empty-message">
+            <div class="empty-state">
+              <i class="pi pi-history empty-icon"></i>
+              <h3>Aucune comparaison trouvée</h3>
+              <p>Il n'y a pas encore de comparaisons dans l'historique ou aucune ne correspond aux filtres appliqués.</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </p-card>
+
+  <!-- Dialog de détails -->
+  <p-dialog 
+    header="Détails de la comparaison"
+    [(visible)]="showDetailDialog"
+    [modal]="true"
+    [style]="{ width: '80vw', maxWidth: '1200px' }"
+    [draggable]="false"
+    [resizable]="false"
+  >
+    <div *ngIf="selectedComparison" class="comparison-details">
+      <!-- Informations générales -->
+      <p-panel header="Informations générales" class="detail-panel">
+        <div class="detail-grid">
+          <div class="detail-row">
+            <span class="detail-label">Date de comparaison:</span>
+            <span class="detail-value">{{ formatDate(selectedComparison.date) }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Utilisateur:</span>
+            <span class="detail-value">{{ selectedComparison.userName }} ({{ selectedComparison.userEmail }})</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Régime obligatoire:</span>
+            <span class="detail-value">{{ selectedComparison.regimeObligatoire }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Code postal:</span>
+            <span class="detail-value">{{ selectedComparison.codePostal }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Date d'effet:</span>
+            <span class="detail-value">{{ selectedComparison.dateEffet }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Situation familiale:</span>
+            <span class="detail-value">{{ selectedComparison.situationFamiliale }}</span>
+          </div>
+        </div>
+      </p-panel>
+
+      <!-- Assurés -->
+      <p-panel header="Personnes assurées" class="detail-panel">
+        <!-- Assuré principal -->
+        <div class="assure-section">
+          <h4><i class="pi pi-user"></i> Assuré Principal</h4>
+          <div class="assure-details">
+            <span class="assure-name">{{ selectedComparison.principalFirstName }} {{ selectedComparison.principalName }}</span>
+            <span class="assure-info">{{ selectedComparison.principalAge }} ans - Né le {{ selectedComparison.principalBirthDate }}</span>
+          </div>
+        </div>
+
+        <!-- Conjoint -->
+        <div *ngIf="selectedComparison.conjoint" class="assure-section">
+          <h4><i class="pi pi-users"></i> Conjoint</h4>
+          <div class="assure-details">
+            <span class="assure-name">{{ selectedComparison.conjoint.firstName }} {{ selectedComparison.conjoint.name }}</span>
+            <span class="assure-info">{{ selectedComparison.conjoint.age }} ans - Né le {{ selectedComparison.conjoint.birthDate }}</span>
+          </div>
+        </div>
+
+        <!-- Enfants -->
+        <div *ngIf="selectedComparison.enfants && selectedComparison.enfants.count > 0" class="assure-section">
+          <h4><i class="pi pi-heart"></i> Enfants ({{ selectedComparison.enfants.count }})</h4>
+          <div class="enfants-list">
+            <div *ngFor="let enfant of selectedComparison.enfants.details; let i = index" class="enfant-item">
+              <span class="enfant-label">Enfant {{ i + 1 }}:</span>
+              <span class="enfant-info">{{ enfant.age }} ans - Né le {{ enfant.birthDate }}</span>
+            </div>
+          </div>
+        </div>
+      </p-panel>
+
+      <!-- Résultats -->
+      <p-panel header="Résultats de la comparaison ({{ selectedComparison.totalResults }})" class="detail-panel">
+        <div class="results-grid">
+          <div *ngFor="let result of selectedComparison.results" class="result-card">
+            <div class="result-header">
+              <h5>{{ result.assureur }}</h5>
+              <span class="result-formule">{{ result.formule }}</span>
+            </div>
+            <div class="result-price">
+              <span class="price-value">{{ result.prix }}€</span>
+              <span class="price-label">/mois</span>
+            </div>
+            <div class="result-guarantees" *ngIf="result.garanties">
+              <div *ngFor="let guarantee of result.garanties | keyvalue" class="guarantee-item">
+                <span class="guarantee-name">{{ guarantee.key }}:</span>
+                <span class="guarantee-value">{{ guarantee.value }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </p-panel>
+    </div>
+  </p-dialog>
+</div>
+
+<!-- Toast pour les messages -->
+<p-toast></p-toast>
+
+<!-- Dialog de confirmation -->
+<p-confirmDialog></p-confirmDialog>

@@ -39,6 +39,7 @@ import { GeneraliSanteProService } from '../../services/generali-sante-pro.servi
 import { ValueAnalyzerService, SliderConfig, ContractAnalysis } from '../../services/value-analyzer.service';
 import { ProximityService } from '../../services/proximity.service';
 import { ContractsService } from '../../services/contracts.service';
+import { ComparisonHistoryService } from '../../services/comparison-history.service';
 import { BesoinClient } from '../../models/comparateur.model';
 import { InsuranceQuoteForm, InsuredPerson } from '../../models/project-model';
 import { MessageService } from 'primeng/api';
@@ -193,6 +194,7 @@ export class CompareComponent implements OnInit {
     private valueAnalyzerService: ValueAnalyzerService,
     private proximityService: ProximityService,
     private contractsService: ContractsService,
+    private comparisonHistoryService: ComparisonHistoryService,
     private messageService: MessageService,
     private router: Router,
     private http: HttpClient,
@@ -804,6 +806,9 @@ export class CompareComponent implements OnInit {
             
             // 🔧 CORRECTION : Mettre à jour toutes les garanties avec les vraies données JSON
             this.updateAllGuaranteesFromContracts();
+            
+            // 📝 ENREGISTRER DANS L'HISTORIQUE
+            this.saveComparisonToHistory();
             
             setTimeout(() => {
               this.fetchAprilPrices();
@@ -4364,5 +4369,76 @@ export class CompareComponent implements OnInit {
     }
 
     return numericValue;
+  }
+
+  /**
+   * Enregistre la comparaison actuelle dans l'historique
+   */
+  private saveComparisonToHistory(): void {
+    try {
+      const formData = this.insuranceForm.value;
+      const personalInfo = formData.personalInfo || {};
+      
+      console.log('🔍 DEBUG - FormData:', formData);
+      console.log('🔍 DEBUG - PersonalInfo:', personalInfo);
+      console.log('🔍 DEBUG - Results avant formatage:', this.results);
+      
+      // Obtenir les informations utilisateur (simulé pour l'instant)
+      const userName = 'Utilisateur Test'; // À remplacer par les vraies données utilisateur
+      const userEmail = 'user@cashedi.com'; // À remplacer par les vraies données utilisateur
+      
+      // Préparer les données de comparaison avec la bonne structure
+      const comparisonData = {
+        userName,
+        userEmail,
+        formData: {
+          // Informations de l'assuré principal
+          nomPrincipal: personalInfo.nom || '',
+          prenomPrincipal: personalInfo.prenom || '',
+          dateNaissancePrincipal: personalInfo.dateNaissance || '',
+          
+          // Informations du conjoint
+          nomConjoint: personalInfo.conjoint?.nom || '',
+          prenomConjoint: personalInfo.conjoint?.prenom || '',
+          dateNaissanceConjoint: personalInfo.conjoint?.dateNaissance || '',
+          
+          // Situation familiale
+          situationFamiliale: personalInfo.etatCivil || '',
+          
+          // Enfants
+          nombreEnfants: personalInfo.enfants?.length || 0,
+          ...this.extractEnfantsData(personalInfo.enfants || []),
+          
+          // Autres informations
+          regimeObligatoire: personalInfo.regime || '',
+          codePostal: personalInfo.codePostal || '',
+          dateEffet: personalInfo.dateEffet || ''
+        },
+        results: this.results
+      };
+      
+      console.log('📝 DEBUG - Données préparées:', comparisonData);
+      
+      // Enregistrer dans l'historique
+      this.comparisonHistoryService.addComparison(comparisonData);
+      
+      console.log('✅ Comparaison enregistrée dans l\'historique');
+    } catch (error) {
+      console.error('❌ Erreur lors de l\'enregistrement dans l\'historique:', error);
+    }
+  }
+
+  /**
+   * Extraire les données des enfants du formulaire
+   */
+  private extractEnfantsData(enfants: any[]): any {
+    const enfantsData: any = {};
+    
+    enfants.forEach((enfant, index) => {
+      const enfantIndex = index + 1;
+      enfantsData[`dateNaissanceEnfant${enfantIndex}`] = enfant.dateNaissance || '';
+    });
+    
+    return enfantsData;
   }
 }

@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { LoginComponent } from './components/login/login.component';
 import { ProjectFormComponent } from './components/project-form/project-form.component';
 import { CompareComponent } from './components/compare/compare.component';
+import { ComparisonHistoryComponent } from './components/comparison-history/comparison-history.component';
 import { HubspotCallbackComponent } from './components/hubspot-callback/hubspot-callback.component';
 import { UserManagementComponent } from './components/user-management/user-management.component';
 import { AuthGuard } from './guards/auth.guard';
@@ -29,6 +30,11 @@ export const routes: Routes = [
   { 
     path: 'compare', 
     component: CompareComponent,
+    canActivate: [AuthGuard]
+  },
+  { 
+    path: 'historique', 
+    component: ComparisonHistoryComponent,
     canActivate: [AuthGuard]
   },
   { 

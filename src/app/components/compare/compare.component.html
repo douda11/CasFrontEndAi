@@ -874,7 +874,7 @@
                 <thead>
                   <tr>
                     <th></th>
-                    <th class="text-center">VOS<br>BESOINS</th>
+                    <th class="text-center"></th>
                     <th *ngFor="let result of results" class="text-center assurance-header compact-header">
                       <div class="insurer-logo-container">
                         <img [src]="getInsurerLogo(result.assurance)" 
@@ -900,7 +900,11 @@
                   <!-- Row for Produit and Formule -->
                   <tr class="border-b product-row">
                     <td class="font-bold">Produit</td>
-                    <td></td>
+                    <td class="text-center vos-besoins-cell">
+                      <div class="vos-besoins-circle">
+                        VOS<br>BESOINS
+                      </div>
+                    </td>
                     <td *ngFor="let result of results" class="text-center product-cell">
                       <div class="product-info">
                         <span class="product-name">{{ getProductNameOnly(result.assurance, result.formule) }}</span>

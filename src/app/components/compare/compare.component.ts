@@ -173,6 +173,7 @@ export class CompareComponent implements OnInit {
     'apivia': 'assets/images/logos/APIVIA.png',
     'april': 'assets/images/logos/APRIL.PNG',
     'asaf': 'assets/images/logos/ASAF.PNG',
+    'axa': 'assets/images/logos/AXA.PNG',
     'entoria': 'assets/images/logos/ENTORIA.PNG',
     'generali': 'assets/images/logos/GENERALI.PNG',
     'harmonie': 'assets/images/logos/HARMONIE.PNG',
@@ -4255,6 +4256,8 @@ export class CompareComponent implements OnInit {
       return this.insurerLogos['april'];
     } else if (assuranceLower.includes('asaf')) {
       return this.insurerLogos['asaf'];
+    } else if (assuranceLower.includes('axa')) {
+      return this.insurerLogos['axa'];
     } else if (assuranceLower.includes('entoria')) {
       return this.insurerLogos['entoria'];
     } else if (assuranceLower.includes('generali')) {

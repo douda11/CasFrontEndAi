@@ -965,3 +965,44 @@
   font-size: 0.7rem !important;
   line-height: 1.1 !important;
 }
+
+/* Style pour "VOS BESOINS" dans la ligne Produit */
+.vos-besoins-cell {
+  padding: 1rem !important;
+  text-align: center;
+  background: linear-gradient(135deg, var(--cashedi-primary) 0%, var(--cashedi-primary-light) 100%) !important;
+}
+
+.vos-besoins-circle {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--cashedi-white);
+  text-align: center;
+  line-height: 1.1;
+}
+
+/* Rectangle violet autour de la colonne VOS BESOINS jusqu'à Chambre Particulière */
+
+/* Première cellule de la colonne VOS BESOINS (titre) */
+.vos-besoins-cell {
+  border-top: 3px solid var(--cashedi-primary) !important;
+  border-left: 3px solid var(--cashedi-primary) !important;
+  border-right: 3px solid var(--cashedi-primary) !important;
+}
+
+/* Cellules des garanties dans la colonne VOS BESOINS (Hospitalisation à Chambre Particulière) */
+.comparison-table tr:nth-child(3) td:nth-child(2),  /* Hospitalisation */
+.comparison-table tr:nth-child(4) td:nth-child(2),  /* Honoraires */
+.comparison-table tr:nth-child(5) td:nth-child(2),  /* Orthodontie */
+.comparison-table tr:nth-child(6) td:nth-child(2),  /* Forfait Optique */
+.comparison-table tr:nth-child(7) td:nth-child(2),  /* Forfait Dentaire */
+.comparison-table tr:nth-child(8) td:nth-child(2),  /* Dentaire */
+.comparison-table tr:nth-child(9) td:nth-child(2) { /* Chambre Particulière */
+  border-left: 3px solid var(--cashedi-primary) !important;
+  border-right: 3px solid var(--cashedi-primary) !important;
+}
+
+/* Dernière cellule du rectangle (Chambre Particulière) */
+.comparison-table tr:nth-child(9) td:nth-child(2) {
+  border-bottom: 3px solid var(--cashedi-primary) !important;
+}

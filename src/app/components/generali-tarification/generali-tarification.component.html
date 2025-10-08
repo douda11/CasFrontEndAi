@@ -1,0 +1,195 @@
+<div class="generali-tarification-container">
+  <div class="card">
+    <div class="card-header">
+      <h2 class="card-title">
+        <i class="fas fa-calculator"></i>
+        Tarification Generali TNS Santé SUP
+      </h2>
+    </div>
+
+    <div class="card-body">
+      <form [formGroup]="tarificationForm" (ngSubmit)="onSubmit()" class="tarification-form">
+        
+        <!-- Informations personnelles -->
+        <div class="form-section">
+          <h3>Informations personnelles</h3>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="age">Âge *</label>
+              <input 
+                type="number" 
+                id="age" 
+                formControlName="age" 
+                class="form-control"
+                [class.is-invalid]="age?.invalid && age?.touched"
+                placeholder="Entre 18 et 65 ans"
+                min="18" 
+                max="65">
+              <div class="invalid-feedback" *ngIf="age?.invalid && age?.touched">
+                <div *ngIf="age?.errors?.['required']">L'âge est obligatoire</div>
+                <div *ngIf="age?.errors?.['min']">L'âge minimum est 18 ans</div>
+                <div *ngIf="age?.errors?.['max']">L'âge maximum est 65 ans</div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="codePostal">Code postal *</label>
+              <input 
+                type="text" 
+                id="codePostal" 
+                formControlName="codePostal" 
+                class="form-control"
+                [class.is-invalid]="codePostal?.invalid && codePostal?.touched"
+                placeholder="Ex: 75001"
+                maxlength="5">
+              <div class="zone-info" *ngIf="getZoneInfo()">
+                <i class="fas fa-map-marker-alt"></i>
+                {{ getZoneInfo() }}
+              </div>
+              <div class="invalid-feedback" *ngIf="codePostal?.invalid && codePostal?.touched">
+                <div *ngIf="codePostal?.errors?.['required']">Le code postal est obligatoire</div>
+                <div *ngIf="codePostal?.errors?.['pattern']">Format invalide (5 chiffres requis)</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="compositionFamiliale">Composition familiale *</label>
+            <select 
+              id="compositionFamiliale" 
+              formControlName="compositionFamiliale" 
+              class="form-control"
+              [class.is-invalid]="compositionFamiliale?.invalid && compositionFamiliale?.touched">
+              <option value="">Sélectionnez votre situation</option>
+              <option *ngFor="let comp of compositions" [value]="comp.value">
+                {{ comp.label }}
+              </option>
+            </select>
+            <div class="invalid-feedback" *ngIf="compositionFamiliale?.invalid && compositionFamiliale?.touched">
+              La composition familiale est obligatoire
+            </div>
+          </div>
+        </div>
+
+        <!-- Options de tarification -->
+        <div class="form-section">
+          <h3>Options de tarification</h3>
+          
+          <div class="form-group">
+            <div class="form-check">
+              <input 
+                type="checkbox" 
+                id="toutesFormules" 
+                formControlName="toutesFormules" 
+                class="form-check-input">
+              <label for="toutesFormules" class="form-check-label">
+                Comparer toutes les formules
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group" *ngIf="!toutesFormules?.value">
+            <label for="formule">Formule</label>
+            <select id="formule" formControlName="formule" class="form-control">
+              <option *ngFor="let f of formules" [value]="f">{{ f }}</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="form-actions">
+          <button 
+            type="submit" 
+            class="btn btn-primary"
+            [disabled]="loading || tarificationForm.invalid">
+            <i class="fas fa-spinner fa-spin" *ngIf="loading"></i>
+            <i class="fas fa-calculator" *ngIf="!loading"></i>
+            {{ loading ? 'Calcul en cours...' : 'Calculer le tarif' }}
+          </button>
+          
+          <button 
+            type="button" 
+            class="btn btn-secondary" 
+            (click)="reset()"
+            [disabled]="loading">
+            <i class="fas fa-undo"></i>
+            Réinitialiser
+          </button>
+        </div>
+      </form>
+
+      <!-- Affichage des erreurs -->
+      <div class="alert alert-danger" *ngIf="error">
+        <i class="fas fa-exclamation-triangle"></i>
+        {{ error }}
+      </div>
+
+      <!-- Résultat unique -->
+      <div class="result-section" *ngIf="result">
+        <div class="result-card">
+          <div class="result-header">
+            <h3>{{ result.assureur }} - {{ result.produit }}</h3>
+            <div class="formule-badge">{{ result.formule }}</div>
+          </div>
+          
+          <div class="result-body">
+            <div class="tarif-principal">
+              <div class="tarif-mensuel">
+                <span class="label">Tarif mensuel</span>
+                <span class="montant">{{ result.tarifMensuel }}€</span>
+              </div>
+              <div class="tarif-annuel">
+                <span class="label">Tarif annuel</span>
+                <span class="montant">{{ result.tarifAnnuel }}€</span>
+              </div>
+            </div>
+            
+            <div class="result-details">
+              <div class="detail-item">
+                <i class="fas fa-map-marker-alt"></i>
+                {{ result.zoneDescription }}
+              </div>
+              <div class="detail-item">
+                <i class="fas fa-users"></i>
+                {{ result.compositionFamiliale }}
+              </div>
+              <div class="detail-item">
+                <i class="fas fa-birthday-cake"></i>
+                {{ result.details.age }} ans ({{ result.ageBracket }})
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Comparaison de toutes les formules -->
+      <div class="comparison-section" *ngIf="allFormules.length > 0">
+        <h3>Comparaison des formules</h3>
+        <div class="formules-grid">
+          <div 
+            class="formule-card" 
+            *ngFor="let formule of allFormules"
+            [class.recommended]="formule.formule === 'F2'">
+            
+            <div class="formule-header">
+              <h4>{{ formule.formule }}</h4>
+              <div class="recommended-badge" *ngIf="formule.formule === 'F2'">
+                Recommandée
+              </div>
+            </div>
+            
+            <div class="formule-pricing">
+              <div class="prix-mensuel">{{ formule.tarifMensuel }}€/mois</div>
+              <div class="prix-annuel">{{ formule.tarifAnnuel }}€/an</div>
+            </div>
+            
+            <div class="formule-details">
+              <small>{{ formule.zoneDescription }}</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

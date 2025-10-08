@@ -1,0 +1,626 @@
+/* CASHedi Professional Design System */
+/* Global styles and PrimeNG theme imports */
+@import "primeflex/primeflex.css";
+@import "primeicons/primeicons.css";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* CASHedi Brand Colors - Professional Purple Theme */
+:root {
+  /* Primary Brand Colors */
+  --cashedi-primary: #A102F2;
+  --cashedi-primary-dark: #8A00D4;
+  --cashedi-primary-light: #B933F5;
+  --cashedi-primary-lighter: #D580FF;
+  --cashedi-primary-lightest: #F0E6FF;
+  
+  /* Secondary Colors */
+  --cashedi-secondary: #6366F1;
+  --cashedi-accent: #EC4899;
+  --cashedi-success: #10B981;
+  --cashedi-warning: #F59E0B;
+  --cashedi-error: #EF4444;
+  --cashedi-info: #3B82F6;
+  
+  /* Neutral Colors */
+  --cashedi-white: #FFFFFF;
+  --cashedi-gray-50: #F9FAFB;
+  --cashedi-gray-100: #F3F4F6;
+  --cashedi-gray-200: #E5E7EB;
+  --cashedi-gray-300: #D1D5DB;
+  --cashedi-gray-400: #9CA3AF;
+  --cashedi-gray-500: #6B7280;
+  --cashedi-gray-600: #4B5563;
+  --cashedi-gray-700: #374151;
+  --cashedi-gray-800: #1F2937;
+  --cashedi-gray-900: #111827;
+  
+  /* Semantic Colors */
+  --primary-color: var(--cashedi-primary);
+  --primary-dark: var(--cashedi-primary-dark);
+  --primary-light: var(--cashedi-primary-light);
+  --surface-ground: var(--cashedi-gray-50);
+  --surface-section: var(--cashedi-white);
+  --surface-card: var(--cashedi-white);
+  --surface-overlay: var(--cashedi-white);
+  --surface-border: var(--cashedi-gray-200);
+  --text-color: var(--cashedi-gray-800);
+  --text-secondary: var(--cashedi-gray-600);
+  --surface-hover: var(--cashedi-gray-100);
+  
+  /* Component Colors */
+  --button-text-color: var(--cashedi-white);
+  --button-bg: var(--cashedi-primary);
+  --button-hover-bg: var(--cashedi-primary-dark);
+  --input-bg: var(--cashedi-white);
+  --input-border: var(--cashedi-gray-300);
+  --input-focus-border: var(--cashedi-primary);
+  --card-bg: var(--cashedi-white);
+  --card-border: var(--cashedi-gray-200);
+  --dialog-bg: var(--cashedi-white);
+  --dialog-header-bg: var(--cashedi-white);
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgba(161, 2, 242, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(161, 2, 242, 0.1), 0 2px 4px -1px rgba(161, 2, 242, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(161, 2, 242, 0.1), 0 4px 6px -2px rgba(161, 2, 242, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(161, 2, 242, 0.1), 0 10px 10px -5px rgba(161, 2, 242, 0.04);
+  
+  /* Border Radius */
+  --border-radius-sm: 0.375rem;
+  --border-radius-md: 0.5rem;
+  --border-radius-lg: 0.75rem;
+  --border-radius-xl: 1rem;
+  
+  /* Typography */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --font-size-4xl: 2.25rem;
+}
+
+/* Dark theme variables */
+.dark-theme {
+  --primary-color: #3B82F6;
+  --primary-dark: #93C5FD;
+  --primary-light: #2563EB;
+  --surface-ground: #1F2937;
+  --surface-section: #374151;
+  --surface-card: #374151;
+  --surface-overlay: #4B5563;
+  --surface-border: #6B7280;
+  --text-color: #F9FAFB;
+  --text-secondary: #E5E7EB;
+  --surface-hover: #4B5563;
+  
+  /* Button */
+  --button-text-color: #fff;
+  --button-bg: var(--primary-color);
+  --button-hover-bg: var(--primary-dark);
+  
+  /* Input */
+  --input-bg: #2D3748;
+  --input-border: #4B5563;
+  --input-focus-border: var(--primary-color);
+  
+  /* Card */
+  --card-bg: var(--surface-card);
+  --card-border: var(--surface-border);
+  
+  /* Dialog */
+  --dialog-bg: var(--surface-overlay);
+  --dialog-header-bg: var(--surface-overlay);
+}
+
+/* Global Styles */
+html, body { 
+  height: 100%;
+  background: linear-gradient(135deg, var(--cashedi-gray-50) 0%, var(--cashedi-primary-lightest) 100%);
+  font-family: var(--font-family);
+  line-height: 1.6;
+}
+
+body { 
+  margin: 0; 
+  color: var(--text-color);
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Professional Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-family);
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--cashedi-gray-900);
+  margin-bottom: 0.5rem;
+}
+
+h1 { font-size: var(--font-size-4xl); }
+h2 { font-size: var(--font-size-3xl); }
+h3 { font-size: var(--font-size-2xl); }
+h4 { font-size: var(--font-size-xl); }
+h5 { font-size: var(--font-size-lg); }
+h6 { font-size: var(--font-size-base); }
+
+/* Professional Cards */
+.cashedi-card {
+  background: var(--cashedi-white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--cashedi-gray-200);
+  transition: all 0.3s ease;
+}
+
+.cashedi-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.cashedi-card-header {
+  background: linear-gradient(135deg, var(--cashedi-primary) 0%, var(--cashedi-primary-light) 100%);
+  color: var(--cashedi-white);
+  padding: 1.5rem;
+  border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+  margin: -1px -1px 0 -1px;
+}
+
+/* Professional Buttons */
+.cashedi-btn-primary {
+  background: linear-gradient(135deg, var(--cashedi-primary) 0%, var(--cashedi-primary-light) 100%);
+  border: none;
+  color: var(--cashedi-white);
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--border-radius-md);
+  font-weight: 500;
+  font-size: var(--font-size-sm);
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.cashedi-btn-primary:hover {
+  background: linear-gradient(135deg, var(--cashedi-primary-dark) 0%, var(--cashedi-primary) 100%);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.cashedi-btn-secondary {
+  background: var(--cashedi-white);
+  border: 2px solid var(--cashedi-primary);
+  color: var(--cashedi-primary);
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--border-radius-md);
+  font-weight: 500;
+  font-size: var(--font-size-sm);
+  transition: all 0.3s ease;
+}
+
+.cashedi-btn-secondary:hover {
+  background: var(--cashedi-primary);
+  color: var(--cashedi-white);
+  transform: translateY(-1px);
+}
+
+/* Professional Form Elements */
+.cashedi-input {
+  border: 2px solid var(--cashedi-gray-300);
+  border-radius: var(--border-radius-md);
+  padding: 0.75rem 1rem;
+  font-size: var(--font-size-sm);
+  transition: all 0.3s ease;
+  background: var(--cashedi-white);
+}
+
+.cashedi-input:focus {
+  border-color: var(--cashedi-primary);
+  box-shadow: 0 0 0 3px rgba(161, 2, 242, 0.1);
+  outline: none;
+}
+
+/* Professional Labels */
+.cashedi-label {
+  font-weight: 500;
+  color: var(--cashedi-gray-700);
+  font-size: var(--font-size-sm);
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+/* Status Indicators */
+.cashedi-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.cashedi-badge-success {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--cashedi-success);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.cashedi-badge-warning {
+  background: rgba(245, 158, 11, 0.1);
+  color: var(--cashedi-warning);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.cashedi-badge-error {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--cashedi-error);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.cashedi-badge-primary {
+  background: rgba(161, 2, 242, 0.1);
+  color: var(--cashedi-primary);
+  border: 1px solid rgba(161, 2, 242, 0.2);
+}
+.mat-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+/* Common utility classes */
+.shadow-1 {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.shadow-2 {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Professional Animations */
+.fadeIn {
+  animation: cashedi-fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes cashedi-fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slideIn {
+  animation: cashedi-slideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes cashedi-slideIn {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.cashedi-pulse {
+  animation: cashedi-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes cashedi-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.cashedi-bounce {
+  animation: cashedi-bounce 1s infinite;
+}
+
+@keyframes cashedi-bounce {
+  0%, 20%, 53%, 80%, 100% {
+    animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+    transform: translate3d(0, 0, 0);
+  }
+  40%, 43% {
+    animation-timing-function: cubic-bezier(0.755, 0.05, 0.855, 0.06);
+    transform: translate3d(0, -8px, 0);
+  }
+  70% {
+    animation-timing-function: cubic-bezier(0.755, 0.05, 0.855, 0.06);
+    transform: translate3d(0, -4px, 0);
+  }
+  90% {
+    transform: translate3d(0, -2px, 0);
+  }
+}
+
+/* Loading States */
+.cashedi-loading {
+  position: relative;
+  overflow: hidden;
+}
+
+.cashedi-loading::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(161, 2, 242, 0.1), transparent);
+  animation: cashedi-shimmer 1.5s infinite;
+}
+
+@keyframes cashedi-shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .cashedi-card {
+    margin: 0.5rem;
+    border-radius: var(--border-radius-md);
+  }
+  
+  .cashedi-card-header {
+    padding: 1rem;
+  }
+  
+  h1 { font-size: var(--font-size-3xl); }
+  h2 { font-size: var(--font-size-2xl); }
+  h3 { font-size: var(--font-size-xl); }
+}
+
+/* Utility Classes */
+.cashedi-text-gradient {
+  background: linear-gradient(135deg, var(--cashedi-primary) 0%, var(--cashedi-primary-light) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.cashedi-border-gradient {
+  border: 2px solid transparent;
+  background: linear-gradient(var(--cashedi-white), var(--cashedi-white)) padding-box,
+              linear-gradient(135deg, var(--cashedi-primary), var(--cashedi-primary-light)) border-box;
+}
+
+/* Focus States for Accessibility */
+.cashedi-focus:focus {
+  outline: 2px solid var(--cashedi-primary);
+  outline-offset: 2px;
+}
+
+/* CASHedi PrimeNG Component Overrides */
+/* Buttons */
+::ng-deep .p-button {
+  background: linear-gradient(135deg, var(--cashedi-primary) 0%, var(--cashedi-primary-light) 100%);
+  border: none;
+  color: var(--cashedi-white);
+  font-weight: 500;
+  border-radius: var(--border-radius-md);
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+::ng-deep .p-button:hover {
+  background: linear-gradient(135deg, var(--cashedi-primary-dark) 0%, var(--cashedi-primary) 100%);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+::ng-deep .p-button:focus {
+  box-shadow: 0 0 0 3px rgba(161, 2, 242, 0.3);
+}
+
+::ng-deep .p-button.p-button-outlined {
+  background: transparent;
+  border: 2px solid var(--cashedi-primary);
+  color: var(--cashedi-primary);
+}
+
+::ng-deep .p-button.p-button-outlined:hover {
+  background: var(--cashedi-primary);
+  color: var(--cashedi-white);
+}
+
+::ng-deep .p-button.p-button-secondary {
+  background: linear-gradient(135deg, var(--cashedi-secondary) 0%, #7C3AED 100%);
+}
+
+::ng-deep .p-button.p-button-secondary:hover {
+  background: linear-gradient(135deg, #5B21B6 0%, var(--cashedi-secondary) 100%);
+}
+
+::ng-deep .p-button.p-button-success {
+  background: linear-gradient(135deg, var(--cashedi-success) 0%, #34D399 100%);
+}
+
+::ng-deep .p-button.p-button-warning {
+  background: linear-gradient(135deg, var(--cashedi-warning) 0%, #FBBF24 100%);
+}
+
+::ng-deep .p-button.p-button-danger {
+  background: linear-gradient(135deg, var(--cashedi-error) 0%, #F87171 100%);
+}
+
+/* Toast Notifications */
+::ng-deep .p-toast {
+  z-index: 9999;
+}
+
+::ng-deep .p-toast .p-toast-message {
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-xl);
+  border: none;
+  backdrop-filter: blur(10px);
+}
+
+::ng-deep .p-toast .p-toast-message.p-toast-message-success {
+  background: linear-gradient(135deg, var(--cashedi-success) 0%, #34D399 100%);
+  color: var(--cashedi-white);
+}
+
+::ng-deep .p-toast .p-toast-message.p-toast-message-info {
+  background: linear-gradient(135deg, var(--cashedi-info) 0%, #60A5FA 100%);
+  color: var(--cashedi-white);
+}
+
+::ng-deep .p-toast .p-toast-message.p-toast-message-warn {
+  background: linear-gradient(135deg, var(--cashedi-warning) 0%, #FBBF24 100%);
+  color: var(--cashedi-white);
+}
+
+::ng-deep .p-toast .p-toast-message.p-toast-message-error {
+  background: linear-gradient(135deg, var(--cashedi-error) 0%, #F87171 100%);
+  color: var(--cashedi-white);
+}
+
+::ng-deep .p-toast .p-toast-message .p-toast-message-icon {
+  color: var(--cashedi-white);
+  font-size: 1.25rem;
+}
+
+::ng-deep .p-toast .p-toast-message .p-toast-message-text {
+  color: var(--cashedi-white);
+}
+
+::ng-deep .p-toast .p-toast-message .p-toast-icon-close {
+  color: var(--cashedi-white);
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: var(--border-radius-sm);
+  transition: all 0.3s ease;
+}
+
+::ng-deep .p-toast .p-toast-message .p-toast-icon-close:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Dropdown */
+::ng-deep .p-dropdown {
+  border: 2px solid var(--cashedi-gray-300);
+  border-radius: var(--border-radius-md);
+  transition: all 0.3s ease;
+}
+
+::ng-deep .p-dropdown:focus {
+  border-color: var(--cashedi-primary);
+  box-shadow: 0 0 0 3px rgba(161, 2, 242, 0.1);
+}
+
+::ng-deep .p-dropdown-panel {
+  border: 1px solid var(--cashedi-gray-200);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-lg);
+}
+
+::ng-deep .p-dropdown-item:hover {
+  background: var(--cashedi-primary-lightest);
+  color: var(--cashedi-primary);
+}
+
+::ng-deep .p-dropdown-item.p-highlight {
+  background: var(--cashedi-primary);
+  color: var(--cashedi-white);
+}
+
+/* Input Text */
+::ng-deep .p-inputtext {
+  border: 2px solid var(--cashedi-gray-300);
+  border-radius: var(--border-radius-md);
+  padding: 0.75rem 1rem;
+  transition: all 0.3s ease;
+}
+
+::ng-deep .p-inputtext:focus {
+  border-color: var(--cashedi-primary);
+  box-shadow: 0 0 0 3px rgba(161, 2, 242, 0.1);
+}
+
+/* Steps Component */
+::ng-deep .p-steps .p-steps-item.p-highlight .p-steps-number {
+  background: var(--cashedi-primary);
+  color: var(--cashedi-white);
+}
+
+::ng-deep .p-steps .p-steps-item.p-highlight .p-steps-title {
+  color: var(--cashedi-primary);
+  font-weight: 600;
+}
+
+/* Dialog */
+::ng-deep .p-dialog {
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-xl);
+}
+
+::ng-deep .p-dialog .p-dialog-header {
+  background: linear-gradient(135deg, var(--cashedi-primary) 0%, var(--cashedi-primary-light) 100%);
+  color: var(--cashedi-white);
+  border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+}
+
+::ng-deep .p-dialog .p-dialog-title {
+  color: var(--cashedi-white);
+  font-weight: 600;
+}
+
+::ng-deep .p-dialog .p-dialog-header-icon {
+  color: var(--cashedi-white);
+}
+
+::ng-deep .p-dialog .p-dialog-header-icon:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Cards */
+::ng-deep .p-card {
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--cashedi-gray-200);
+  transition: all 0.3s ease;
+}
+
+::ng-deep .p-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+::ng-deep .p-card .p-card-header {
+  background: linear-gradient(135deg, var(--cashedi-primary) 0%, var(--cashedi-primary-light) 100%);
+  color: var(--cashedi-white);
+  border-radius: var(--border-radius-lg) var(--border-radius-lg) 0 0;
+}
+
+/* Print Styles */
+@media print {
+  .cashedi-card {
+    box-shadow: none;
+    border: 1px solid var(--cashedi-gray-300);
+  }
+  
+  .cashedi-btn-primary,
+  .cashedi-btn-secondary {
+    background: var(--cashedi-white) !important;
+    color: var(--cashedi-gray-900) !important;
+    border: 1px solid var(--cashedi-gray-300) !important;
+  }
+}

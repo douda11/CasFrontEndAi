@@ -1,0 +1,40 @@
+.wizard-nav-container {
+  margin-bottom: 1rem;
+}
+
+:host ::ng-deep {
+  .p-menubar {
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    
+    .p-menuitem-link {
+      transition: all 0.2s;
+      border-radius: 0.25rem;
+      
+      &:hover {
+        background-color: var(--surface-100);
+      }
+    }
+    
+    .p-menuitem-icon {
+      margin-right: 0.5rem;
+    }
+  }
+  
+  .logo {
+    display: flex;
+    align-items: center;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  :host ::ng-deep {
+    .p-menubar-button {
+      display: flex;
+    }
+    
+    .p-menubar-root-list {
+      display: none;
+    }
+  }
+}

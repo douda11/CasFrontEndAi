@@ -1,0 +1,5005 @@
+[
+    { 
+      "insurer": "AÉSIO",
+      "contract_name": "TNS Pro",
+      "contract_type": "Complémentaire santé",
+      "level_id": "tns_pro_niv1",
+      "level_name": "Niveau 1",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "125 % BR",
+          "chambre_particuliere": "30 €"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "100 % BR"
+        },
+        " ": {
+          "soins_dentaires": "125 % BR",
+          "implantologie": "100 €",
+          "orthodontie": "150 % BR"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "100 €"
+        }
+      },
+      "source": {
+        "pdf_name": "1.1 Garanties TNS Pro.pdf",
+        "page_range": "all"
+      }
+    },
+    {
+      "insurer": "AÉSIO",
+      "contract_name": "TNS Pro",
+      "contract_type": "Complémentaire santé",
+      "level_id": "tns_pro_niv2",
+      "level_name": "Niveau 2",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "150 % BR",
+          "chambre_particuliere": "60 €"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "150 % BR"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "150 % BR",
+          "implantologie": "300 €",
+          "orthodontie": "200 % BR"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "120 €"
+        }
+      },
+      "source": {
+        "pdf_name": "1.1 Garanties TNS Pro.pdf",
+        "page_range": "all"
+      }
+    },
+    {
+      "insurer": "AÉSIO",
+      "contract_name": "TNS Pro",
+      "contract_type": "Complémentaire santé",
+      "level_id": "tns_pro_niv3",
+      "level_name": "Niveau 3",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "200 % BR",
+          "chambre_particuliere": "80 €"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "200 % BR"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "175 % BR",
+          "implantologie": "450 €",
+          "orthodontie": "250 % BR"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "135 €"
+        }
+      },
+      "source": {
+        "pdf_name": "1.1 Garanties TNS Pro.pdf",
+        "page_range": "all"
+      }
+    },
+    {
+      "insurer": "AÉSIO",
+      "contract_name": "TNS Pro",
+      "contract_type": "Complémentaire santé",
+      "level_id": "tns_pro_niv4",
+      "level_name": "Niveau 4",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "300 % BR",
+          "chambre_particuliere": "100 €"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "250 % BR"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "200 % BR",
+          "implantologie": "600 €",
+          "orthodontie": "300 % BR"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "150 €"
+        }
+      },
+      "source": {
+        "pdf_name": "1.1 Garanties TNS Pro.pdf",
+        "page_range": "all"
+      }
+    },
+    {
+      "insurer": "AÉSIO",
+      "contract_name": "TNS Pro",
+      "contract_type": "Complémentaire santé",
+      "level_id": "tns_pro_niv5",
+      "level_name": "Niveau 5",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "400 % BR",
+          "chambre_particuliere": "120 €"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "300 % BR"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "250 % BR",
+          "implantologie": "750 €",
+          "orthodontie": "350 % BR"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "160 €"
+        }
+      },
+      "source": {
+        "pdf_name": "1.1 Garanties TNS Pro.pdf",
+        "page_range": "all"
+      }
+    },
+    {
+      "insurer": "AÉSIO",
+      "contract_name": "TNS Pro",
+      "contract_type": "Complémentaire santé",
+      "level_id": "tns_pro_niv6",
+      "level_name": "Niveau 6",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "500 % BR",
+          "chambre_particuliere": "140 €"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "350 % BR"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "300 % BR",
+          "implantologie": "900 €",
+          "orthodontie": "400 % BR"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "175 €"
+        }
+      },
+      "source": {
+        "pdf_name": "1.1 Garanties TNS Pro.pdf",
+        "page_range": "all"
+      }
+    },
+    {
+      "insurer": "Alptis",
+      "contract_name": "Santé Pro+ Surco",
+      "contract_type": "Surcomplémentaire santé",
+      "level_id": "alptis_sante_pro_surco_lvl1",
+      "level_name": "Niveau 1",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "250 % BRSS"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "150 % BRSS"
+        },
+        "DENTAIRE": {},
+        "OPTIQUE": {}
+      },
+      "source": {
+        "pdf_name": "alptis (1).pdf",
+        "page_range": "3"
+      }
+    },
+    {
+      "insurer": "Alptis",
+      "contract_name": "Santé Pro+ Surco",
+      "contract_type": "Surcomplémentaire santé",
+      "level_id": "alptis_sante_pro_surco_lvl2",
+      "level_name": "Niveau 2",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "300 % BRSS"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "200 % BRSS"
+        },
+        "DENTAIRE": {},
+        "OPTIQUE": {}
+      },
+      "source": {
+        "pdf_name": "alptis (1).pdf",
+        "page_range": "3"
+      }
+    },
+    {
+      "insurer": "Alptis",
+      "contract_name": "Santé Pro+ Surco",
+      "contract_type": "Surcomplémentaire santé",
+      "level_id": "alptis_sante_pro_surco_lvl3",
+      "level_name": "Niveau 3",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "350 % BRSS"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "250 % BRSS"
+        },
+        "DENTAIRE": {},
+        "OPTIQUE": {}
+      },
+      "source": {
+        "pdf_name": "alptis (1).pdf",
+        "page_range": "3"
+      }
+    },
+    {
+      "insurer": "Alptis",
+      "contract_name": "Santé Pro+ Surco",
+      "contract_type": "Surcomplémentaire santé",
+      "level_id": "alptis_sante_pro_surco_lvl4",
+      "level_name": "Niveau 4",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "400 % BRSS"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "300 % BRSS"
+        },
+        "DENTAIRE": {},
+        "OPTIQUE": {}
+      },
+      "source": {
+        "pdf_name": "alptis (1).pdf",
+        "page_range": "3"
+      }
+    },
+    {
+      "insurer": "Alptis",
+      "contract_name": "Santé Pro+ Surco",
+      "contract_type": "Surcomplémentaire santé",
+      "level_id": "alptis_sante_pro_surco_lvl5",
+      "level_name": "Niveau 5",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "450 % BRSS"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "350 % BRSS"
+        },
+        "DENTAIRE": {},
+        "OPTIQUE": {}
+      },
+      "source": {
+        "pdf_name": "alptis (1).pdf",
+        "page_range": "3"
+      }
+    },
+    {
+      "insurer": "Alptis",
+      "contract_name": "Santé Pro+ Surco",
+      "contract_type": "Surcomplémentaire santé",
+      "level_id": "alptis_sante_pro_surco_lvl6",
+      "level_name": "Niveau 6",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "500 % BRSS"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "400 % BRSS"
+        },
+        "DENTAIRE": {},
+        "OPTIQUE": {}
+      },
+      "source": {
+        "pdf_name": "alptis (1).pdf",
+        "page_range": "3"
+      }
+    },
+    {
+      "insurer": "Alptis",
+      "contract_name": "Santé Select",
+      "contract_type": "Complémentaire santé",
+      "level_id": "alptis_sante_select_lvl1",
+      "level_name": "Niveau 1",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "100 % BRSS",
+          "chambre_particuliere": "-"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "100 % BRSS"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "100 % BRSS",
+          "implantologie": "-",
+          "orthodontie": "100 % BRSS"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "200 €"
+        }
+      },
+      "source": {
+        "pdf_name": "alptis (2).pdf",
+        "page_range": "3–6"
+      }
+    },
+    {
+      "insurer": "Alptis",
+      "contract_name": "Santé Select",
+      "contract_type": "Complémentaire santé",
+      "level_id": "alptis_sante_select_lvl2",
+      "level_name": "Niveau 2",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "125 % BRSS",
+          "chambre_particuliere": "30 €"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "125 % BRSS"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "150 % BRSS",
+          "implantologie": "100 €",
+          "orthodontie": "150 % BRSS"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "250 €"
+        }
+      },
+      "source": {
+        "pdf_name": "alptis (2).pdf",
+        "page_range": "3–6"
+      }
+    },
+    {
+      "insurer": "Alptis",
+      "contract_name": "Santé Pro+",
+      "contract_type": "Complémentaire santé",
+      "level_id": "alptis_sante_pro_plus_lvl1",
+      "level_name": "Niveau 1",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "250 % BRSS",
+          "chambre_particuliere": "60 €"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "150 % BRSS"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "200 % BRSS",
+          "implantologie": "500 €",
+          "orthodontie": "200 €"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "350 €"
+        }
+      },
+      "source": {
+        "pdf_name": "alptis (3).pdf",
+        "page_range": "2–5"
+      }
+    },
+    {
+      "insurer": "Alptis",
+      "contract_name": "Santé Pro+",
+      "contract_type": "Complémentaire santé",
+      "level_id": "alptis_sante_pro_plus_lvl2",
+      "level_name": "Niveau 2",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "300 % BRSS",
+          "chambre_particuliere": "80 €"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "200 % BRSS"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "250 % BRSS",
+          "implantologie": "600 €",
+          "orthodontie": "250 €"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "450 €"
+        }
+      },
+      "source": {
+        "pdf_name": "alptis (3).pdf",
+        "page_range": "2–5"
+      }
+    },
+    {
+      "insurer": "Alptis",
+      "contract_name": "Santé Pro+",
+      "contract_type": "Complémentaire santé",
+      "level_id": "alptis_sante_pro_plus_lvl3",
+      "level_name": "Niveau 3",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "350 % BRSS",
+          "chambre_particuliere": "90 €"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "250 % BRSS"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "300 % BRSS",
+          "implantologie": "700 €",
+          "orthodontie": "300 €"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "500 €"
+        }
+      },
+      "source": {
+        "pdf_name": "alptis (3).pdf",
+        "page_range": "2–5"
+      }
+    },
+    {
+      "insurer": "Alptis",
+      "contract_name": "Santé Pro+",
+      "contract_type": "Complémentaire santé",
+      "level_id": "alptis_sante_pro_plus_lvl4",
+      "level_name": "Niveau 4",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "400 % BRSS",
+          "chambre_particuliere": "100 €"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "300 % BRSS"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "350 % BRSS",
+          "implantologie": "800 €",
+          "orthodontie": "350 €"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "600 €"
+        }
+      },
+      "source": {
+        "pdf_name": "alptis (3).pdf",
+        "page_range": "2–5"
+      }
+    },
+    {
+      "insurer": "Alptis",
+      "contract_name": "Santé Pro+",
+      "contract_type": "Complémentaire santé",
+      "level_id": "alptis_sante_pro_plus_lvl5",
+      "level_name": "Niveau 5",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "450 % BRSS",
+          "chambre_particuliere": "110 €"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "350 % BRSS"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "400 % BRSS",
+          "implantologie": "900 €",
+          "orthodontie": "400 €"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "650 €"
+        }
+      },
+      "source": {
+        "pdf_name": "alptis (3).pdf",
+        "page_range": "2–5"
+      }
+    },
+    {
+      "insurer": "Alptis",
+      "contract_name": "Santé Pro+",
+      "contract_type": "Complémentaire santé",
+      "level_id": "alptis_sante_pro_plus_lvl6",
+      "level_name": "Niveau 6",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "500 % BRSS",
+          "chambre_particuliere": "120 €"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "400 % BRSS"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "500 % BRSS",
+          "implantologie": "1000 €",
+          "orthodontie": "450 €"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "700 €"
+        }
+      },
+      "source": {
+        "pdf_name": "alptis (3).pdf",
+        "page_range": "2–5"
+      }
+    },
+    {
+      "insurer": "Apivia",
+      "contract_name": "Vitamin3 Pro",
+      "contract_type": "Complémentaire santé",
+      "level_id": "apivia_vitamin3pro_lvl1",
+      "level_name": "Niveau 1",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "100%",
+          "chambre_particuliere": "40 €/jour"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "100%"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "100%",
+          "implantologie": "-",
+          "orthodontie": "100%"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "200 €"
+        }
+      },
+      "source": {
+        "pdf_name": "apivia.pdf",
+        "page_range": "full"
+      }
+    },
+    {
+      "insurer": "Apivia",
+      "contract_name": "Vitamin3 Pro",
+      "contract_type": "Complémentaire santé",
+      "level_id": "apivia_vitamin3pro_lvl2",
+      "level_name": "Niveau 2",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "175%",
+          "chambre_particuliere": "60 €/jour"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "150%"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "125%",
+          "implantologie": "250 €",
+          "orthodontie": "125%"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "250 €"
+        }
+      },
+      "source": {
+        "pdf_name": "apivia.pdf",
+        "page_range": "full"
+      }
+    },
+    {
+      "insurer": "Apivia",
+      "contract_name": "Vitamin3 Pro",
+      "contract_type": "Complémentaire santé",
+      "level_id": "apivia_vitamin3pro_lvl3",
+      "level_name": "Niveau 3",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "250%",
+          "chambre_particuliere": "60 €/jour"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "200%"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "125%",
+          "implantologie": "250 €",
+          "orthodontie": "200%"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "250 €"
+        }
+      },
+      "source": {
+        "pdf_name": "apivia.pdf",
+        "page_range": "full"
+      }
+    },
+    {
+      "insurer": "Apivia",
+      "contract_name": "Vitamin3 Pro",
+      "contract_type": "Complémentaire santé",
+      "level_id": "apivia_vitamin3pro_lvl4",
+      "level_name": "Niveau 4",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "250%",
+          "chambre_particuliere": "80 €/jour"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "275%"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "150%",
+          "implantologie": "400 €",
+          "orthodontie": "275%"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "350 €"
+        }
+      },
+      "source": {
+        "pdf_name": "apivia.pdf",
+        "page_range": "full"
+      }
+    },
+    {
+      "insurer": "Apivia",
+      "contract_name": "Vitamin3 Pro",
+      "contract_type": "Complémentaire santé",
+      "level_id": "apivia_vitamin3pro_lvl5",
+      "level_name": "Niveau 5",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "325%",
+          "chambre_particuliere": "60 €/jour"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "275%"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "125%",
+          "implantologie": "250 €",
+          "orthodontie": "200%"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "350 €"
+        }
+      },
+      "source": {
+        "pdf_name": "apivia.pdf",
+        "page_range": "full"
+      }
+    },
+    {
+      "insurer": "Apivia",
+      "contract_name": "Vitamin3 Pro",
+      "contract_type": "Complémentaire santé",
+      "level_id": "apivia_vitamin3pro_lvl6",
+      "level_name": "Niveau 6",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "250%",
+          "chambre_particuliere": "100 €/jour"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "350%"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "125%",
+          "implantologie": "250 €",
+          "orthodontie": "200%"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "350 €"
+        }
+      },
+      "source": {
+        "pdf_name": "apivia.pdf",
+        "page_range": "full"
+      }
+    },
+    {
+      "insurer": "Apivia",
+      "contract_name": "Vitamin3 Pro",
+      "contract_type": "Complémentaire santé",
+      "level_id": "apivia_vitamin3pro_lvl7",
+      "level_name": "Niveau 7",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "400%",
+          "chambre_particuliere": "100 €/jour"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "350%"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "200%",
+          "implantologie": "550 €",
+          "orthodontie": "350%"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "500 €"
+        }
+      },
+      "source": {
+        "pdf_name": "apivia.pdf",
+        "page_range": "full"
+      }
+    },
+    {
+      "insurer": "APRIL",
+      "contract_name": "Santé Mix Proximité",
+      "contract_type": "Complémentaire santé",
+      "level_id": "sante_mix_proximite_niv1",
+      "level_name": "Niveau 1",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "100% BR",
+          "chambre_particuliere": "-"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "100% BR"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "100% BR",
+          "orthodontie": "100% BR"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "200 €"
+        }
+      },
+      "source": {
+        "pdf_name": "april (1).pdf",
+        "page_range": "5-7"
+      }
+    },
+    {
+      "insurer": "APRIL",
+      "contract_name": "Santé Mix Proximité",
+      "contract_type": "Complémentaire santé",
+      "level_id": "sante_mix_proximite_niv2",
+      "level_name": "Niveau 2",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "125% BR",
+          "chambre_particuliere": "40 €"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "125% BR"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "125% BR",
+          "orthodontie": "125% BR"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "275 €"
+        }
+      },
+      "source": {
+        "pdf_name": "april (1).pdf",
+        "page_range": "5-7"
+      }
+    },
+    {
+      "insurer": "APRIL",
+      "contract_name": "Santé Mix Proximité",
+      "contract_type": "Complémentaire santé",
+      "level_id": "sante_mix_proximite_niv3",
+      "level_name": "Niveau 3",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "150% BR",
+          "chambre_particuliere": "55 €"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "150% BR"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "150% BR",
+          "orthodontie": "150% BR"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "350 €"
+        }
+      },
+      "source": {
+        "pdf_name": "april (1).pdf",
+        "page_range": "5-7"
+      }
+    },
+    {
+      "insurer": "APRIL",
+      "contract_name": "Santé Mix Proximité",
+      "contract_type": "Complémentaire santé",
+      "level_id": "sante_mix_proximite_niv4",
+      "level_name": "Niveau 4",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "200% BR",
+          "chambre_particuliere": "70 €"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "200% BR"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "175% BR",
+          "orthodontie": "200% BR"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "425 €"
+        }
+      },
+      "source": {
+        "pdf_name": "april (1).pdf",
+        "page_range": "5-7"
+      }
+    },
+    {
+      "insurer": "APRIL",
+      "contract_name": "Santé Mix Proximité",
+      "contract_type": "Complémentaire santé",
+      "level_id": "sante_mix_proximite_niv5",
+      "level_name": "Niveau 5",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "250% BR",
+          "chambre_particuliere": "85 €"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "250% BR"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "200% BR",
+          "orthodontie": "250% BR"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "500 €"
+        }
+      },
+      "source": {
+        "pdf_name": "april (1).pdf",
+        "page_range": "5-7"
+      }
+    },
+    {
+      "insurer": "APRIL",
+      "contract_name": "Santé Mix Proximité",
+      "contract_type": "Complémentaire santé",
+      "level_id": "sante_mix_proximite_niv6",
+      "level_name": "Niveau 6", 
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "300% BR",
+          "chambre_particuliere": "100 €"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "300% BR"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "250% BR",
+          "orthodontie": "300% BR"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "500 €"
+        }
+      },
+      "source": {
+        "pdf_name": "april (1).pdf",
+        "page_range": "5-7"
+      }
+    },
+    
+   
+    
+    {
+      "insurer": "ASAF",
+      "contract_name": "MCCI Proévidence 2",
+      "contract_type": "Complémentaire santé",
+      "level_id": "mcci_proevidence2_niv1",
+      "level_name": "Tranquillité",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "125% BR",
+          "honoraires_chirurgien_non_optam": "105% BR",
+          "chambre_particuliere": "30 €"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "100% BR",
+          "consultation_generaliste_non_optam": "100% BR"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "100% BR",
+          "orthodontie": "125% BR"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "200 €"
+        }
+      },
+      "source": {
+        "pdf_name": "asaf (1).pdf",
+        "page_range": "50–55"
+      }
+    },
+    {
+      "insurer": "ASAF",
+      "contract_name": "MCCI Proévidence 2",
+      "contract_type": "Complémentaire santé",
+      "level_id": "mcci_proevidence2_niv2",
+      "level_name": "Sécurité",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "150% BR",
+          "honoraires_chirurgien_non_optam": "130% BR",
+          "chambre_particuliere": "45 €"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "130% BR",
+          "consultation_generaliste_non_optam": "110% BR"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "150% BR",
+          "orthodontie": "150% BR"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "250 €"
+        }
+      },
+      "source": {
+        "pdf_name": "asaf (1).pdf",
+        "page_range": "50–55"
+      }
+    },
+    {
+      "insurer": "ASAF",
+      "contract_name": "MCCI Proévidence 2",
+      "contract_type": "Complémentaire santé",
+      "level_id": "mcci_proevidence2_niv3",
+      "level_name": "Agilité",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "175% BR",
+          "honoraires_chirurgien_non_optam": "150% BR",
+          "chambre_particuliere": "60 €"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "150% BR",
+          "consultation_generaliste_non_optam": "130% BR"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "225% BR",
+          "orthodontie": "200% BR"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "320 €"
+        }
+      },
+      "source": {
+        "pdf_name": "asaf (1).pdf",
+        "page_range": "50–55"
+      }
+    },
+    {
+      "insurer": "ASAF",
+      "contract_name": "MCCI Proévidence 2",
+      "contract_type": "Complémentaire santé",
+      "level_id": "mcci_proevidence2_niv4",
+      "level_name": "Flexibilité",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "225% BR",
+          "honoraires_chirurgien_non_optam": "200% BR",
+          "chambre_particuliere": "80 €"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "225% BR",
+          "consultation_generaliste_non_optam": "200% BR"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "250% BR",
+          "orthodontie": "250% BR"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "350 €"
+        }
+      },
+      "source": {
+        "pdf_name": "asaf (1).pdf",
+        "page_range": "50–55"
+      }
+    },
+    {
+      "insurer": "ASAF",
+      "contract_name": "MCCI Proévidence 2",
+      "contract_type": "Complémentaire santé",
+      "level_id": "mcci_proevidence2_niv5",
+      "level_name": "Confort",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "300% BR",
+          "honoraires_chirurgien_non_optam": "",
+          "chambre_particuliere": "95 €"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "300% BR",
+          "consultation_generaliste_non_optam": ""
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "300% BR",
+          "orthodontie": "350% BR"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "380 €"
+        }
+      },
+      "source": {
+        "pdf_name": "asaf (1).pdf",
+        "page_range": "50–55"
+      }
+    },
+    {
+      "insurer": "ASAF",
+      "contract_name": "MCCI Proévidence 2",
+      "contract_type": "Complémentaire santé",
+      "level_id": "mcci_proevidence2_niv6",
+      "level_name": "Sérénité",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "400% BR",
+          "honoraires_chirurgien_non_optam": "",
+          "chambre_particuliere": "115 €"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "400% BR",
+          "consultation_generaliste_non_optam": ""
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "400% BR",
+          "orthodontie": "450% BR"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "420 €"
+        }
+      },
+      "source": {
+        "pdf_name": "asaf (1).pdf",
+        "page_range": "50–55"
+      }
+    },
+    {
+      "insurer": "ASAF",
+      "contract_name": "MCCI Proévidence 2",
+      "contract_type": "Complémentaire santé",
+      "level_id": "mcci_proevidence2_niv7",
+      "level_name": "Liberté",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "500% BR",
+          "honoraires_chirurgien_non_optam": "",
+          "chambre_particuliere": "140 €"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "500% BR",
+          "consultation_generaliste_non_optam": ""
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "",
+          "orthodontie": "500% BR"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "470 €"
+        }
+      },
+      "source": {
+        "pdf_name": "asaf (1).pdf",
+        "page_range": "50–55"
+      }
+    },
+    {
+      "insurer": "ASAF",
+      "contract_name": "Méana Santé Pro 3",
+      "contract_type": "Complémentaire santé",
+      "level_id": "meana_sante_pro3_niv1",
+      "level_name": "Niveau 125",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "125% BR",
+          "chambre_particuliere": "30 €"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "125% BR"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "125% BR",
+          "orthodontie": "125% BR"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "200 €"
+        }
+      },
+      "source": {
+        "pdf_name": "asaf (2).pdf",
+        "page_range": "48–52"
+      }
+    },
+    {
+      "insurer": "ASAF",
+      "contract_name": "Méana Santé Pro 3",
+      "contract_type": "Complémentaire santé",
+      "level_id": "meana_sante_pro3_niv2",
+      "level_name": "Niveau 175",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "175% BR",
+          "chambre_particuliere": "40 €"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "175% BR"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "175% BR",
+          "orthodontie": "175% BR"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "300 €"
+        }
+      },
+      "source": {
+        "pdf_name": "asaf (2).pdf",
+        "page_range": "48–52"
+      }
+    },
+    {
+      "insurer": "ASAF",
+      "contract_name": "Méana Santé Pro 3",
+      "contract_type": "Complémentaire santé",
+      "level_id": "meana_sante_pro3_niv3",
+      "level_name": "Niveau 225",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "225% BR",
+          "chambre_particuliere": "50 €"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "225% BR"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "225% BR",
+          "orthodontie": "225% BR"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "350 €"
+        }
+      },
+      "source": {
+        "pdf_name": "asaf (2).pdf",
+        "page_range": "48–52"
+      }
+    },
+    {
+      "insurer": "ASAF",
+      "contract_name": "Méana Santé Pro 3",
+      "contract_type": "Complémentaire santé",
+      "level_id": "meana_sante_pro3_niv4",
+      "level_name": "Niveau 300",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "300% BR",
+          "chambre_particuliere": "60 €"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "300% BR"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "300% BR",
+          "orthodontie": "300% BR"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "400 €"
+        }
+      },
+      "source": {
+        "pdf_name": "asaf (2).pdf",
+        "page_range": "48–52"
+      }
+    },
+    {
+      "insurer": "ASAF",
+      "contract_name": "Méana Santé Pro 3",
+      "contract_type": "Complémentaire santé",
+      "level_id": "meana_sante_pro3_niv5",
+      "level_name": "Niveau 350",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "350% BR",
+          "chambre_particuliere": "70 €"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "350% BR"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "350% BR",
+          "orthodontie": "350% BR"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "500 €"
+        }
+      },
+      "source": {
+        "pdf_name": "asaf (2).pdf",
+        "page_range": "48–52"
+      }
+    },
+    {
+      "insurer": "ASAF",
+      "contract_name": "Osalys Essentiel",
+      "contract_type": "Complémentaire santé",
+      "level_id": "osalys_essentiel_niv1",
+      "level_name": "Essentiel 1",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "100% BR"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "100% BR"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "100% BR",
+          "orthodontie": "100% BR"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "200 €"
+        }
+      },
+      "source": {
+        "pdf_name": "asaf (3).pdf",
+        "page_range": "46–48"
+      }
+    },
+    {
+      "insurer": "ASAF",
+      "contract_name": "Osalys Essentiel",
+      "contract_type": "Complémentaire santé",
+      "level_id": "osalys_essentiel_niv2",
+      "level_name": "Essentiel 2",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "150% BR"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "150% BR"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "150% BR",
+          "orthodontie": "150% BR"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "300 €"
+        }
+      },
+      "source": {
+        "pdf_name": "asaf (3).pdf",
+        "page_range": "46–48"
+      }
+    },
+    {
+      "insurer": "ASAF",
+      "contract_name": "Osalys Essentiel",
+      "contract_type": "Complémentaire santé",
+      "level_id": "osalys_essentiel_niv3",
+      "level_name": "Essentiel 3",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "200% BR"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "200% BR"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "200% BR",
+          "orthodontie": "200% BR"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "400 €"
+        }
+      },
+      "source": {
+        "pdf_name": "asaf (3).pdf",
+        "page_range": "46–48"
+      }
+    },
+    {
+      "insurer": "Entoria",
+      "contract_name": "Essentiel Pro",
+      "contract_type": "Complémentaire santé",
+      "level_id": "entoria_essentiel_pro",
+      "level_name": "Essentiel Pro",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "150% BR",
+          "honoraires_chirurgien_non_optam": "125% BR",
+          "chambre_particuliere": "40 €"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "150% BR",
+          "consultation_generaliste_non_optam": "125% BR"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "125% BR",
+          "orthodontie": "150% BR"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "Deux verres très complexes + monture : 275 €"
+        }
+      },
+      "source": {
+        "pdf_name": "entoria (1).pdf",
+        "page_range": "entire"
+      }
+    },
+    {
+      "insurer": "Entoria",
+      "contract_name": "Excellence Pro",
+      "contract_type": "Surcomplémentaire santé",
+      "level_id": "entoria_excellence_pro",
+      "level_name": "Excellence Pro",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "+300% BR",
+          "honoraires_chirurgien_non_optam": "+300% BR",
+          "chambre_particuliere": "+30 € / jour, max 10 jours"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "+250% BR",
+          "consultation_generaliste_non_optam": "+200% BR"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "+300% BR",
+          "orthodontie": "+300% BR"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "+200 € / an"
+        }
+      },
+      "source": {
+        "pdf_name": "entoria (2).pdf",
+        "page_range": "entire"
+      }
+    },
+    {
+      "insurer": "Entoria",
+      "contract_name": "Confort Pro",
+      "contract_type": "Surcomplémentaire santé",
+      "level_id": "entoria_confort_pro",
+      "level_name": "Confort Pro",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "+100% BR",
+          "honoraires_chirurgien_non_optam": "+100% BR",
+          "chambre_particuliere": "+20 € / jour, max 10 jours"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "+100% BR",
+          "consultation_generaliste_non_optam": "+50% BR"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "+200% BR",
+          "orthodontie": "+200% BR"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "+100 € / an"
+        }
+      },
+      "source": {
+        "pdf_name": "entoria (3).pdf",
+        "page_range": "entire"
+      }
+    },
+    {
+      "insurer": "Entoria",
+      "contract_name": "Sécurité Pro",
+      "contract_type": "Surcomplémentaire santé",
+      "level_id": "entoria_securite_pro",
+      "level_name": "Sécurité Pro",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "+100% BR",
+          "honoraires_chirurgien_non_optam": "+100% BR",
+          "chambre_particuliere": "+10 € / jour, max 10 jours"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "+100% BR",
+          "consultation_generaliste_non_optam": "+20% BR"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "+100% BR",
+          "orthodontie": "+100% BR"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "+100 € / an"
+        }
+      },
+      "source": {
+        "pdf_name": "entoria (4).pdf",
+        "page_range": "entire"
+      }
+    },
+    {
+      "insurer": "Entoria",
+      "contract_name": "Excellence Pro",
+      "contract_type": "Complémentaire santé",
+      "level_id": "entoria_excellence_pro_complementaire",
+      "level_name": "Excellence Pro",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "500% BR",
+          "honoraires_chirurgien_non_optam": "200% BR",
+          "chambre_particuliere": "140 €"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "400% BR",
+          "consultation_generaliste_non_optam": "200% BR"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "400% BR",
+          "orthodontie": "500% BR"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "Deux verres très complexes + monture : 755 €"
+        }
+      },
+      "source": {
+        "pdf_name": "entoria (5).pdf",
+        "page_range": "entire"
+      }
+    },
+    {
+      "insurer": "Entoria",
+      "contract_name": "Confort Pro",
+      "contract_type": "Complémentaire santé",
+      "level_id": "entoria_confort_pro_complementaire",
+      "level_name": "Confort Pro",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "300% BR",
+          "honoraires_chirurgien_non_optam": "200% BR",
+          "chambre_particuliere": "110 €"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "250% BR",
+          "consultation_generaliste_non_optam": "200% BR"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "350% BR",
+          "orthodontie": "350% BR"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "Deux verres très complexes + monture : 610 €"
+        }
+      },
+      "source": {
+        "pdf_name": "entoria (6).pdf",
+        "page_range": "entire"
+      }
+    },
+    {
+      "insurer": "Entoria",
+      "contract_name": "Sécurité Pro",
+      "contract_type": "Complémentaire santé",
+      "level_id": "entoria_securite_pro_complementaire",
+      "level_name": "Sécurité Pro",
+      "benefits": {
+        "HOSPITALISATION": {
+          "honoraires_chirurgien_optam": "200% BR",
+          "honoraires_chirurgien_non_optam": "180% BR",
+          "chambre_particuliere": "80 €"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "200% BR",
+          "consultation_generaliste_non_optam": "180% BR"
+        },
+        "DENTAIRE": {
+          "soins_dentaires": "200% BR",
+          "orthodontie": "250% BR"
+        },
+        "OPTIQUE": {
+          "verres_complexes": "Deux verres très complexes + monture : 450 €"
+        }
+      },
+      "source": {
+        "pdf_name": "entoria (7).pdf",
+        "page_range": "entire"
+      }
+    },
+  {
+    "insurer": "Generali",
+    "contract_name": "La Santé",
+    "contract_type": "Complémentaire santé",
+    "level_id": "generali_la_sante_r1",
+    "level_name": "Formule R1",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "100% BRSS",
+        "honoraires_chirurgien_non_optam": "100% BRSS",
+        "chambre_particuliere": "-"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "100% BRSS",
+        "consultation_generaliste_non_optam": "100% BRSS"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "100% BRSS",
+        "orthodontie": "125% BRSS"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "cf. grille optique"
+      }
+    },
+    "source": {
+      "pdf_name": "generali (1).pdf",
+      "page_range": "2–7"
+    }
+  },
+  
+  {
+    "insurer": "Generali",
+    "contract_name": "La Santé Séniors",
+    "contract_type": "Complémentaire santé",
+    "level_id": "generali_seniors_lvl1",
+    "level_name": "Formule 1S",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "100% BRSS",
+        "honoraires_chirurgien_non_optam": "100% BRSS",
+        "chambre_particuliere": "-"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "100% BRSS",
+        "consultation_generaliste_non_optam": "100% BRSS"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "100% BRSS",
+        "orthodontie": "100% BRSS"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "90 €"
+      }
+    },
+    "source": {
+      "pdf_name": "generali (3).pdf",
+      "page_range": "2–7"
+    }
+  },
+  {
+    "insurer": "Generali",
+    "contract_name": "La Santé Séniors",
+    "contract_type": "Complémentaire santé",
+    "level_id": "generali_seniors_lvl2",
+    "level_name": "Formule 2S",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "150% BRSS",
+        "honoraires_chirurgien_non_optam": "125% BRSS",
+        "chambre_particuliere": "50 €/jour"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "125% BRSS",
+        "consultation_generaliste_non_optam": "100% BRSS"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "125% BRSS",
+        "orthodontie": "125% BRSS"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "110 €"
+      }
+    },
+    "source": {
+      "pdf_name": "generali (3).pdf",
+      "page_range": "2–7"
+    }
+  },
+  {
+    "insurer": "Generali",
+    "contract_name": "La Santé Séniors",
+    "contract_type": "Complémentaire santé",
+    "level_id": "generali_seniors_lvl3",
+    "level_name": "Formule 3S",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "150% BRSS",
+        "honoraires_chirurgien_non_optam": "125% BRSS",
+        "chambre_particuliere": "60 €/jour"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "125% BRSS",
+        "consultation_generaliste_non_optam": "100% BRSS"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "150% BRSS",
+        "orthodontie": "150% BRSS"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "200 €"
+      }
+    },
+    "source": {
+      "pdf_name": "generali (3).pdf",
+      "page_range": "2–7"
+    }
+  },
+  {
+    "insurer": "Generali",
+    "contract_name": "La Santé Séniors",
+    "contract_type": "Complémentaire santé",
+    "level_id": "generali_seniors_lvl4",
+    "level_name": "Formule 3S+",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "100% FR",
+        "honoraires_chirurgien_non_optam": "200% BRSS",
+        "chambre_particuliere": "80 €/jour"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "150% BRSS",
+        "consultation_generaliste_non_optam": "125% BRSS"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "150% BRSS",
+        "orthodontie": "150% BRSS"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "140 €"
+      }
+    },
+    "source": {
+      "pdf_name": "generali (3).pdf",
+      "page_range": "2–7"
+    }
+  },
+  {
+    "insurer": "Generali",
+    "contract_name": "La Santé Séniors",
+    "contract_type": "Complémentaire santé",
+    "level_id": "generali_seniors_lvl5",
+    "level_name": "Formule 4S",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "100% FR",
+        "honoraires_chirurgien_non_optam": "200% BRSS",
+        "chambre_particuliere": "100 €/jour"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "225% BRSS",
+        "consultation_generaliste_non_optam": "200% BRSS"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "250% BRSS",
+        "orthodontie": "250% BRSS"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "200 €"
+      }
+    },
+    "source": {
+      "pdf_name": "generali (3).pdf",
+      "page_range": "2–7"
+    }
+  },
+  {
+    "insurer": "Generali",
+    "contract_name": "La Santé Séniors",
+    "contract_type": "Complémentaire santé",
+    "level_id": "generali_seniors_lvl6",
+    "level_name": "Formule 5S",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "100% FR",
+        "honoraires_chirurgien_non_optam": "200% BRSS",
+        "chambre_particuliere": "125 €/jour"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "300% BRSS",
+        "consultation_generaliste_non_optam": "200% BRSS"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "350% BRSS",
+        "orthodontie": "350% BRSS"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "250 €"
+      }
+    },
+    "source": {
+      "pdf_name": "generali (3).pdf",
+      "page_range": "2–7"
+    }
+  },
+  {
+    "insurer": "Generali",
+    "contract_name": "Santé Pro",
+    "contract_type": "Complémentaire santé",
+    "level_id": "generali_sante_pro_p0",
+    "level_name": "Formule P0",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "100% BRSS",
+        "honoraires_chirurgien_non_optam": "100% BRSS",
+        "chambre_particuliere": "-"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "100% BRSS",
+        "consultation_generaliste_non_optam": "100% BRSS"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "100% BRSS",
+        "orthodontie": "100% BRSS"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "cf. grille optique"
+      }
+    },
+    "source": {
+      "pdf_name": "generali (4).pdf",
+      "page_range": "1–8"
+    }
+  },
+  {
+    "insurer": "Generali",
+    "contract_name": "Santé Pro",
+    "contract_type": "Complémentaire santé",
+    "level_id": "generali_sante_pro_p1",
+    "level_name": "Formule P1",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "100% BRSS",
+        "honoraires_chirurgien_non_optam": "100% BRSS",
+        "chambre_particuliere": "40 €"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "100% BRSS",
+        "consultation_generaliste_non_optam": "100% BRSS"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "130% BRSS",
+        "orthodontie": "150% BRSS"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "cf. grille optique"
+      }
+    },
+    "source": {
+      "pdf_name": "generali (4).pdf",
+      "page_range": "1–8"
+    }
+  },
+  {
+    "insurer": "Generali",
+    "contract_name": "Santé Pro",
+    "contract_type": "Complémentaire santé",
+    "level_id": "generali_sante_pro_p2",
+    "level_name": "Formule P2",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "200% BRSS",
+        "honoraires_chirurgien_non_optam": "130% BRSS",
+        "chambre_particuliere": "50 €"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "150% BRSS",
+        "consultation_generaliste_non_optam": "130% BRSS"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "200% BRSS",
+        "orthodontie": "200% BRSS"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "cf. grille optique"
+      }
+    },
+    "source": {
+      "pdf_name": "generali (4).pdf",
+      "page_range": "1–8"
+    }
+  },
+  {
+    "insurer": "Generali",
+    "contract_name": "Santé Pro",
+    "contract_type": "Complémentaire santé",
+    "level_id": "generali_sante_pro_p3",
+    "level_name": "Formule P3",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "320% BRSS",
+        "honoraires_chirurgien_non_optam": "180% BRSS",
+        "chambre_particuliere": "65 €"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "250% BRSS",
+        "consultation_generaliste_non_optam": "180% BRSS"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "300% BRSS",
+        "orthodontie": "300% BRSS"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "cf. grille optique"
+      }
+    },
+    "source": {
+      "pdf_name": "generali (4).pdf",
+      "page_range": "1–8"
+    }
+  },
+  {
+    "insurer": "Generali",
+    "contract_name": "Santé Pro",
+    "contract_type": "Complémentaire santé",
+    "level_id": "generali_sante_pro_p4",
+    "level_name": "Formule P4",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "400% BRSS",
+        "honoraires_chirurgien_non_optam": "200% BRSS",
+        "chambre_particuliere": "100 €"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "300% BRSS",
+        "consultation_generaliste_non_optam": "200% BRSS"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "400% BRSS",
+        "orthodontie": "400% BRSS"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "cf. grille optique"
+      }
+    },
+    "source": {
+      "pdf_name": "generali (4).pdf",
+      "page_range": "1–8"
+    }
+  },
+  {
+    "insurer": "Generali",
+    "contract_name": "Santé Pro",
+    "contract_type": "Complémentaire santé",
+    "level_id": "generali_sante_pro_p5",
+    "level_name": "Formule P5",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "500% BRSS",
+        "honoraires_chirurgien_non_optam": "200% BRSS",
+        "chambre_particuliere": "150 €"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "400% BRSS",
+        "consultation_generaliste_non_optam": "200% BRSS"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "550% BRSS",
+        "orthodontie": "550% BRSS"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "cf. grille optique"
+      }
+    },
+    "source": {
+      "pdf_name": "generali (4).pdf",
+      "page_range": "1–8"
+    }
+  },
+  {
+    "insurer": "Harmonie Mutuelle",
+    "contract_name": "Perform’ Santé TNS",
+    "contract_type": "Complémentaire santé",
+    "level_id": "harmonie_perform_sante_tns_f5",
+    "level_name": "Formule 5",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "500 %",
+        "honoraires_chirurgien_non_optam": "200 %",
+        "chambre_particuliere": "130 €/Nuit",
+        "chambre_ambulatoire": "70 €/Jour"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "500 %",
+        "consultation_generaliste_non_optam": "200 %"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "500 %",
+        "orthodontie": "400 %",
+        "implantologie": "800 €/Implant"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "Très complexe 60 % + 350 €"
+      }
+    },
+    "source": {
+      "pdf_name": "harmonie (2).pdf",
+      "page_range": "all"
+    }
+  },
+  {
+    "insurer": "Harmonie Mutuelle",
+    "contract_name": "Perform’ Santé TNS",
+    "contract_type": "Complémentaire santé",
+    "level_id": "harmonie_perform_sante_tns_f4",
+    "level_name": "Formule 4",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "400 %",
+        "honoraires_chirurgien_non_optam": "200 %",
+        "chambre_particuliere": "100 €/Nuit",
+        "chambre_ambulatoire": "50 €/Jour"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "400 %",
+        "consultation_generaliste_non_optam": "200 %"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "400 %",
+        "orthodontie": "350 %",
+        "implantologie": "600 €/Implant"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "Très complexe 60 % + 300 €"
+      }
+    },
+    "source": {
+      "pdf_name": "harmonie (3).pdf",
+      "page_range": "all"
+    }
+  },
+  {
+    "insurer": "Harmonie Mutuelle",
+    "contract_name": "Perform’ Santé TNS",
+    "contract_type": "Complémentaire santé",
+    "level_id": "harmonie_perform_sante_tns_f3",
+    "level_name": "Formule 3",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "300 %",
+        "honoraires_chirurgien_non_optam": "200 %",
+        "chambre_particuliere": "80 €/Nuit",
+        "chambre_ambulatoire": "40 €/Jour"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "300 %",
+        "consultation_generaliste_non_optam": "200 %"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "300 %",
+        "orthodontie": "300 %",
+        "implantologie": "400 €/Implant",
+        "parodontologie": "300 €/An"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "Très complexe 60 % + 200 €"
+      },
+      "AIDE_AUDITIVE": {
+        "audiologie": "100 %",
+        "forfait_appareil": "400 €/Appareil"
+      },
+      "BIEN_ETRE": {
+        "medecines_douces": "30 €/Séance (3 max)",
+        "activite_physique_adaptee": "100 €/An",
+        "contraception_non_remboursee": "30 €/An",
+        "sevrage_tabagique": "30 €/An",
+        "prevention_dietetique": "30 €/An",
+        "vaccins_hors_grippe": "20 €/An"
+      }
+    },
+    "source": {
+      "pdf_name": "harmonie (4).pdf",
+      "page_range": "all"
+    }
+  },
+  {
+    "insurer": "Harmonie Mutuelle",
+    "contract_name": "Perform’ Santé TNS",
+    "contract_type": "Complémentaire santé",
+    "level_id": "harmonie_perform_sante_tns_f2",
+    "level_name": "Formule 2",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "200 %",
+        "chambre_particuliere": "50 €/Nuit"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "200 %"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "200 %",
+        "implantologie": "250 €/Implant",
+        "orthodontie": "200 %"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "Très complexe 60 % + 150 €"
+      }
+    },
+    "source": {
+      "pdf_name": "harmonie (5).pdf",
+      "page_range": "all"
+    }
+  },
+  {
+    "insurer": "Harmonie Mutuelle",
+    "contract_name": "Perform’ Santé TNS",
+    "contract_type": "Complémentaire santé",
+    "level_id": "harmonie_perform_sante_tns_f1",
+    "level_name": "Formule 1",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "100 %",
+        "chambre_particuliere": "non précisé"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "100 %"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "100 %",
+        "implantologie": "non précisé",
+        "orthodontie": "125 %"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "Très complexe 60 % + 75 €"
+      }
+    },
+    "source": {
+      "pdf_name": "harmonie (6).pdf",
+      "page_range": "all"
+    }
+  },
+  {
+    "insurer": "Henner",
+    "contract_name": "TNS+ Santé",
+    "contract_type": "Complémentaire santé",
+    "level_id": "henner_tns_plus_lvl1",
+    "level_name": "Niveau 1",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "100 % BR",
+        "chambre_particuliere": "40 € / jour"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "100 % BR"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "100 % BR",
+        "implantologie": "150 € / implant",
+        "orthodontie": "125 % BR"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "Deux verres complexes + monture : 200 €"
+      }
+    },
+    "source": {
+      "pdf_name": "henner (1).pdf",
+      "page_range": "10–14"
+    }
+  },
+  {
+    "insurer": "Henner",
+    "contract_name": "TNS+ Santé",
+    "contract_type": "Complémentaire santé",
+    "level_id": "henner_tns_plus_lvl2",
+    "level_name": "Niveau 2",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "200 % BR",
+        "chambre_particuliere": "60 € / jour"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "200 % BR"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "200 % BR",
+        "implantologie": "300 € / implant",
+        "orthodontie": "200 % BR"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "Deux verres complexes + monture : 300 €"
+      }
+    },
+    "source": {
+      "pdf_name": "henner (1).pdf",
+      "page_range": "10–14"
+    }
+  },
+  {
+    "insurer": "Henner",
+    "contract_name": "TNS+ Santé",
+    "contract_type": "Complémentaire santé",
+    "level_id": "henner_tns_plus_lvl3",
+    "level_name": "Niveau 3",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "300 % BR",
+        "chambre_particuliere": "90 € / jour"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "300 % BR"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "300 % BR",
+        "implantologie": "400 € / implant",
+        "orthodontie": "300 % BR"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "Deux verres complexes + monture : 400 €"
+      }
+    },
+    "source": {
+      "pdf_name": "henner (1).pdf",
+      "page_range": "10–14"
+    }
+  },
+  {
+    "insurer": "Henner",
+    "contract_name": "TNS+ Santé",
+    "contract_type": "Complémentaire santé",
+    "level_id": "henner_tns_plus_lvl4",
+    "level_name": "Niveau 4",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "400 % BR",
+        "chambre_particuliere": "120 € / jour"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "400 % BR"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "400 % BR",
+        "implantologie": "550 € / implant",
+        "orthodontie": "400 % BR"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "Deux verres complexes + monture : 500 €"
+      }
+    },
+    "source": {
+      "pdf_name": "henner (1).pdf",
+      "page_range": "10–14"
+    }
+  },
+  {
+    "insurer": "Henner",
+    "contract_name": "TNS+ Santé",
+    "contract_type": "Complémentaire santé",
+    "level_id": "henner_tns_plus_lvl5",
+    "level_name": "Niveau 5",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "500 % BR",
+        "chambre_particuliere": "150 € / jour"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "500 % BR"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "500 % BR",
+        "implantologie": "700 € / implant",
+        "orthodontie": "500 % BR"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "Deux verres complexes + monture : 610 €"
+      }
+    },
+    "source": {
+      "pdf_name": "henner (1).pdf",
+      "page_range": "10–14"
+    }
+  },
+  {
+    "insurer": "Henner",
+    "contract_name": "Solutions Indépendants Santé",
+    "contract_type": "Complémentaire santé",
+    "level_id": "henner_solutions_independants_lvl1",
+    "level_name": "Niveau 1",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "100 % BR",
+        "chambre_particuliere": "-"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "100 % BR"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "100 % BR",
+        "implantologie": "100 € / implant",
+        "orthodontie": "125 % BR"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "Deux verres très complexes + monture : 230 €"
+      }
+    },
+    "source": {
+      "pdf_name": "henner (2).pdf",
+      "page_range": "entire"
+    }
+  },
+  {
+    "insurer": "Henner",
+    "contract_name": "Solutions Indépendants Santé",
+    "contract_type": "Complémentaire santé",
+    "level_id": "henner_solutions_independants_lvl2",
+    "level_name": "Niveau 2",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "150 % BR",
+        "chambre_particuliere": "30 € / jour"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "125 % BR"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "100 % BR",
+        "implantologie": "100 € / implant",
+        "orthodontie": "125 % BR"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "Deux verres très complexes + monture : 290 €"
+      }
+    },
+    "source": {
+      "pdf_name": "henner (2).pdf",
+      "page_range": "entire"
+    }
+  },
+  {
+    "insurer": "Henner",
+    "contract_name": "Solutions Indépendants Santé",
+    "contract_type": "Complémentaire santé",
+    "level_id": "henner_solutions_independants_lvl3",
+    "level_name": "Niveau 3",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "200 % BR",
+        "chambre_particuliere": "45 € / jour"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "150 % BR"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "175 % BR",
+        "implantologie": "200 € / implant",
+        "orthodontie": "150 % BR"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "Deux verres très complexes + monture : 400 €"
+      }
+    },
+    "source": {
+      "pdf_name": "henner (2).pdf",
+      "page_range": "entire"
+    }
+  },
+  {
+    "insurer": "Henner",
+    "contract_name": "Solutions Indépendants Santé",
+    "contract_type": "Complémentaire santé",
+    "level_id": "henner_solutions_independants_lvl4",
+    "level_name": "Niveau 4",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "250 % BR",
+        "chambre_particuliere": "60 € / jour"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "200 % BR"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "225 % BR",
+        "implantologie": "300 € / implant",
+        "orthodontie": "175 % BR"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "Deux verres très complexes + monture : 500 €"
+      }
+    },
+    "source": {
+      "pdf_name": "henner (2).pdf",
+      "page_range": "entire"
+    }
+  },
+  {
+    "insurer": "Henner",
+    "contract_name": "Solutions Indépendants Santé",
+    "contract_type": "Complémentaire santé",
+    "level_id": "henner_solutions_independants_lvl5",
+    "level_name": "Niveau 5",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "300 % BR",
+        "chambre_particuliere": "80 € / jour"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "250 % BR"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "275 % BR",
+        "implantologie": "400 € / implant",
+        "orthodontie": "200 % BR"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "Deux verres très complexes + monture : 600 €"
+      }
+    },
+    "source": {
+      "pdf_name": "henner (2).pdf",
+      "page_range": "entire"
+    }
+  },
+  {
+    "insurer": "Henner",
+    "contract_name": "Solutions Indépendants Santé",
+    "contract_type": "Complémentaire santé",
+    "level_id": "henner_solutions_independants_lvl6",
+    "level_name": "Niveau 6",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "350 % BR",
+        "chambre_particuliere": "100 € / jour"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "350 % BR"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "350 % BR",
+        "implantologie": "500 € / implant",
+        "orthodontie": "250 % BR"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "Deux verres très complexes + monture : 650 €"
+      }
+    },
+    "source": {
+      "pdf_name": "henner (2).pdf",
+      "page_range": "entire"
+    }
+  },
+  {
+    "insurer": "Henner",
+    "contract_name": "Solutions Indépendants Santé",
+    "contract_type": "Complémentaire santé",
+    "level_id": "henner_solutions_independants_lvl7",
+    "level_name": "Niveau 7",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "450 % BR",
+        "chambre_particuliere": "120 € / jour"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "450 % BR"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "450 % BR",
+        "implantologie": "600 € / implant",
+        "orthodontie": "350 % BR"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "Deux verres très complexes + monture : 650 €"
+      }
+    },
+    "source": {
+      "pdf_name": "henner (2).pdf",
+      "page_range": "entire"
+    }
+  },
+  {
+    "insurer": "Malakoff Humanis",
+    "contract_name": "ATOUT+ TNS",
+    "contract_type": "Complémentaire santé",
+    "level_id": "malakoff_atout_plus_f1",
+    "level_name": "Formule 1 MAX",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "300 % BR",
+        "honoraires_chirurgien_non_optam": "200 % BR",
+        "chambre_particuliere": "90 €"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "100 % BR"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "100 % BR",
+        "implantologie": "-",
+        "orthodontie": "125 % BR"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "80 €"
+      }
+    },
+    "source": {
+      "pdf_name": "malakoff.pdf",
+      "page_range": "2–7"
+    }
+  },
+  {
+    "insurer": "Malakoff Humanis",
+    "contract_name": "ATOUT+ TNS",
+    "contract_type": "Complémentaire santé",
+    "level_id": "malakoff_atout_plus_f2",
+    "level_name": "Formule 2",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "200 % BR",
+        "honoraires_chirurgien_non_optam": "180 % BR",
+        "chambre_particuliere": "60 €"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "200 % BR"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "150 % BR",
+        "implantologie": "-",
+        "orthodontie": "250 % BR"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "120 €"
+      }
+    },
+    "source": {
+      "pdf_name": "malakoff.pdf",
+      "page_range": "2–7"
+    }
+  },
+  {
+    "insurer": "Malakoff Humanis",
+    "contract_name": "ATOUT+ TNS",
+    "contract_type": "Complémentaire santé",
+    "level_id": "malakoff_atout_plus_f3",
+    "level_name": "Formule 3",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "300 % BR",
+        "honoraires_chirurgien_non_optam": "200 % BR",
+        "chambre_particuliere": "90 €"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "300 % BR"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "250 % BR",
+        "implantologie": "1000 €",
+        "orthodontie": "400 % BR"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "220 €"
+      }
+    },
+    "source": {
+      "pdf_name": "malakoff.pdf",
+      "page_range": "2–7"
+    }
+  },
+  {
+    "insurer": "Malakoff Humanis",
+    "contract_name": "ATOUT+ TNS",
+    "contract_type": "Complémentaire santé",
+    "level_id": "malakoff_atout_plus_f4",
+    "level_name": "Formule 4",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "400 % BR",
+        "honoraires_chirurgien_non_optam": "200 % BR",
+        "chambre_particuliere": "100 €"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "400 % BR"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "300 % BR",
+        "implantologie": "300 €",
+        "orthodontie": "450 % BR"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "230 €"
+      }
+    },
+    "source": {
+      "pdf_name": "malakoff.pdf",
+      "page_range": "2–7"
+    }
+  },
+  {
+    "insurer": "Malakoff Humanis",
+    "contract_name": "ATOUT+ TNS",
+    "contract_type": "Complémentaire santé",
+    "level_id": "malakoff_atout_plus_f5",
+    "level_name": "Formule 4+",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "400 % BR",
+        "honoraires_chirurgien_non_optam": "400 % BR",
+        "chambre_particuliere": "100 €"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "400 % BR"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "300 % BR",
+        "implantologie": "300 €",
+        "orthodontie": "450 % BR"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "230 €"
+      }
+    },
+    "source": {
+      "pdf_name": "malakoff.pdf",
+      "page_range": "2–7"
+    }
+  },
+  {
+    "insurer": "Malakoff Humanis",
+    "contract_name": "ATOUT+ TNS",
+    "contract_type": "Complémentaire santé",
+    "level_id": "malakoff_atout_plus_f6",
+    "level_name": "Formule 5+",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "500 % BR",
+        "honoraires_chirurgien_non_optam": "500 % BR",
+        "chambre_particuliere": "120 €"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "500 % BR"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "400 % BR",
+        "implantologie": "400 €",
+        "orthodontie": "500 % BR"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "240 €"
+      }
+    },
+    "source": {
+      "pdf_name": "malakoff.pdf",
+      "page_range": "2–7"
+    }
+  },
+  {
+    "insurer": "Solly Azar",
+    "contract_name": "Complémentaire Santé Senior",
+    "contract_type": "Complémentaire santé",
+    "level_id": "azar_senior_f1",
+    "level_name": "Formule 1",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "100 %",
+        "chambre_particuliere": "-"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "100 %"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "100 %",
+        "implantologie": "-",
+        "orthodontie": "100 %"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "100 %"
+      }
+    },
+    "source": {
+      "pdf_name": "azar (1).pdf",
+      "page_range": "2–13"
+    }
+  },
+  {
+    "insurer": "Solly Azar",
+    "contract_name": "Complémentaire Santé Senior",
+    "contract_type": "Complémentaire santé",
+    "level_id": "azar_senior_f2",
+    "level_name": "Formule 2",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "125 %",
+        "chambre_particuliere": "30 €/jour"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "100 %"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "100 %",
+        "implantologie": "-",
+        "orthodontie": "100 %"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "100 %"
+      }
+    },
+    "source": {
+      "pdf_name": "azar (1).pdf",
+      "page_range": "2–13"
+    }
+  },
+  {
+    "insurer": "Solly Azar",
+    "contract_name": "Complémentaire Santé Senior",
+    "contract_type": "Complémentaire santé",
+    "level_id": "azar_senior_f3",
+    "level_name": "Formule 3",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "150 %",
+        "chambre_particuliere": "45 €/jour"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "125 %"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "125 %",
+        "implantologie": "100 €",
+        "orthodontie": "100 %"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "250 €"
+      }
+    },
+    "source": {
+      "pdf_name": "azar (1).pdf",
+      "page_range": "2–13"
+    }
+  },
+  {
+    "insurer": "Solly Azar",
+    "contract_name": "Complémentaire Santé Senior",
+    "contract_type": "Complémentaire santé",
+    "level_id": "azar_senior_f4",
+    "level_name": "Formule 4",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "200 %",
+        "chambre_particuliere": "60 €/jour"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "150 %"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "150 %",
+        "implantologie": "150 €",
+        "orthodontie": "100 %"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "300 €"
+      }
+    },
+    "source": {
+      "pdf_name": "azar (1).pdf",
+      "page_range": "2–13"
+    }
+  },
+  {
+    "insurer": "Solly Azar",
+    "contract_name": "Complémentaire Santé Senior",
+    "contract_type": "Complémentaire santé",
+    "level_id": "azar_senior_f5",
+    "level_name": "Formule 5",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "250 %",
+        "chambre_particuliere": "70 €/jour"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "175 %"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "200 %",
+        "implantologie": "200 €",
+        "orthodontie": "100 %"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "350 €"
+      }
+    },
+    "source": {
+      "pdf_name": "azar (1).pdf",
+      "page_range": "2–13"
+    }
+  },
+  {
+    "insurer": "Solly Azar",
+    "contract_name": "Complémentaire Santé Senior",
+    "contract_type": "Complémentaire santé",
+    "level_id": "azar_senior_f6",
+    "level_name": "Formule 6",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "300 %",
+        "chambre_particuliere": "85 €/jour"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "250 %"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "250 %",
+        "implantologie": "250 €",
+        "orthodontie": "100 %"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "400 €"
+      }
+    },
+    "source": {
+      "pdf_name": "azar (1).pdf",
+      "page_range": "2–13"
+    }
+  },
+  {
+    "insurer": "Solly Azar",
+    "contract_name": "Complémentaire Santé TNS",
+    "contract_type": "Complémentaire santé",
+    "level_id": "azar_tns_f1",
+    "level_name": "Formule 1",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "100 %",
+        "chambre_particuliere": "-"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "100 %"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "100 %",
+        "implantologie": "-",
+        "orthodontie": "100 %"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "200 €"
+      }
+    },
+    "source": {
+      "pdf_name": "azar (2).pdf",
+      "page_range": "full"
+    }
+  },
+  {
+    "insurer": "Solly Azar",
+    "contract_name": "Complémentaire Santé TNS",
+    "contract_type": "Complémentaire santé",
+    "level_id": "azar_tns_f2",
+    "level_name": "Formule 2",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "125 %",
+        "chambre_particuliere": "30 €/jour"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "125 %"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "100 %",
+        "implantologie": "-",
+        "orthodontie": "125 %"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "250 €"
+      }
+    },
+    "source": {
+      "pdf_name": "azar (2).pdf",
+      "page_range": "full"
+    }
+  },
+  {
+    "insurer": "Solly Azar",
+    "contract_name": "Complémentaire Santé TNS",
+    "contract_type": "Complémentaire santé",
+    "level_id": "azar_tns_f3",
+    "level_name": "Formule 3",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "175 %",
+        "chambre_particuliere": "45 €/jour"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "150 %"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "125 %",
+        "implantologie": "150 €/acte",
+        "orthodontie": "180 %"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "350 €"
+      }
+    },
+    "source": {
+      "pdf_name": "azar (2).pdf",
+      "page_range": "full"
+    }
+  },
+  {
+    "insurer": "Solly Azar",
+    "contract_name": "Complémentaire Santé TNS",
+    "contract_type": "Complémentaire santé",
+    "level_id": "azar_tns_f4",
+    "level_name": "Formule 4",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "200 %",
+        "chambre_particuliere": "60 €/jour"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "200 %"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "150 %",
+        "implantologie": "200 €/acte",
+        "orthodontie": "250 %"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "400 €"
+      }
+    },
+    "source": {
+      "pdf_name": "azar (2).pdf",
+      "page_range": "full"
+    }
+  },
+  {
+    "insurer": "Solly Azar",
+    "contract_name": "Complémentaire Santé TNS",
+    "contract_type": "Complémentaire santé",
+    "level_id": "azar_tns_f5",
+    "level_name": "Formule 5",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "250 %",
+        "chambre_particuliere": "75 €/jour"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "250 %"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "250 %",
+        "implantologie": "300 €/acte",
+        "orthodontie": "300 %"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "500 €"
+      }
+    },
+    "source": {
+      "pdf_name": "azar (2).pdf",
+      "page_range": "full"
+    }
+  },
+  {
+    "insurer": "Solly Azar",
+    "contract_name": "Complémentaire Santé TNS",
+    "contract_type": "Complémentaire santé",
+    "level_id": "azar_tns_f6",
+    "level_name": "Formule 6",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "350 %",
+        "chambre_particuliere": "90 €/jour"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "300 %"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "300 %",
+        "implantologie": "450 €/acte",
+        "orthodontie": "350 %"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "550 €"
+      }
+    },
+    "source": {
+      "pdf_name": "azar (2).pdf",
+      "page_range": "full"
+    }
+  },
+  {
+    "insurer": "Solly Azar",
+    "contract_name": "Complémentaire Santé TNS",
+    "contract_type": "Complémentaire santé",
+    "level_id": "azar_tns_f7",
+    "level_name": "Formule 7",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "475 %",
+        "chambre_particuliere": "120 €/jour"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "400 %"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "400 %",
+        "implantologie": "600 €/acte",
+        "orthodontie": "450 %"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "650 €"
+      }
+    },
+    "source": {
+      "pdf_name": "azar (2).pdf",
+      "page_range": "full"
+    }
+  },
+  {
+    "insurer": "SwissLife",
+    "contract_name": "Santé Additionnelle",
+    "contract_type": "Surcomplémentaire santé",
+    "level_id": "swisslife_sante_additionnelle_lvl1",
+    "level_name": "Niveau 1",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "+100%",
+        "chambre_particuliere": "66 €/j"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "+50%"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "+100%",
+        "implantologie": "211 €",
+        "orthodontie": "422 €"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "158 €"
+      }
+    },
+    "source": {
+      "pdf_name": "swiss (1).pdf",
+      "page_range": "all"
+    }
+  },
+  {
+    "insurer": "SwissLife",
+    "contract_name": "Santé Additionnelle",
+    "contract_type": "Surcomplémentaire santé",
+    "level_id": "swisslife_sante_additionnelle_lvl2",
+    "level_name": "Niveau 2",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "+150%",
+        "chambre_particuliere": "82 €/j"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "+75%"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "+150%",
+        "implantologie": "264 €",
+        "orthodontie": "633 €"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "211 €"
+      }
+    },
+    "source": {
+      "pdf_name": "swiss (1).pdf",
+      "page_range": "all"
+    }
+  },
+  {
+    "insurer": "SwissLife",
+    "contract_name": "Santé Additionnelle",
+    "contract_type": "Surcomplémentaire santé",
+    "level_id": "swisslife_sante_additionnelle_lvl3",
+    "level_name": "Niveau 3",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "+200%",
+        "chambre_particuliere": "97 €/j"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "+100%"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "+200%",
+        "implantologie": "317 €",
+        "orthodontie": "845 €"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "264 €"
+      }
+    },
+    "source": {
+      "pdf_name": "swiss (1).pdf",
+      "page_range": "all"
+    }
+  },
+  {
+    "insurer": "SwissLife",
+    "contract_name": "Santé Additionnelle",
+    "contract_type": "Surcomplémentaire santé",
+    "level_id": "swisslife_sante_additionnelle_lvl4",
+    "level_name": "Niveau 4",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "+250%",
+        "chambre_particuliere": "112 €/j"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "+200%"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "+250%",
+        "implantologie": "422 €",
+        "orthodontie": "1 267 €"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "317 €"
+      }
+    },
+    "source": {
+      "pdf_name": "swiss (1).pdf",
+      "page_range": "all"
+    }
+  },
+  {
+    "insurer": "SwissLife",
+    "contract_name": "Santé Madelin",
+    "contract_type": "Complémentaire santé",
+    "level_id": "swisslife_sante_madelin_lvl1",
+    "level_name": "Niveau 1",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "100%",
+        "chambre_particuliere": "-"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "100%"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "100%",
+        "implantologie": "-",
+        "orthodontie": "100%"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "200 €"
+      }
+    },
+    "source": {
+      "pdf_name": "swiss (2).pdf",
+      "page_range": "full"
+    }
+  },
+  {
+    "insurer": "SwissLife",
+    "contract_name": "Santé Madelin",
+    "contract_type": "Complémentaire santé",
+    "level_id": "swisslife_sante_madelin_lvl2",
+    "level_name": "Niveau 2",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "100%",
+        "chambre_particuliere": "40 €/j"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "100%"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "100%",
+        "implantologie": "250 €",
+        "orthodontie": "100%"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "200 €"
+      }
+    },
+    "source": {
+      "pdf_name": "swiss (2).pdf",
+      "page_range": "full"
+    }
+  },
+  {
+    "insurer": "SwissLife",
+    "contract_name": "Santé Madelin",
+    "contract_type": "Complémentaire santé",
+    "level_id": "swisslife_sante_madelin_lvl3",
+    "level_name": "Niveau 3",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "125%",
+        "chambre_particuliere": "45 €/j"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "125%"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "125%",
+        "implantologie": "270 €",
+        "orthodontie": "125%"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "250 €"
+      }
+    },
+    "source": {
+      "pdf_name": "swiss (2).pdf",
+      "page_range": "full"
+    }
+  },
+  {
+    "insurer": "SwissLife",
+    "contract_name": "Santé Madelin",
+    "contract_type": "Complémentaire santé",
+    "level_id": "swisslife_sante_madelin_lvl4",
+    "level_name": "Niveau 4",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "150%",
+        "chambre_particuliere": "50 €/j"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "150%"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "150%",
+        "implantologie": "290 €",
+        "orthodontie": "150%"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "300 €"
+      }
+    },
+    "source": {
+      "pdf_name": "swiss (2).pdf",
+      "page_range": "full"
+    }
+  },
+  {
+    "insurer": "SwissLife",
+    "contract_name": "Santé Madelin",
+    "contract_type": "Complémentaire santé",
+    "level_id": "swisslife_sante_madelin_lvl5",
+    "level_name": "Niveau 5",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "175%",
+        "chambre_particuliere": "55 €/j"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "175%"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "175%",
+        "implantologie": "310 €",
+        "orthodontie": "175%"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "350 €"
+      }
+    },
+    "source": {
+      "pdf_name": "swiss (2).pdf",
+      "page_range": "full"
+    }
+  },
+  {
+    "insurer": "SwissLife",
+    "contract_name": "Santé Madelin",
+    "contract_type": "Complémentaire santé",
+    "level_id": "swisslife_sante_madelin_lvl6",
+    "level_name": "Niveau 6",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "200%",
+        "chambre_particuliere": "65 €/j"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "200%"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "200%",
+        "implantologie": "330 €",
+        "orthodontie": "200%"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "400 €"
+      }
+    },
+    "source": {
+      "pdf_name": "swiss (2).pdf",
+      "page_range": "full"
+    }
+  },
+  {
+    "insurer": "SwissLife",
+    "contract_name": "Santé Madelin",
+    "contract_type": "Complémentaire santé",
+    "level_id": "swisslife_sante_madelin_lvl7",
+    "level_name": "Niveau 7",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "250%",
+        "chambre_particuliere": "80 €/j"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "250%"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "250%",
+        "implantologie": "370 €",
+        "orthodontie": "250%"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "475 €"
+      }
+    },
+    "source": {
+      "pdf_name": "swiss (2).pdf",
+      "page_range": "full"
+    }
+  },
+  {
+    "insurer": "SwissLife",
+    "contract_name": "Santé Madelin",
+    "contract_type": "Complémentaire santé",
+    "level_id": "swisslife_sante_madelin_lvl8",
+    "level_name": "Niveau 8",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "300%",
+        "chambre_particuliere": "100 €/j"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "300%"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "350%",
+        "implantologie": "450 €",
+        "orthodontie": "350%"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "575 €"
+      }
+    },
+    "source": {
+      "pdf_name": "swiss (2).pdf",
+      "page_range": "full"
+    }
+  },
+  {
+    "insurer": "SwissLife",
+    "contract_name": "Santé Madelin",
+    "contract_type": "Complémentaire santé",
+    "level_id": "swisslife_sante_madelin_lvl9",
+    "level_name": "Niveau 9",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "400%",
+        "chambre_particuliere": "135 €/j"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "400%"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "500%",
+        "implantologie": "750 €",
+        "orthodontie": "500%"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "700 €"
+      }
+    },
+    "source": {
+      "pdf_name": "swiss (2).pdf",
+      "page_range": "full"
+    }
+  },
+  {
+    "insurer": "SwissLife",
+    "contract_name": "SLPE+ Santé",
+    "contract_type": "Complémentaire santé",
+    "level_id": "swisslife_slpe_plus_ani100",
+    "level_name": "ANI 100",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "100%",
+        "chambre_particuliere": "-"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "100%"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "100%",
+        "implantologie": "-",
+        "orthodontie": "150 €"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "100 €"
+      }
+    },
+    "source": {
+      "pdf_name": "swiss (3).pdf",
+      "page_range": "all"
+    }
+  },
+  {
+    "insurer": "SwissLife",
+    "contract_name": "SLPE+ Santé",
+    "contract_type": "Complémentaire santé",
+    "level_id": "swisslife_slpe_plus_ani125",
+    "level_name": "ANI 125",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "125%",
+        "chambre_particuliere": "40 €/j"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "125%"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "125%",
+        "implantologie": "250 €",
+        "orthodontie": "165 €"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "100 €"
+      }
+    },
+    "source": {
+      "pdf_name": "swiss (3).pdf",
+      "page_range": "all"
+    }
+  },
+  {
+    "insurer": "Zenioo",
+    "contract_name": "Zen Santé Eco",
+    "contract_type": "Complémentaire santé",
+    "level_id": "zenioo_sante_eco_100",
+    "level_name": "Formule 100",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "100 %",
+        "chambre_particuliere": "-"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "100 %"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "100 %",
+        "implantologie": "-",
+        "orthodontie": "100 %"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "100 %"
+      }
+    },
+    "source": {
+      "pdf_name": "zenioo (1).pdf",
+      "page_range": "1–2"
+    }
+  },
+  {
+    "insurer": "Zenioo",
+    "contract_name": "Zen Santé Eco",
+    "contract_type": "Complémentaire santé",
+    "level_id": "zenioo_sante_eco_125",
+    "level_name": "Formule 125",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "125 %",
+        "chambre_particuliere": "-"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "125 %"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "100 %",
+        "implantologie": "-",
+        "orthodontie": "100 %"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "100 %"
+      }
+    },
+    "source": {
+      "pdf_name": "zenioo (1).pdf",
+      "page_range": "1–2"
+    }
+  },
+  {
+    "insurer": "Zenioo",
+    "contract_name": "Zen Santé Eco",
+    "contract_type": "Complémentaire santé",
+    "level_id": "zenioo_sante_eco_150",
+    "level_name": "Formule 150",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "150 %",
+        "chambre_particuliere": "-"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "150 %"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "100 %",
+        "implantologie": "-",
+        "orthodontie": "100 %"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "200 €"
+      }
+    },
+    "source": {
+      "pdf_name": "zenioo (1).pdf",
+      "page_range": "1–2"
+    }
+  },
+  {
+    "insurer": "Zenioo",
+    "contract_name": "Zen Santé Eco",
+    "contract_type": "Complémentaire santé",
+    "level_id": "zenioo_sante_eco_200",
+    "level_name": "Formule 200",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "200 %",
+        "chambre_particuliere": "60 € / jour"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "150 %"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "100 %",
+        "implantologie": "-",
+        "orthodontie": "100 %"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "200 €"
+      }
+    },
+    "source": {
+      "pdf_name": "zenioo (1).pdf",
+      "page_range": "1–2"
+    }
+  },
+  {
+    "insurer": "Zenioo",
+    "contract_name": "Zen Santé Flexi Senior",
+    "contract_type": "Complémentaire santé",
+    "level_id": "zenioo_flexi_senior_125",
+    "level_name": "Formule 125",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "125 %",
+        "chambre_particuliere": "40 €"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "100 %"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "125 %",
+        "implantologie": "150 €",
+        "orthodontie": "100 %"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "200 €"
+      }
+    },
+    "source": {
+      "pdf_name": "zenioo (2).pdf",
+      "page_range": "1–6"
+    }
+  },
+  {
+    "insurer": "Zenioo",
+    "contract_name": "Zen Santé Flexi Senior",
+    "contract_type": "Complémentaire santé",
+    "level_id": "zenioo_flexi_senior_150",
+    "level_name": "Formule 150",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "150 %",
+        "chambre_particuliere": "55 €"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "125 %"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "150 %",
+        "implantologie": "200 €",
+        "orthodontie": "100 %"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "250 €"
+      }
+    },
+    "source": {
+      "pdf_name": "zenioo (2).pdf",
+      "page_range": "1–6"
+    }
+  },
+  {
+    "insurer": "Zenioo",
+    "contract_name": "Zen Santé Flexi Senior",
+    "contract_type": "Complémentaire santé",
+    "level_id": "zenioo_flexi_senior_200",
+    "level_name": "Formule 200",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "200 %",
+        "chambre_particuliere": "70 €"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "150 %"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "175 %",
+        "implantologie": "250 €",
+        "orthodontie": "100 %"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "300 €"
+      }
+    },
+    "source": {
+      "pdf_name": "zenioo (2).pdf",
+      "page_range": "1–6"
+    }
+  },
+  {
+    "insurer": "Zenioo",
+    "contract_name": "Zen Santé Flexi Senior",
+    "contract_type": "Complémentaire santé",
+    "level_id": "zenioo_flexi_senior_250",
+    "level_name": "Formule 250",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "250 %",
+        "chambre_particuliere": "85 €"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "200 %"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "200 %",
+        "implantologie": "300 €",
+        "orthodontie": "100 %"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "350 €"
+      }
+    },
+    "source": {
+      "pdf_name": "zenioo (2).pdf",
+      "page_range": "1–6"
+    }
+  },
+  {
+    "insurer": "Zenioo",
+    "contract_name": "Zen Santé Équilibre",
+    "contract_type": "Complémentaire santé",
+    "level_id": "zenioo_equilibre_f2",
+    "level_name": "Formule 2",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "125 %",
+        "chambre_particuliere": "-"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "100 %"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "125 %",
+        "implantologie": "800 € (plafond annuel)",
+        "orthodontie": "100 %"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "200 €"
+      }
+    },
+    "source": {
+      "pdf_name": "zenioo (3).pdf",
+      "page_range": "1–5"
+    }
+  },
+  {
+    "insurer": "Zenioo",
+    "contract_name": "Zen Santé Équilibre",
+    "contract_type": "Complémentaire santé",
+    "level_id": "zenioo_equilibre_f3",
+    "level_name": "Formule 3",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "150 %",
+        "chambre_particuliere": "-"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "100 %"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "125 %",
+        "implantologie": "800 € (plafond annuel)",
+        "orthodontie": "100 %"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "200 €"
+      }
+    },
+    "source": {
+      "pdf_name": "zenioo (3).pdf",
+      "page_range": "1–5"
+    }
+  },
+  {
+    "insurer": "Zenioo",
+    "contract_name": "Zen Santé Équilibre",
+    "contract_type": "Complémentaire santé",
+    "level_id": "zenioo_equilibre_f3r",
+    "level_name": "Formule 3 Renforcée",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "150 %",
+        "chambre_particuliere": "45 €/jour"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "125 %"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "150 %",
+        "implantologie": "1 000 € (plafond annuel)",
+        "orthodontie": "100 %"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "250 €"
+      }
+    },
+    "source": {
+      "pdf_name": "zenioo (3).pdf",
+      "page_range": "1–5"
+    }
+  },
+  {
+    "insurer": "Zenioo",
+    "contract_name": "Zen Santé Équilibre",
+    "contract_type": "Complémentaire santé",
+    "level_id": "zenioo_equilibre_f4",
+    "level_name": "Formule 4",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "175 %",
+        "chambre_particuliere": "45 €/jour"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "125 %"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "150 %",
+        "implantologie": "1 000 € (plafond annuel)",
+        "orthodontie": "100 %"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "250 €"
+      }
+    },
+    "source": {
+      "pdf_name": "zenioo (3).pdf",
+      "page_range": "1–5"
+    }
+  },
+  {
+    "insurer": "Zenioo",
+    "contract_name": "Zen Santé Équilibre",
+    "contract_type": "Complémentaire santé",
+    "level_id": "zenioo_equilibre_f5",
+    "level_name": "Formule 5",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "200 %",
+        "chambre_particuliere": "60 €/jour"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "150 %"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "175 %",
+        "implantologie": "1 200 € (plafond annuel)",
+        "orthodontie": "100 %"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "300 €"
+      }
+    },
+    "source": {
+      "pdf_name": "zenioo (3).pdf",
+      "page_range": "1–5"
+    }
+  },
+  {
+    "insurer": "Zenioo",
+    "contract_name": "Zen Santé Équilibre",
+    "contract_type": "Complémentaire santé",
+    "level_id": "zenioo_equilibre_f6",
+    "level_name": "Formule 6",
+    "benefits": {
+      "HOSPITALISATION": {
+        "honoraires_chirurgien_optam": "250 %",
+        "chambre_particuliere": "70 €/jour"
+      },
+      "SOINS_COURANTS": {
+        "consultation_generaliste_optam": "200 %"
+      },
+      "DENTAIRE": {
+        "soins_dentaires": "200 %",
+        "implantologie": "1 400 € (plafond annuel)",
+        "orthodontie": "100 %"
+      },
+      "OPTIQUE": {
+        "verres_complexes": "350 €"
+      }
+    },
+    "source": {
+      "pdf_name": "zenioo (3).pdf",
+      "page_range": "1–5"
+    }
+  },
+  {
+     "insurer": "utwin",
+     "contract_name": "MULTI' Santé",
+  "contract_type": "Complémentaire santé",
+    "level_id": "utwin_multi_sante_niv1",
+  "level_name": "Niveau 1",
+  "benefits": {
+     "HOSPITALISATION": {
+      "honoraires_chirurgien_optam": "100 % BR"
+    },
+    "SOINS_COURANTS": {
+      "consultation_generaliste_optam": "100 % BR"
+    },
+    "DENTAIRE": {
+         "soins_dentaires": "100 % BR",
+      "implantologie": "50 €",
+      "orthodontie": "100 % BR"
+   
+    },
+    "OPTIQUE": {
+      "verres_complexes": "160 €"
+    }
+    
+  },
+  "source": {
+        "pdf_name": "utwin_multi_sante.pdf",
+    "page_range": "1-2"
+  }
+},
+{
+  "insurer": "utwin",
+      "contract_name": "MULTI' Santé",
+  "contract_type": "Complémentaire santé",
+    "level_id": "multi_sante_niv2",
+  "level_name": "Niveau 2",
+  "benefits": {
+    "HOSPITALISATION": {
+      "chambre_particuliere": "30 €",
+      "honoraires_chirurgien_optam": "125 % BR"
+    },
+    "SOINS_COURANTS": {
+      "consultation_generaliste_optam": "125 % BR"
+    },
+    "DENTAIRE": {
+            "soins_dentaires": "125 % BR",
+      "implantologie": "50 €",
+      "orthodontie": "100 % BR"
+    },
+    
+    "OPTIQUE": {
+      "verres_complexes": "200 €"
+    }
+  },
+  "source": {
+    "pdf_name": "contrat.pdf",
+    "page_range": "all"
+  }
+},
+{
+    "insurer": "utwin",
+    "contract_name": "MULTI' Santé",
+  "contract_type": "Complémentaire santé",
+  "level_id": "multi_sante_niv3",
+  "level_name": "Niveau 3",
+  "benefits": {
+       "HOSPITALISATION": {
+      "chambre_particuliere": "50 €",
+      "honoraires_chirurgien_optam": "150 % BR"
+    },  
+    "SOINS_COURANTS": {
+      "consultation_generaliste_optam": "150 % BR"
+    },
+    "DENTAIRE": {
+            "soins_dentaires": "125 % BR",
+      "implantologie": "100 €",
+      "orthodontie": "150 % BR"
+    },
+ 
+    "OPTIQUE": {
+      "verres_complexes": "200 €"
+    }
+  },
+  "source": {
+     "pdf_name": "utwin_multi_sante.pdf",
+    "page_range": "1-2"
+  }
+},
+{
+    "insurer": "utwin",
+   "contract_name": "MULTI' Santé",
+  "contract_type": "Complémentaire santé",
+  "level_id": "multi_sante_niv4",
+  "level_name": "Niveau 4",
+  "benefits": {
+        "HOSPITALISATION": {
+      "chambre_particuliere": "70 €",
+      "honoraires_chirurgien_optam": "200 % BR"
+    },
+    "SOINS_COURANTS": {
+      "consultation_generaliste_optam": "175 % BR"
+    },
+    "DENTAIRE": {
+            "soins_dentaires": "150 % BR",
+      "implantologie": "200 % BR",
+      "orthodontie": "200 % BR"
+    },
+    "OPTIQUE": {
+      "verres_complexes": "230 €"
+    }
+  },
+  "source": {
+        "pdf_name": "utwin_multi_sante.pdf",
+    "page_range": "1"
+  }
+},
+{
+    "insurer": "utwin",
+   "contract_name": "MULTI' Santé",
+  "contract_type": "Complémentaire santé",
+  "level_id": "utwin_multi_sante_niv5",
+  "level_name": "Niveau 5",
+  "benefits": {
+        "HOSPITALISATION": {
+      "chambre_particuliere": "70 €",
+      "honoraires_chirurgien_optam": "250 % BR"
+    },
+     "SOINS_COURANTS": {
+      "consultation_generaliste_optam": "225 % BR"
+    },
+    "DENTAIRE": {
+            "soins_dentaires": "200 % BR",
+      "implantologie": "250 % BR",
+      "orthodontie": "250 % BR"
+    },
+
+    "OPTIQUE": {
+      "verres_complexes": "260 €"
+    }
+  },
+  "source": {
+        "pdf_name": "contrat.pdf",
+  "page_range": "all"
+  }
+},
+{
+    "insurer": "utwin",
+  "contract_name": "MULTI' Santé",
+  "contract_type": "Complémentaire santé",
+  "level_id": "multi_sante_niv6",
+  "level_name": "Niveau 6",
+  "benefits": {
+        "HOSPITALISATION": {
+      "chambre_particuliere": "90 €",
+      "honoraires_chirurgien_optam": "300 % BR"
+    },
+     "SOINS_COURANTS": {
+      "consultation_generaliste_optam": "300 % BR"
+    },
+    "DENTAIRE": {
+      "soins_dentaires": "300 % BR",
+      "implantologie": "300 €",
+      "orthodontie": "300 % BR"
+        },
+    "OPTIQUE": {
+      "verres_complexes": "Frais réels"
+    }
+  },
+  "source": {
+        "pdf_name": "utwin_garanties_multi_sante.pdf",
+    "page_range": "1-2"
+  }
+},
+{
+  "insurer": "utwin",
+  "contract_name": "BASIC' Santé",
+  "contract_type": "Complémentaire santé",
+  "level_id": "utwin_basic_sante_formule_1_eco",
+  "level_name": "Formule 1 éco",
+  "benefits": {
+       "HOSPITALISATION": {
+      "honoraires_chirurgien_optam": "100 % BR",
+      "chambre_particuliere": "0 €"
+    },
+     "SOINS_COURANTS": {
+      "consultation_generaliste_optam": "100 % BR"
+    },
+    "DENTAIRE": {
+      "soins_dentaires": "100 % BR",
+      "implantologie": "0 €",
+      "orthodontie": "100 % BR"
+    },
+    "OPTIQUE": {
+      "verres_complexes": "0 €"
+    }
+  },
+  "source": {
+      "pdf_name": "TABLEAU DE GARANTIES BASIC' Santé.pdf",
+    "page_range": "1"
+  }
+},
+{
+        "insurer": "utwin",
+        "contract_name": "BASIC' Santé",
+        "contract_type": "Complémentaire santé",
+        "level_id": "utwin_basic_sante_formule1",
+        "level_name": "Formule 1",
+  "benefits": {
+     "HOSPITALISATION": {
+            "honoraires_chirurgien_optam": "130 % BR",
+      "chambre_particuliere": "30 €"
+    },
+      "SOINS_COURANTS": {
+      "consultation_generaliste_optam": "130 % BR"
+    },
+    "DENTAIRE": {
+      "soins_dentaires": "100 % BR",
+      "implantologie": "100 €",
+      "orthodontie": "100 % BR"
+    },
+    "OPTIQUE": {
+      "verres_complexes": "100 % BR"
+    }
+  
+  },
+  "source": {
+      "pdf_name": "utwin_basic_sante_garanties.pdf",
+    "page_range": "1"
+  }
+},
+{
+    "insurer": "utwin",
+    "contract_name": "BASIC' Santé",
+  "contract_type": "Complémentaire santé",
+  "level_id": "utwin_basic_sante_f1ecoplus",
+  "level_name": "Formule 1 éco +",
+  "benefits": {
+       "HOSPITALISATION": {
+      "honoraires_chirurgien_optam": "100 % BR",
+      "chambre_particuliere": "0 €"
+    },
+    
+    "SOINS_COURANTS": {
+      "consultation_generaliste_optam": "100 % BR"
+    },
+    "DENTAIRE": {
+      "soins_dentaires": "100 % BR",
+      "implantologie": "0 €",
+      "orthodontie": "100 % BR"
+    },
+    "OPTIQUE": {
+      "verres_complexes": "100 % BR"
+   
+  },
+  "source": {
+    "pdf_name": "utwin_garanties_basic_sante.pdf",
+    "page_range": "all"
+  }
+}
+},
+{
+    "insurer": "utwin",
+    "contract_name": "BASIC' Santé",
+  "contract_type": "Complémentaire santé",
+  "level_id": "basic_sante_formule_1_plus",
+  "level_name": "Formule 1 +",
+  "benefits": {
+     "HOSPITALISATION": {
+            "honoraires_chirurgien_optam": "130 % BR",
+      "chambre_particuliere": "30 €"
+    },
+    "SOINS_COURANTS": {
+      "consultation_generaliste_optam": "130 % BR"
+    },
+    "DENTAIRE": {
+       "soins_dentaires": "100 % BR",
+      "implantologie": "100 €",
+      "orthodontie": "100 % BR"
+    },
+   
+    "OPTIQUE": {
+      "verres_complexes": "100 % BR"
+    }
+  },
+  "source": {
+        "pdf_name": "Tableau de Garanties BASIC' Santé.pdf",
+    "page_range": "1"
+  }
+},
+{ 
+   "insurer": "utwin",
+   "contract_name": "BASIC' Santé",
+  "contract_type": "Complémentaire santé",
+  "level_id": "basic_sante_formule_2_eco",
+  "level_name": "Formule 2 éco",
+  "benefits": {
+     "HOSPITALISATION": {
+      "honoraires_chirurgien_optam": "130 % BR",
+      "chambre_particuliere": "30 €"
+    },
+     "SOINS_COURANTS": {
+      "consultation_generaliste_optam": "130 % BR"
+    },
+    "DENTAIRE": {
+      "soins_dentaires": "100 % BR",
+      "implantologie": "100 €",
+      "orthodontie": "100 % BR"
+    },
+   
+    "OPTIQUE": {
+      "verres_complexes": null
+    }
+  },
+  "source": {
+    "pdf_name": "utwin_basic_sante.pdf",
+    "page_range": "all"
+  }
+},
+{
+  "benefits": {
+    "DENTAIRE": {
+      "implantologie": "300 €",
+      "orthodontie": "300 % BR",
+      "soins_dentaires": "200 % BR"
+    },
+    "HOSPITALISATION": {
+      "chambre_particuliere": "70 €",
+      "honoraires_chirurgien_optam": "250 % BR"
+    },
+    "OPTIQUE": {
+      "verres_complexes": "100 % BR"
+    },
+    "SOINS_COURANTS": {
+      "consultation_generaliste_optam": "200 % BR"
+    }
+  },
+  "contract_name": "BASIC' Santé",
+  "contract_type": "Complémentaire santé",
+  "insurer": "utwin",
+  "level_id": "utwin_basic_sante_formule2",
+  "level_name": "Formule 2",
+  "source": {
+    "page_range": "1",
+    "pdf_name": "TABLEAU DE GARANTIES BASIC' Santé.pdf"
+  }
+},
+{
+    "insurer": "utwin",
+    "contract_name": "BASIC' Santé",
+  "contract_type": "Complémentaire santé",
+  "level_id": "utwin_basic_sante_formule_2_eco_plus",
+  "level_name": "Formule 2 éco +",
+  "benefits": {
+        "HOSPITALISATION": {
+                "honoraires_chirurgien_optam": "130 % BR",
+      "chambre_particuliere": "30 €"
+    },
+       "SOINS_COURANTS": {
+      "consultation_generaliste_optam": "130 % BR"
+    },
+    "DENTAIRE": {
+            "soins_dentaires": "150 % BR",
+      "implantologie": "100 €",
+      "orthodontie": "200 % BR"
+    },
+
+    "OPTIQUE": {
+      "verres_complexes": "100 % BR"
+    }
+ 
+  },
+  "source": {
+    "pdf_name": "utwin_basic_sante.pdf",
+    "page_range": "all"
+  }
+},
+{
+  "benefits": {
+    "DENTAIRE": {
+      "implantologie": "100 €",
+      "orthodontie": "200 % BR",
+      "soins_dentaires": "150 % BR"
+    },
+    "HOSPITALISATION": {
+      "chambre_particuliere": "30 €",
+      "honoraires_chirurgien_optam": "130 % BR"
+    },
+    "OPTIQUE": {
+      "verres_complexes": "100 % BR"
+    },
+    "SOINS_COURANTS": {
+      "consultation_generaliste_optam": "130 % BR"
+    }
+  },
+  "contract_name": "BASIC' Santé",
+  "contract_type": "Complémentaire santé",
+  "insurer": "utwin",
+  "level_id": "basic_sante_formule_2_plus",
+  "level_name": "Formule 2 +",
+  "source": {
+    "page_range": "all",
+    "pdf_name": "contrat.pdf"
+  }
+},
+{
+  "contract_name": "BASIC' Santé",
+  "contract_type": "Complémentaire santé",
+  "insurer": "utwin",
+  "level_id": "basic_sante_formule_3_eco",
+  "level_name": "Formule 3 éco",
+  "benefits": {
+   
+    "HOSPITALISATION": {
+       "honoraires_chirurgien_optam": "160 % BR",
+      "chambre_particuliere": "50 €"
+    },
+        "SOINS_COURANTS": {
+      "consultation_generaliste_optam": "160 % BR"
+    },
+     "DENTAIRE": {
+      "soins_dentaires": "150 % BR",
+      "implantologie": "300 €",
+      "orthodontie": "200 % BR"
+    },
+    "OPTIQUE": {
+      "verres_complexes": "100%"
+    }
+
+  },
+  "source": {
+    "pdf_name": "utwin_basic_sante.pdf",
+    "page_range": "all"
+  }
+},
+{
+  "contract_name": "BASIC' Santé",
+  "contract_type": "Complémentaire santé",
+  "insurer": "utwin",
+  "level_id": "utwin_basic_sante_formule3",
+  "level_name": "Formule 3",
+  "benefits": {
+      "HOSPITALISATION": {
+      "honoraires_chirurgien_optam": "160 % BR",
+      "chambre_particuliere": "50 €"
+    },
+     "SOINS_COURANTS": {
+      "consultation_generaliste_optam": "160 % BR"
+    },
+    "DENTAIRE": {
+            "soins_dentaires": "200 % BR",
+      "implantologie": "300 €",
+      "orthodontie": "300 % BR"
+    },
+
+    "OPTIQUE": {
+      "verres_complexes": "100 % BR"
+    }
+   
+  },
+  "source": {
+    "pdf_name": "TABLEAU DE GARANTIES BASIC' Santé.pdf",
+    "page_range": "1"
+  }
+},
+{
+   "contract_name": "BASIC' Santé",
+  "contract_type": "Complémentaire santé",
+  "insurer": "utwin",
+  "level_id": "utwin_basic_sante_formule_3_eco_plus",
+  "level_name": "Formule 3 éco +",
+  "benefits": {
+        "HOSPITALISATION": {
+      "honoraires_chirurgien_optam": "160 % BR",
+      "chambre_particuliere": "50 €"
+    },
+    "SOINS_COURANTS": {
+      "consultation_generaliste_optam": "160 % BR"
+    },  
+    "DENTAIRE": {
+      "soins_dentaires": "150 % BR",
+      "implantologie": "100 €",
+      "orthodontie": "200 % BR"
+    },
+    "OPTIQUE": {
+      "verres_complexes": "100 % BR"
+    }
+  },
+  "source": {
+    "pdf_name": "TABLEAU DE GARANTIES BASIC' Santé.pdf",
+    "page_range": "all"
+  }
+},
+{     
+  "insurer": "utwin",
+  "contract_name": "BASIC' Santé",
+  "contract_type": "Complémentaire santé",
+  "level_id": "utwin_basic_sante_formule_3_plus",
+  "level_name": "Formule 3 +",
+  "benefits": {
+      "HOSPITALISATION": {
+      "honoraires_chirurgien_optam": "250 % BR",
+      "chambre_particuliere": "70 €"
+    },
+     "SOINS_COURANTS": {
+      "consultation_generaliste_optam": "250 % BR"
+    },
+    "DENTAIRE": {
+      "soins_dentaires": "200 % BR",
+      "implantologie": "300 €",
+      "orthodontie": "300 % BR"
+    },
+
+    "OPTIQUE": {
+      "verres_complexes": "100 % BR"
+    }
+   
+  },
+
+  "source": {
+   "pdf_name": "TABLEAU DE GARANTIES BASIC' Santé.pdf",
+    "page_range": "all"
+  }
+},
+{
+    "insurer": "APRIL",
+    "contract_name": "Santé Pro Start",
+  "contract_type": "Complémentaire santé",
+  "level_id": "sante_pro_start_april_formule1",
+  "level_name": "FORMULE 1",
+  "benefits": {
+      "HOSPITALISATION": {
+      "honoraires_chirurgien_optam": "100 % BR",
+      "chambre_particuliere": "30 €"
+    },
+     "SOINS_COURANTS": {
+      "consultation_generaliste_optam": "100 % BR"
+    },
+    "DENTAIRE": {
+      "soins_dentaires": "100 % BR",
+      "implantologie": "100 €",
+      "orthodontie": "125 % BR"
+    },
+  
+    "OPTIQUE": {
+      "verres_complexes": "200 €"
+    }
+   
+  },
+   "source": {
+        "pdf_name": "sante_pro_start_april.pdf",
+    "page_range": "3-4"
+  }
+
+},
+{
+    "insurer": "APRIL",
+   "contract_name": "Santé Pro Start",
+  "contract_type": "Complémentaire santé",
+  "level_id": "sante_pro_start_formule2",
+  "level_name": "FORMULE 2",
+  "benefits": {
+     "HOSPITALISATION": {
+      "honoraires_chirurgien_optam": "150 % BR",
+      "chambre_particuliere": "50 €"
+    },
+    "SOINS_COURANTS": {
+      "consultation_generaliste_optam": "150 % BR"
+    },
+    "DENTAIRE": {
+      "soins_dentaires": "150 % BR",
+      "implantologie": "150 €",
+      "orthodontie": "150 % BR"
+    },
+    "OPTIQUE": {
+      "verres_complexes": "250 €"
+    }
+    
+  },
+  "source": {
+    "pdf_name": "Garanties_Sante_Pro_Start_APRIL.pdf",
+    "page_range": "3-4"
+  }
+},
+{
+    "insurer": "APRIL",
+  "contract_name": "Santé Pro Start APRIL",
+  "contract_type": "Complémentaire santé",
+  "level_id": "sante_pro_start_formule_3",
+  "level_name": "FORMULE 3",
+  "benefits": {
+      "HOSPITALISATION": {
+      "honoraires_chirurgien_optam": "200 % BR",
+       "chambre_particuliere": "60 €"
+
+    },
+    "SOINS_COURANTS": {
+      "consultation_generaliste_optam": "200 % BR"
+    },
+    "DENTAIRE": {
+      "soins_dentaires": "200 % BR",
+      "implantologie": "200 €",
+      "orthodontie": "175 % BR"
+    },
+  
+    "OPTIQUE": {
+      "verres_complexes": "325 €"
+    }
+  },
+  "source": {
+   "pdf_name": "april-sante-pro-start.pdf",
+    "page_range": "3-4"
+  }
+},
+{
+    "insurer": "APRIL",
+    "contract_name": "Santé Pro Start",
+  "contract_type": "Complémentaire santé",
+  "level_id": "april_sante_pro_start_4",
+  "level_name": "Formule 4",
+  "benefits": {
+      "HOSPITALISATION": {
+      "honoraires_chirurgien_optam": "350 % BR",
+      "chambre_particuliere": "100 €"
+    },
+    "SOINS_COURANTS": {
+      "consultation_generaliste_optam": "350 % BR"
+    },
+    "DENTAIRE": {
+            "soins_dentaires": "350 % BR",
+      "implantologie": "400 €",
+      "orthodontie": "325 % BR"
+    },
+  
+    "OPTIQUE": {
+      "verres_complexes": "500 €"
+    }
+    
+  },
+
+  "source": {
+        "pdf_name": "Garanties Sante Pro Start APRIL.pdf",
+    "page_range": "3-5"
+  }
+},
+{
+    "insurer": "APRIL",
+    "contract_name": "Santé Pro Start",
+  "contract_type": "Complémentaire santé",
+  "level_id": "sante_pro_start_5",
+  "level_name": "FORMULE 5",
+  "benefits": {
+       "HOSPITALISATION": {
+      "honoraires_chirurgien_optam": "400 % BR",
+      "chambre_particuliere": "110 €"
+    },
+     "SOINS_COURANTS": {
+      "consultation_generaliste_optam": "400 % BR"
+    },
+    "DENTAIRE": {
+      "soins_dentaires": "400 % BR",
+      "implantologie": "425 €",
+      "orthodontie": "375 % BR"
+    },
+ 
+    "OPTIQUE": {
+      "verres_complexes": "450 €"
+    }
+   
+  },
+  "source": {
+    "page_range": "3-5",
+    "pdf_name": "Sante_Pro_Start_APRIL.pdf"
+  }
+},
+{
+    "insurer": "2MA",
+    "contract_name": "2MA Privilège",
+  "contract_type": "Complémentaire santé",
+  "level_id": "2ma_privilege_niv1",
+  "level_name": "Niveau 1",
+  "benefits": {
+       "HOSPITALISATION": {
+      "honoraires_chirurgien_optam": "100 % BR",
+      "chambre_particuliere": "0 €"
+    },
+       "SOINS_COURANTS": {
+      "consultation_generaliste_optam": "100 % BR"
+    },
+    "DENTAIRE": {
+      "soins_dentaires": "100 % BR",
+      "implantologie": "0 €",
+      "orthodontie": "100 % BR"
+    },
+ 
+    "OPTIQUE": {
+      "verres_complexes": "100 % BR"
+    }
+ 
+  },
+  "source": {
+    "pdf_name": "2MA_Privilege.pdf",
+    "page_range": "all"
+  }
+},
+{
+    "insurer": "2MA",
+    "contract_name": "2MA Privilège",
+  "contract_type": "Complémentaire santé",
+  "level_id": "2ma_privilege_niv2",
+  "level_name": "Niveau 2",
+  "benefits": {
+    "HOSPITALISATION": {
+      "honoraires_chirurgien_optam": "125 % BR",
+      "chambre_particuliere": "45 €"
+    },
+      "SOINS_COURANTS": {
+      "consultation_generaliste_optam": "100 % BR"
+    },
+    "DENTAIRE": {
+      "soins_dentaires": "100 % BR",
+      "implantologie": "100 €",
+      "orthodontie": "100 % BR"
+    },
+    
+    "OPTIQUE": {
+      "verres_complexes": "100 €"
+    }
+  },
+  "source": {
+    "pdf_name": "2MA_Privilege.pdf",
+    "page_range": "all"
+  }
+},
+{
+  "insurer": "2MA",
+  "contract_name": "Privilège",
+  "contract_type": "Complémentaire santé",
+  "level_id": "2ma_privilege_niv3",
+  "level_name": "Niveau 3",
+  "benefits": {
+       "HOSPITALISATION": {
+      "honoraires_chirurgien_optam": "150 % BR",
+      "chambre_particuliere": "60 €"
+    },
+    "SOINS_COURANTS": {
+      "consultation_generaliste_optam": "125 % BR"
+    },
+    "DENTAIRE": {
+      "soins_dentaires": "125 % BR",
+      "implantologie": "250 €",
+      "orthodontie": "150 % BR"
+    },
+ 
+    "OPTIQUE": {
+      "verres_complexes": "350 €"
+    }
+    
+  },
+  
+  "source": {
+    "pdf_name": "2MA_Privilege.pdf",
+    "page_range": "all"
+  }
+},
+{
+    "insurer": "2MA",
+   "contract_name": "2MA Privilège",
+  "contract_type": "Complémentaire santé",
+  "level_id": "2ma_privilege_niv4",
+  "level_name": "Niveau 4",
+  "benefits": {
+    "HOSPITALISATION": {
+     "honoraires_chirurgien_optam": "175 % BR",
+      "chambre_particuliere": "60 €"
+    },
+     "SOINS_COURANTS": {
+      "consultation_generaliste_optam": "150 % BR"
+    },
+    "DENTAIRE": {
+      "soins_dentaires": "150 % BR",
+      "implantologie": "200 €",
+      "orthodontie": "100 % BR"
+    },
+    
+    "OPTIQUE": {
+      "verres_complexes": "300 €"
+    }
+  },
+  "source": {
+    "pdf_name": "2MA Privilège.pdf",
+    "page_range": "all"
+  }
+},
+{  
+    "insurer": "2MA",
+  "contract_name": "2MA Privilège",
+  "contract_type": "Complémentaire santé",
+  "level_id": "2ma_privilege_niv5",
+  "level_name": "Niveau 5",
+  "benefits": {
+     "HOSPITALISATION": {
+      "chambre_particuliere": "70 €",
+      "honoraires_chirurgien_optam": "200 % BR"
+    },
+     "SOINS_COURANTS": {
+      "consultation_generaliste_optam": "175 % BR"  
+     },
+    "DENTAIRE": {
+      "soins_dentaires": "175 % BR",
+      "implantologie": "250 €",
+      "orthodontie": "150 % BR"
+    },
+    "OPTIQUE": {
+      "verres_complexes": "300 €"
+    }
+    },
+  "source": {
+    "pdf_name": "2MA Privilège.pdf",
+    "page_range": "all"
+  }
+},
+{
+  "insurer": "2MA",
+  "contract_name": "2MA Privilège",
+  "contract_type": "Complémentaire santé",
+  "level_id": "2ma_privilege_niv6",
+  "level_name": "Niveau 6",
+  "benefits": {
+       "HOSPITALISATION": {
+      "honoraires_chirurgien_optam": "250 % BR",
+      "chambre_particuliere": "85 €"
+    },
+    "SOINS_COURANTS": {
+      "consultation_generaliste_optam": "200 % BR"
+    },
+    "DENTAIRE": {
+      "soins_dentaires": "200 % BR",
+      "implantologie": "300 €",
+      "orthodontie": "150 % BR"
+    },
+ 
+    "OPTIQUE": {
+      "verres_complexes": "350 €"
+    }
+    
+  },
+  "source": {
+    "pdf_name": "2MA Privilège.pdf",
+    "page_range": "all"
+  }
+},
+{
+    "insurer": "2MA",
+    "contract_name": "2MA Privilège",
+  "contract_type": "Complémentaire santé",
+  "level_id": "2ma_privilege_niv7",
+  "level_name": "Niveau 7",
+  "benefits": {
+    "DENTAIRE": {
+      "soins_dentaires": "250 % BR",
+      "implantologie": "350 €",
+      "orthodontie": "150 % BR"
+    },
+    "HOSPITALISATION": {
+      "honoraires_chirurgien_optam": "300 % BR",
+      "chambre_particuliere": "100 €"
+    },
+     "SOINS_COURANTS": {
+      "consultation_generaliste_optam": "250 % BR"
+    },
+    "OPTIQUE": {
+      "verres_complexes": "400 €"
+    }
+  },
+  "source": {
+    "pdf_name": "2MA_Privilege.pdf",
+    "page_range": "all"
+  }
+},
+{ 
+    "insurer": "2MA",
+   "contract_name": "2MA Privilège",
+  "contract_type": "Complémentaire santé",
+  "level_id": "2ma_privilege_niv8",
+  "level_name": "Niveau 8",
+  "benefits": {
+    "HOSPITALISATION": {
+      "honoraires_chirurgien_optam": "350 % BR",
+      "chambre_particuliere": "100 € / jour"
+    },
+    "SOINS_COURANTS": {
+      "consultation_generaliste_optam": "300 % BR"
+    },
+    "DENTAIRE": {
+      "soins_dentaires": "300 % BR",
+      "implantologie": "400 €",
+      "orthodontie": "100 % BR"
+    },
+    
+    "OPTIQUE": {
+      "verres_complexes": "500 €"
+    }
+    
+  },
+
+  "source": {
+    "pdf_name": "2MA Privilège.pdf",
+    "page_range": "all"
+  }
+},
+{
+    "insurer": "2MA",
+   "contract_name": "2MA Essentiel",
+  "contract_type": "Complémentaire santé",
+  "level_id": "2ma_essentiel_niv1",
+  "level_name": "Niveau 1",
+  "benefits": {
+    
+       "HOSPITALISATION": {
+    "honoraires_chirurgien_optam": "125 % BR",
+   "chambre_particuliere": "0 €"
+    },
+        "SOINS_COURANTS": {
+      "consultation_generaliste_optam": "100 % BR"
+    },
+    "DENTAIRE": {
+       "soins_dentaires": "100 % BR",
+      "implantologie": "0 €",
+      "orthodontie": "100 % BR"
+    },
+    "OPTIQUE": {
+      "verres_complexes": "100 % BR"
+    }
+
+  },
+ 
+  "source": {
+    "pdf_name": "2MA Essentiel.pdf",
+    "page_range": "all"
+  }
+},
+{
+   "insurer": "2MA",
+  "contract_name": "2MA Essentiel",
+  "contract_type": "Complémentaire santé",
+  "level_id": "2ma_essentiel_niv2",
+  "level_name": "Niveau 2",
+  "benefits": {
+     "HOSPITALISATION": {
+       "honoraires_chirurgien_optam": "140 % BR",
+      "chambre_particuliere": "30 €"
+    },
+    "SOINS_COURANTS": {
+      "consultation_generaliste_optam": "125 % BR"
+    },
+    "DENTAIRE": {
+      "soins_dentaires": "100 % BR",
+      "implantologie": "150 % BR",
+      "orthodontie": "125 % BR"
+    },
+   
+    "OPTIQUE": {
+      "verres_complexes": "150 €"
+    }
+    
+  },
+  
+  "source": {
+    "pdf_name": "2MA Essentiel.pdf",
+    "page_range": "all"
+  }
+},
+{ 
+   "insurer": "2MA",
+    "contract_name": "2MA Essentiel",
+  "contract_type": "Complémentaire santé",
+  "level_id": "2ma_essentiel_niv3",
+  "level_name": "Niveau 3",
+  "benefits": {
+    "HOSPITALISATION": {
+      "honoraires_chirurgien_optam": "170 % BR",
+      "chambre_particuliere": "55 €"
+      
+    },
+     "SOINS_COURANTS": {
+      "consultation_generaliste_optam": "125 % BR"
+    },
+    "DENTAIRE": {
+      "soins_dentaires": "100 % BR",
+      "implantologie": "175 % BR",
+      "orthodontie": "175 % BR"
+    },
+    
+    "OPTIQUE": {
+      "verres_complexes": "250 €"
+    }
+  },
+  "source": {
+    "pdf_name": "2MA_Essentiel.pdf",
+    "page_range": "all"
+  }
+},
+{
+    "insurer": "2MA",
+    "contract_name": "2MA Essentiel",
+  "contract_type": "Complémentaire santé",
+  "level_id": "2ma_essentiel_niv4",
+  "level_name": "Niveau 4",
+  "benefits": {
+        "HOSPITALISATION": {
+       "honoraires_chirurgien_optam": "200 % BR",
+      "chambre_particuliere": "60 €"
+    },
+    "SOINS_COURANTS": {
+      "consultation_generaliste_optam": "175 % BR"
+    },
+    "DENTAIRE": {
+      "soins_dentaires": "100 % BR",
+      "implantologie": "250 % BR",
+      "orthodontie": "250 % BR"
+    },
+
+    "OPTIQUE": {
+      "verres_complexes": "175 €"
+    }
+    
+  },
+  "source": {
+    "pdf_name": "2MA Essentiel.pdf",
+    "page_range": "all"
+  }
+},
+{
+  "insurer": "Generali",
+  "contract_name": "TNS SANTÉ SUP Socle",
+  "contract_type": "Complémentaire santé",
+  "level_id": "tns_sante_sup_1",
+  "level_name": "Formule TNSR 1",
+  "benefits": {
+    "HOSPITALISATION": {
+      "honoraires_chirurgien_optam": "100 % BRSS",
+      "chambre_particuliere": "51 €"
+    },
+    "SOINS_COURANTS": {
+      "consultation_generaliste_optam": "100 % BRSS"
+    },
+    "DENTAIRE": {
+      "soins_dentaires": "100 % BRSS",
+      "implantologie": "130 % BRSS",
+      "orthodontie": "150 % BRSS"
+    },
+   
+    "OPTIQUE": {
+      "verres_complexes": "190 €"
+    }
+  },
+  "source": {
+    "page_range": "all",
+    "pdf_name": "TNS_SANTE_SUP_Generali.pdf"
+  }
+},
+{
+  "insurer": "Generali",
+  "contract_name": "TNS SANTÉ SUP Socle",
+  "contract_type": "Complémentaire santé",
+  "level_id": "tns_sante_sup_tnsr2",
+  "level_name": "Formule TNSR 2",
+  "benefits": {
+    "HOSPITALISATION": {
+      "honoraires_chirurgien_optam": "150 % BRSS",
+      "chambre_particuliere": "4 % PMSS"
+        },
+    "DENTAIRE": {
+      "soins_dentaires": "200 % BRSS",
+      "implantologie": "8 % PMSS",
+      "orthodontie": "200 % BRSS"
+    },
+ 
+    "OPTIQUE": {
+      "verres_complexes": "560 €"
+    },
+    "SOINS_COURANTS": {
+      "consultation_generaliste_optam": "200 % BRSS"
+    }
+  },
+
+  "source": {
+    "page_range": "all",
+    "pdf_name": "TNS_SANTE_SUP_Generali.pdf"
+  }
+},
+{
+  "insurer": "Generali",
+  "contract_name": "TNS SANTÉ SUP Socle",
+  "contract_type": "Complémentaire santé",
+  "level_id": "tns_sante_sup_tnsr3",
+  "level_name": "Formule TNSR 3",
+  "benefits": {
+    "HOSPITALISATION": {
+      "honoraires_chirurgien_optam": "100% FR",
+      "chambre_particuliere": "5% PMSS"
+        },
+        "SOINS_COURANTS": {
+          "consultation_generaliste_optam": "250% BRSS"
+        },
+    "DENTAIRE": {
+      "soins_dentaires": "250% BRSS",
+      "implantologie": "250% BRSS",
+      "orthodontie": "250% BRSS"
+    },
+  
+    "OPTIQUE": {
+      "verres_complexes": "600 €"
+    }
+  },
+  "source": {
+    "page_range": "all",
+    "pdf_name": "TNS SANTÉ SUP Generali.pdf"
+  }
+},
+{
+  "insurer": "Generali",
+  "contract_name": "TNS SANTÉ SUP Socle",
+  "contract_type": "Complémentaire santé",
+  "level_id": "generali_tns_sante_sup_tnsr4",
+  "level_name": "Formule TNSR 4",
+  "benefits": {
+    "HOSPITALISATION": {
+      "honoraires_chirurgien_optam": "100 % FR",
+      "chambre_particuliere": "196,25 €"
+    },
+    "SOINS_COURANTS": {
+      "consultation_generaliste_optam": "300 % BRSS"
+    },
+    "DENTAIRE": {
+      "soins_dentaires": "350 % BRSS",
+      "implantologie": "350 % BRSS",
+      "orthodontie": "300 % BRSS"
+    },  
+    "OPTIQUE": {
+      "verres_complexes": "600 €"
+    }
+  
+  },
+  "source": {
+    "page_range": "all",
+    "pdf_name": "Generali_TNS_Sante_Sup.pdf"
+  }
+},
+{
+  "insurer": "Generali",
+  "contract_name": "TNS SANTÉ SUP Socle",
+  "contract_type": "Complémentaire santé",
+  "level_id": "generali_tns_sante_sup_tnsr5",
+  "level_name": "Formule TNSR 5",
+  "benefits": {
+    "HOSPITALISATION": {
+      "honoraires_chirurgien_optam": "100 % FR",
+      "chambre_particuliere": "171.4 €"
+    },
+    "SOINS_COURANTS": {
+      "consultation_generaliste_optam": "100 % FR"
+    },
+    "DENTAIRE": {
+      "soins_dentaires": "500 % BRSS",
+      "implantologie": "1028.4 €",
+      "orthodontie": "400 % BRSS"
+    },
+    
+    "OPTIQUE": {
+      "verres_complexes": "700 €"
+    }
+  },
+  "source": {
+    "page_range": "all",
+    "pdf_name": "generali_tns_sante_sup.pdf"
+  }
+},
+{
+  "insurer": "Generali",
+  "contract_name": "TNS SANTÉ SUP Sur-complémentaire",
+  "contract_type": "Complémentaire santé",
+  "level_id": "tnsnr_1",
+  "level_name": "Formule TNSNR 1",
+  "benefits": {
+    "DENTAIRE": {},
+    "HOSPITALISATION": {
+      "honoraires_chirurgien_optam": "150 % BRSS"
+    },
+    "OPTIQUE": {},
+    "SOINS_COURANTS": {
+      "consultation_generaliste_optam": "150 % BRSS"
+    }
+  },
+  "source": {
+    "page_range": "1",
+    "pdf_name": "generali_tns_sante_sup.pdf"
+  }
+},
+{
+  "insurer": "Generali",
+  "contract_name": "TNS SANTÉ SUP Sur-complémentaire",
+  "contract_type": "Complémentaire santé",
+  "level_id": "generali_tns_sante_sup_tnsnr2",
+  "level_name": "Formule TNSNR 2",
+  "benefits": {
+    "HOSPITALISATION": {
+      "honoraires_chirurgien_optam": "250 % BRSS"
+    },
+    "SOINS_COURANTS": {
+      "consultation_generaliste_optam": "230 % BRSS"
+    }
+  },
+  "source": {
+    "page_range": "1",
+    "pdf_name": "TNS_SANTE_SUP_Generali.pdf"
+  }
+},
+{ 
+  "contract_name": "TNS SANTÉ SUP Sur-complémentaire" ,
+"contract_type": "Sur-complémentaire",
+"insurer": "GENERALI",
+"level_id": "tns_sante_sup_niv3",
+"level_name": "Formule TNSNR 3",
+   "benefits": {
+  "DENTAIRE": {},
+  "HOSPITALISATION": {
+    "honoraires_chirurgien_optam": "250 % BRSS"
+  },
+  "OPTIQUE": {},
+  "SOINS_COURANTS": {
+    "consultation_generaliste_optam": "250 % BRSS"
+  }
+},
+"source": {
+  "page_range": "all",
+  "pdf_name": "TNS SANTE SUP Generali.pdf"
+}
+},
+{
+  "insurer": "Generali",
+  "contract_name": "TNS SANTÉ SUP Sur-complémentaire",
+  "contract_type": "Complémentaire santé",
+  "level_id": "generali_tns_sante_sup_tnsnr4",
+  "level_name": "Formule TNSNR 4",
+  "benefits": {
+    "DENTAIRE": {},
+    "HOSPITALISATION": {
+      "honoraires_chirurgien_optam": "250 % BRSS"
+    },
+    "OPTIQUE": {},
+    "SOINS_COURANTS": {
+      "consultation_generaliste_optam": "250 % BRSS"
+    }
+  },
+  "source": {
+    "page_range": "all",
+    "pdf_name": "Generali_TNS_SANTE_SUP.pdf"
+  }
+},
+{
+  "insurer": "Generali",
+  "contract_name": "TNS SANTÉ SUP Sur-complémentaire",
+  "contract_type": "Sur-complémentaire",
+  "level_id": "generali_tns_sante_sup_tnsnr5",
+  "level_name": "Formule TNSNR 5",
+  "benefits": {
+    "HOSPITALISATION": {
+      "honoraires_chirurgien_optam": "300 % BRSS"
+    },
+    "SOINS_COURANTS": {
+      "consultation_generaliste_optam": "250 % BRSS"
+    }
+  },
+  "source": {
+    "page_range": "1",
+    "pdf_name": "TNS_SANTE_SUP_Generali.pdf"
+  }
+}
+  
+]

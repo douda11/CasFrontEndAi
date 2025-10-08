@@ -1,0 +1,572 @@
+.user-management {
+  padding: 1rem;
+}
+
+.card {
+  background: #ffffff;
+  border: 1px solid #e9ecef;
+  border-radius: 6px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 1px -1px rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 1px 3px 0 rgba(0,0,0,.12);
+}
+
+.text-primary {
+  color: #007ad9 !important;
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.text-3xl {
+  font-size: 1.875rem;
+}
+
+/* Filters Section Styles */
+.filters-card {
+  margin-bottom: 1.5rem;
+}
+
+.filters-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 1rem;
+  align-items: end;
+}
+
+@media (max-width: 768px) {
+  .filters-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+}
+
+/* Search Input Styling */
+.search-container {
+  position: relative;
+}
+
+.search-container .p-inputtext {
+  padding-left: 2.5rem;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  transition: all 0.2s ease;
+}
+
+.search-container .p-inputtext:focus {
+  border-color: #007ad9;
+  box-shadow: 0 0 0 2px rgba(0, 122, 217, 0.1);
+}
+
+.search-container .pi-search {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6b7280;
+  z-index: 2;
+}
+
+/* Dropdown Styling */
+::ng-deep .p-dropdown {
+  border-radius: 6px !important;
+  border: 1px solid #d1d5db !important;
+  transition: all 0.2s ease !important;
+}
+
+::ng-deep .p-dropdown:not(.p-disabled):hover {
+  border-color: #007ad9 !important;
+}
+
+::ng-deep .p-dropdown.p-focus {
+  border-color: #007ad9 !important;
+  box-shadow: 0 0 0 2px rgba(0, 122, 217, 0.1) !important;
+}
+
+::ng-deep .p-dropdown .p-dropdown-label {
+  padding: 0.75rem !important;
+  color: #374151 !important;
+}
+
+::ng-deep .p-dropdown .p-dropdown-label.p-placeholder {
+  color: #9ca3af !important;
+}
+
+/* Refresh Button Styling */
+.refresh-btn {
+  background: #f8fafc !important;
+  border: 1px solid #d1d5db !important;
+  color: #374151 !important;
+  border-radius: 6px !important;
+  padding: 0.75rem 1rem !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+}
+
+.refresh-btn:hover {
+  background: #007ad9 !important;
+  border-color: #007ad9 !important;
+  color: white !important;
+  transform: translateY(-1px);
+}
+
+.refresh-btn:active {
+  transform: translateY(0);
+}
+
+/* Filter Labels */
+.filter-label {
+  display: block;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.mb-4 {
+  margin-bottom: 1.5rem;
+}
+
+.w-full {
+  width: 100%;
+}
+
+/* Dialog Styling */
+::ng-deep .p-dialog {
+  border-radius: 12px !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+}
+
+::ng-deep .p-dialog .p-dialog-header {
+  background: linear-gradient(135deg, #007ad9 0%, #0056b3 100%) !important;
+  color: white !important;
+  border-radius: 12px 12px 0 0 !important;
+  padding: 1.5rem !important;
+}
+
+::ng-deep .p-dialog .p-dialog-title {
+  font-size: 1.25rem !important;
+  font-weight: 600 !important;
+  color: white !important;
+}
+
+::ng-deep .p-dialog .p-dialog-content {
+  padding: 2rem !important;
+  background: white !important;
+}
+
+::ng-deep .p-dialog .p-dialog-footer {
+  padding: 1.5rem 2rem !important;
+  background: #f8fafc !important;
+  border-radius: 0 0 12px 12px !important;
+  border-top: 1px solid #e2e8f0 !important;
+}
+
+/* Form Styling in Dialog */
+.dialog-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.dialog-form-grid .full-width {
+  grid-column: 1 / -1;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-label {
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.form-label .required {
+  color: #dc2626;
+}
+
+/* Input Styling in Dialog */
+::ng-deep .p-dialog .p-inputtext {
+  border: 2px solid #e5e7eb !important;
+  border-radius: 8px !important;
+  padding: 0.75rem !important;
+  font-size: 0.875rem !important;
+  transition: all 0.2s ease !important;
+}
+
+::ng-deep .p-dialog .p-inputtext:focus {
+  border-color: #007ad9 !important;
+  box-shadow: 0 0 0 3px rgba(0, 122, 217, 0.1) !important;
+}
+
+/* Dropdown Styling in Dialog */
+::ng-deep .p-dialog .p-dropdown {
+  border: 2px solid #e5e7eb !important;
+  border-radius: 8px !important;
+  transition: all 0.2s ease !important;
+}
+
+::ng-deep .p-dialog .p-dropdown:not(.p-disabled):hover {
+  border-color: #007ad9 !important;
+}
+
+::ng-deep .p-dialog .p-dropdown.p-focus {
+  border-color: #007ad9 !important;
+  box-shadow: 0 0 0 3px rgba(0, 122, 217, 0.1) !important;
+}
+
+::ng-deep .p-dialog .p-dropdown .p-dropdown-label {
+  padding: 0.75rem !important;
+  font-size: 0.875rem !important;
+  color: #374151 !important;
+}
+
+::ng-deep .p-dialog .p-dropdown .p-dropdown-label.p-placeholder {
+  color: #9ca3af !important;
+  font-style: italic !important;
+}
+
+/* Button Styling in Dialog */
+::ng-deep .p-dialog .p-button {
+  padding: 0.75rem 1.5rem !important;
+  font-weight: 500 !important;
+  border-radius: 8px !important;
+  transition: all 0.2s ease !important;
+}
+
+::ng-deep .p-dialog .p-button.p-button-text {
+  background: transparent !important;
+  border: 2px solid #e5e7eb !important;
+  color: #6b7280 !important;
+}
+
+::ng-deep .p-dialog .p-button.p-button-text:hover {
+  background: #f3f4f6 !important;
+  border-color: #d1d5db !important;
+}
+
+::ng-deep .p-dialog .p-button:not(.p-button-text) {
+  background: #007ad9 !important;
+  border: 2px solid #007ad9 !important;
+}
+
+::ng-deep .p-dialog .p-button:not(.p-button-text):hover {
+  background: #0056b3 !important;
+  border-color: #0056b3 !important;
+  transform: translateY(-1px) !important;
+}
+
+.flex {
+  display: flex;
+}
+
+.justify-content-between {
+  justify-content: space-between;
+}
+
+.align-items-center {
+  align-items: center;
+}
+
+.gap-2 {
+  gap: 0.5rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1rem;
+}
+
+.col-12 {
+  grid-column: span 12;
+}
+
+.col-6 {
+  grid-column: span 6;
+}
+
+.col-3 {
+  grid-column: span 3;
+}
+
+.col-4 {
+  grid-column: span 4;
+}
+
+.col-2 {
+  grid-column: span 2;
+}
+
+@media (min-width: 768px) {
+  .md\:col-4 {
+    grid-column: span 4;
+  }
+  
+  .md\:col-3 {
+    grid-column: span 3;
+  }
+  
+  .md\:col-2 {
+    grid-column: span 2;
+  }
+}
+
+.p-input-icon-left {
+  position: relative;
+}
+
+.p-input-icon-left > i {
+  position: absolute;
+  top: 50%;
+  margin-top: -0.5rem;
+  left: 0.75rem;
+  color: #6c757d;
+  z-index: 1;
+}
+
+.p-input-icon-left > input {
+  padding-left: 2.5rem;
+}
+
+.block {
+  display: block;
+}
+
+.text-900 {
+  color: #212529;
+}
+
+.font-medium {
+  font-weight: 500;
+}
+
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
+/* Custom styles for better UX */
+.user-management h1 {
+  margin: 0;
+}
+
+.p-button {
+  transition: all 0.2s;
+}
+
+.p-button:hover {
+  transform: translateY(-1px);
+}
+
+.p-tag {
+  font-weight: 500;
+}
+
+.p-table .p-datatable-tbody > tr > td {
+  padding: 0.75rem;
+  vertical-align: middle;
+}
+
+.p-table .p-datatable-thead > tr > th {
+  padding: 0.75rem;
+  font-weight: 600;
+  background-color: #f8f9fa;
+}
+
+.p-dialog .p-dialog-content {
+  padding: 1.5rem;
+}
+
+.p-dialog .p-dialog-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #dee2e6;
+}
+
+/* Enhanced User Dialog Styles */
+::ng-deep .user-dialog .p-dialog-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  color: white !important;
+  border-radius: 12px 12px 0 0 !important;
+  padding: 1.5rem 2rem !important;
+  font-size: 1.1rem !important;
+  font-weight: 600 !important;
+}
+
+::ng-deep .user-dialog .p-dialog-content {
+  padding: 2rem !important;
+  background: #ffffff !important;
+}
+
+::ng-deep .user-dialog .p-dialog-footer {
+  padding: 1.5rem 2rem !important;
+  background: #f8f9fa !important;
+  border-top: 1px solid #e9ecef !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+  gap: 1rem !important;
+}
+
+/* User Form Layout */
+.user-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-row {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.form-field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-field.full-width {
+  flex: 1 1 100%;
+}
+
+.field-label {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+}
+
+/* Enhanced Form Input Styles */
+::ng-deep .user-dialog .form-input {
+  width: 100% !important;
+  padding: 0.875rem 1rem !important;
+  border: 2px solid #e9ecef !important;
+  border-radius: 8px !important;
+  font-size: 0.95rem !important;
+  transition: all 0.3s ease !important;
+  background: #ffffff !important;
+}
+
+::ng-deep .user-dialog .form-input:focus {
+  border-color: #667eea !important;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
+  outline: none !important;
+}
+
+::ng-deep .user-dialog .form-input::placeholder {
+  color: #6c757d !important;
+  font-style: italic !important;
+}
+
+/* Enhanced Dropdown Styles */
+::ng-deep .user-dialog .form-dropdown .p-dropdown {
+  width: 100% !important;
+  border: 2px solid #e9ecef !important;
+  border-radius: 8px !important;
+  transition: all 0.3s ease !important;
+  background: #ffffff !important;
+  min-height: 3.125rem !important;
+}
+
+::ng-deep .user-dialog .form-dropdown .p-dropdown:not(.p-disabled):hover {
+  border-color: #667eea !important;
+}
+
+::ng-deep .user-dialog .form-dropdown .p-dropdown:not(.p-disabled).p-focus {
+  border-color: #667eea !important;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
+}
+
+::ng-deep .user-dialog .form-dropdown .p-dropdown-label {
+  padding: 0.875rem 1rem !important;
+  font-size: 0.95rem !important;
+}
+
+::ng-deep .user-dialog .form-dropdown .p-dropdown-label.p-placeholder {
+  color: #6c757d !important;
+  font-style: italic !important;
+}
+
+/* Fix dropdown panel visibility and scrolling */
+::ng-deep .user-dialog .p-dropdown-panel {
+  z-index: 9999 !important;
+  max-height: 200px !important;
+  overflow-y: auto !important;
+  border: 1px solid #e9ecef !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+}
+
+::ng-deep .user-dialog .p-dropdown-items {
+  max-height: 180px !important;
+  overflow-y: auto !important;
+}
+
+::ng-deep .user-dialog .p-dropdown-item {
+  padding: 0.75rem 1rem !important;
+  font-size: 0.95rem !important;
+  transition: background-color 0.2s ease !important;
+}
+
+::ng-deep .user-dialog .p-dropdown-item:hover {
+  background-color: #f8f9fa !important;
+}
+
+::ng-deep .user-dialog .p-dropdown-item.p-highlight {
+  background-color: #667eea !important;
+  color: white !important;
+}
+
+/* Ensure dialog doesn't clip dropdown */
+::ng-deep .user-dialog .p-dialog {
+  overflow: visible !important;
+}
+
+::ng-deep .user-dialog .p-dialog-content {
+  overflow: visible !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .user-management {
+    padding: 0.5rem;
+  }
+  
+  .card {
+    padding: 1rem;
+  }
+  
+  .text-3xl {
+    font-size: 1.5rem;
+    line-height: 2rem;
+  }
+  
+  .flex {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .justify-content-between {
+    justify-content: flex-start;
+  }
+  
+  .form-row {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  ::ng-deep .user-dialog .p-dialog-content {
+    padding: 1.5rem !important;
+  }
+  
+  ::ng-deep .user-dialog .p-dialog-footer {
+    padding: 1rem 1.5rem !important;
+    flex-direction: column !important;
+  }
+}
